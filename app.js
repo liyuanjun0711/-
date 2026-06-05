@@ -1,10 +1,8 @@
 const data = window.MARKET_BRIEFING_DATA || {};
 
-const text = (value, fallback = "--") => value ?? fallback;
-
 function setText(id, value) {
   const node = document.getElementById(id);
-  if (node) node.textContent = text(value);
+  if (node) node.textContent = value || "--";
 }
 
 function pctClass(value) {
@@ -19,40 +17,23 @@ function renderMetrics() {
   (data.metrics || []).forEach((item) => {
     const box = document.createElement("div");
     box.className = "metric";
-    box.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong>`;
+    box.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong><small>${item.note || ""}</small>`;
     wrap.appendChild(box);
   });
 }
 
 function renderDecisions() {
   const wrap = document.getElementById("decisionGrid");
-  if (!wrap) return;
   wrap.innerHTML = "";
   (data.decisions || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = `decision-card ${item.tone || ""}`;
+    box.className = `decision-card ${item.tone || "hold"}`;
     box.innerHTML = `
       <span class="label">${item.type}</span>
       <strong>${item.title}</strong>
       <p>${item.action}</p>
-      <p><strong>触发：</strong>${item.trigger}</p>
-      <p><strong>不触发：</strong>${item.fallback}</p>
-    `;
-    wrap.appendChild(box);
-  });
-}
-
-function renderNews() {
-  const wrap = document.getElementById("newsList");
-  wrap.innerHTML = "";
-  (data.marketRadar || []).forEach((item) => {
-    const box = document.createElement("article");
-    box.className = `news-item ${item.type || "neutral"}`;
-    box.innerHTML = `
-      <span class="tag">${item.impact || "观察"}</span>
-      <h3>${item.title}</h3>
-      <p>${item.summary}</p>
-      <p><strong>行动：</strong>${item.action}</p>
+      <p><b>触发：</b>${item.trigger}</p>
+      <p><b>不触发：</b>${item.fallback}</p>
     `;
     wrap.appendChild(box);
   });
@@ -64,7 +45,7 @@ function renderActions() {
   (data.actions || []).forEach((item) => {
     const card = document.createElement("article");
     const priceClass = pctClass(item.changePct || 0);
-    card.className = "action-card";
+    card.className = `action-card ${item.tone || ""}`;
     card.innerHTML = `
       <div class="action-top">
         <div>
@@ -80,7 +61,8 @@ function renderActions() {
       <dl>
         <div><dt>触发</dt><dd>${item.trigger}</dd></div>
         <div><dt>手数</dt><dd>${item.lots}</dd></div>
-        <div><dt>不触发</dt><dd>${item.fallback}</dd></div>
+        <div><dt>没到价</dt><dd>${item.fallback}</dd></div>
+        <div><dt>把握度</dt><dd>${item.confidence || "中"}</dd></div>
         ${item.liveMeta ? `<div><dt>实时</dt><dd>${item.liveMeta}</dd></div>` : ""}
       </dl>
     `;
@@ -89,12 +71,12 @@ function renderActions() {
 }
 
 function inferSecid(code) {
-  return code && /^[56]/.test(code) ? `1.${code}` : `0.${code}`;
+  if (!code) return "";
+  return /^[56]/.test(code) ? `1.${code}` : `0.${code}`;
 }
 
 function setLiveStatus(message) {
-  const node = document.getElementById("liveQuoteStatus");
-  if (node) node.textContent = message;
+  setText("liveQuoteStatus", message);
 }
 
 function fetchJsonp(url, callbackName) {
@@ -137,13 +119,13 @@ async function refreshQuotes() {
       item.price = String(quote.f2);
       item.changePct = Number(quote.f3) || 0;
       item.changeText = `${item.changePct > 0 ? "+" : ""}${item.changePct.toFixed(2)}%`;
-      item.liveMeta = `开${quote.f17} 高${quote.f15} 低${quote.f16} 昨${quote.f18}`;
+      item.liveMeta = `开 ${quote.f17} / 高 ${quote.f15} / 低 ${quote.f16} / 昨 ${quote.f18}`;
     });
     renderActions();
     const now = new Date();
     setLiveStatus(`实时行情 ${now.toLocaleTimeString("zh-CN", { hour12: false })}`);
   } catch {
-    setLiveStatus("行情刷新失败，显示晨报价格");
+    setLiveStatus("行情刷新失败，显示晨报报价");
   }
 }
 
@@ -160,17 +142,16 @@ function renderRisk() {
 
 function renderOutlook() {
   const wrap = document.getElementById("outlookGrid");
-  if (!wrap) return;
   wrap.innerHTML = "";
   (data.outlooks || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = "outlook-card";
+    box.className = `outlook-card ${item.tone || ""}`;
     box.innerHTML = `
       <span class="meta">${item.bias || "观察"}</span>
       <h3>${item.name}</h3>
-      <p><strong>预期：</strong>${item.expectation}</p>
-      <p><strong>关键位：</strong>${item.levels}</p>
-      <p><strong>操作：</strong>${item.plan}</p>
+      <p><b>预期：</b>${item.expectation}</p>
+      <p><b>关键位：</b>${item.levels}</p>
+      <p><b>操作：</b>${item.plan}</p>
     `;
     wrap.appendChild(box);
   });
@@ -178,7 +159,6 @@ function renderOutlook() {
 
 function renderScenarios() {
   const wrap = document.getElementById("scenarioGrid");
-  if (!wrap) return;
   wrap.innerHTML = "";
   (data.scenarios || []).forEach((item) => {
     const box = document.createElement("article");
@@ -187,7 +167,24 @@ function renderScenarios() {
       <span class="meta">${item.probability || "情景"}</span>
       <h3>${item.title}</h3>
       <p>${item.body}</p>
-      <p><strong>动作：</strong>${item.action}</p>
+      <p><b>动作：</b>${item.action}</p>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
+function renderNews() {
+  const wrap = document.getElementById("newsList");
+  wrap.innerHTML = "";
+  (data.marketRadar || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = `news-item ${item.type || "neutral"}`;
+    box.innerHTML = `
+      <span class="tag">${item.impact || "观察"}</span>
+      <h3>${item.title}</h3>
+      <p>${item.summary}</p>
+      <p><b>行动：</b>${item.action}</p>
+      ${item.source ? `<small>${item.source}</small>` : ""}
     `;
     wrap.appendChild(box);
   });
@@ -217,7 +214,6 @@ function renderExplain() {
 
 function renderRichList(id, items, className) {
   const wrap = document.getElementById(id);
-  if (!wrap) return;
   wrap.innerHTML = "";
   (items || []).forEach((item, index) => {
     const box = className === "learning-item" ? document.createElement("details") : document.createElement("article");
@@ -232,20 +228,6 @@ function renderRichList(id, items, className) {
   });
 }
 
-function renderSources() {
-  const wrap = document.getElementById("sources");
-  wrap.innerHTML = "";
-  (data.sources || []).forEach((item) => {
-    const div = document.createElement("div");
-    if (item.href) {
-      div.innerHTML = `<a href="${item.href}" target="_blank" rel="noreferrer">${item.label}</a><span> - ${item.note || ""}</span>`;
-    } else {
-      div.textContent = `${item.label} - ${item.note || ""}`;
-    }
-    wrap.appendChild(div);
-  });
-}
-
 function setupSegments() {
   document.querySelectorAll(".segment button").forEach((button) => {
     button.addEventListener("click", () => {
@@ -254,6 +236,19 @@ function setupSegments() {
       const target = document.getElementById(button.dataset.target);
       if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  });
+}
+
+function setupExpandButton() {
+  const button = document.getElementById("expandActions");
+  if (!button) return;
+  button.addEventListener("click", () => {
+    const details = [...document.querySelectorAll("details")];
+    const shouldOpen = details.some((node) => !node.open);
+    details.forEach((node) => {
+      node.open = shouldOpen;
+    });
+    button.textContent = shouldOpen ? "收起全部" : "展开全部";
   });
 }
 
@@ -271,12 +266,13 @@ renderDecisions();
 renderActions();
 renderOutlook();
 renderRisk();
-renderList("watchList", data.watchList);
 renderScenarios();
 renderNews();
 renderRichList("timelineList", data.timeline, "timeline-item");
+renderList("watchList", data.watchList);
 renderExplain();
 renderList("riskNotes", data.riskNotes);
 renderRichList("learningList", data.learning, "learning-item");
 setupSegments();
+setupExpandButton();
 setupQuoteRefresh();
