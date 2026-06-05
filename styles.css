@@ -54,12 +54,17 @@
 
 html {
   scroll-behavior: smooth;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
+  width: 100%;
   margin: 0;
   overflow-x: hidden;
+  padding-bottom: calc(112px + env(safe-area-inset-bottom));
   color: var(--color-text);
   background:
     linear-gradient(140deg, rgba(255, 242, 204, 0.55), transparent 34%),
@@ -83,6 +88,21 @@ body::before {
 
 button {
   font: inherit;
+  touch-action: manipulation;
+}
+
+body,
+.phone-shell,
+.app-hero,
+.hero-status-card,
+.segment,
+.layout,
+.view-toolbar,
+.module-card,
+.summary-card,
+.section-body,
+.mini-card {
+  max-width: 100%;
 }
 
 button,
@@ -144,6 +164,7 @@ h3 {
 p {
   margin-bottom: var(--space-3);
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 svg {
@@ -180,9 +201,10 @@ svg {
 }
 
 .phone-shell {
-  width: min(100%, 430px);
+  width: min(calc(100vw - 40px), 390px);
+  max-width: 390px;
   margin: 0 auto;
-  padding: 0 var(--space-5) calc(106px + env(safe-area-inset-bottom));
+  padding: 0 0 calc(124px + env(safe-area-inset-bottom));
   overflow: clip;
 }
 
@@ -197,19 +219,21 @@ svg {
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--space-7);
+  min-width: 0;
 }
 
 .toolbar-actions {
   display: flex;
   gap: var(--space-2);
+  flex: 0 0 auto;
 }
 
 .icon-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.58);
@@ -232,6 +256,7 @@ svg {
 
 .hero-copy {
   margin-bottom: var(--space-6);
+  min-width: 0;
 }
 
 .eyebrow,
@@ -264,6 +289,7 @@ svg {
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
+  min-width: 0;
 }
 
 .status-text {
@@ -293,7 +319,8 @@ svg {
 }
 
 .primary-btn,
-.secondary-btn {
+.secondary-btn,
+.section-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -302,6 +329,7 @@ svg {
   font-weight: 800;
   cursor: pointer;
   transition: transform var(--ease), box-shadow var(--ease), background var(--ease), color var(--ease);
+  max-width: 100%;
 }
 
 .primary-btn {
@@ -321,13 +349,40 @@ svg {
   color: var(--color-text);
 }
 
+.secondary-btn.compact {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.section-toggle {
+  gap: var(--space-2);
+  min-width: 92px;
+  border: 1px solid var(--color-line);
+  padding: 0 var(--space-4);
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--color-text);
+}
+
+.section-toggle svg {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--ease);
+}
+
+.section-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
 .primary-btn:hover,
-.secondary-btn:hover {
+.secondary-btn:hover,
+.section-toggle:hover {
   transform: scale(1.02);
 }
 
 .primary-btn:active,
-.secondary-btn:active {
+.secondary-btn:active,
+.section-toggle:active,
+.was-tapped {
   transform: scale(0.98);
 }
 
@@ -364,6 +419,7 @@ svg {
   overflow-x: auto;
   scrollbar-width: none;
   max-width: 100%;
+  min-width: 0;
 }
 
 .segment::-webkit-scrollbar {
@@ -410,6 +466,21 @@ svg {
 .layout {
   display: grid;
   gap: var(--space-5);
+  min-width: 0;
+}
+
+.view-toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-4);
+  align-items: start;
+  padding: var(--space-5);
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .summary-card,
@@ -422,6 +493,7 @@ svg {
   overflow: hidden;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  min-width: 0;
 }
 
 .summary-card {
@@ -433,9 +505,17 @@ svg {
     var(--tone-action);
 }
 
+.summary-card .section-head {
+  display: none;
+}
+
 .hero-summary h2 {
   font-size: clamp(23px, 5.6vw, 28px);
   line-height: 1.2;
+}
+
+.summary-copy h2 {
+  margin: 0;
 }
 
 .module-card {
@@ -482,6 +562,30 @@ svg {
   gap: var(--space-4);
   align-items: start;
   margin-bottom: var(--space-4);
+  min-width: 0;
+}
+
+.section-body {
+  display: grid;
+  gap: var(--space-3);
+  max-height: 5000px;
+  opacity: 1;
+  transform: translateY(0);
+  overflow: hidden;
+  transition:
+    max-height 300ms ease,
+    opacity 260ms ease,
+    transform 300ms ease,
+    margin 260ms ease;
+  min-width: 0;
+}
+
+.section-body.collapsed {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  margin-top: calc(-1 * var(--space-3));
+  pointer-events: none;
 }
 
 .decision-grid,
@@ -496,6 +600,7 @@ svg {
 .hero-metrics {
   display: grid;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .hero-metrics,
@@ -526,13 +631,15 @@ svg {
 
 .mini-card,
 .module-card,
-.summary-card {
+.summary-card,
+.view-toolbar {
   transition: transform var(--ease), box-shadow var(--ease), background var(--ease);
 }
 
 .mini-card:hover,
 .module-card:hover,
-.summary-card:hover {
+.summary-card:hover,
+.view-toolbar:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-hover);
 }
@@ -551,6 +658,7 @@ svg {
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.72);
   box-shadow: var(--shadow-card);
+  min-width: 0;
 }
 
 .metric {
@@ -632,6 +740,7 @@ svg {
   font-weight: 850;
   line-height: 1.25;
   overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .decision-card p,
@@ -658,6 +767,7 @@ svg {
   gap: var(--space-3);
   align-items: start;
   margin-bottom: var(--space-4);
+  min-width: 0;
 }
 
 .action-top strong {
@@ -665,6 +775,8 @@ svg {
   font-size: 20px;
   font-weight: 850;
   line-height: 1.2;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .action-price {
@@ -785,48 +897,6 @@ svg {
   background: var(--tone-risk-strong);
 }
 
-details {
-  overflow: hidden;
-}
-
-summary {
-  position: relative;
-  cursor: pointer;
-  list-style: none;
-  padding-right: 30px;
-  font-size: 17px;
-  font-weight: 850;
-  line-height: 1.35;
-}
-
-summary::-webkit-details-marker {
-  display: none;
-}
-
-summary::after {
-  content: "";
-  position: absolute;
-  right: 2px;
-  top: 4px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background:
-    linear-gradient(var(--color-text), var(--color-text)) center/10px 2px no-repeat,
-    linear-gradient(var(--color-text), var(--color-text)) center/2px 10px no-repeat,
-    rgba(23, 23, 19, .08);
-  transition: transform var(--ease), background var(--ease);
-}
-
-details[open] summary::after {
-  transform: rotate(45deg);
-}
-
-details p {
-  margin: var(--space-3) 0 0;
-  animation: detailsEnter 280ms var(--ease-long) both;
-}
-
 .bottom-nav {
   position: fixed;
   left: 50%;
@@ -836,8 +906,9 @@ details p {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--space-1);
   width: min(calc(100% - 32px), 440px);
+  max-width: calc(100vw - 20px);
   min-height: 70px;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-pill);
   background: rgba(15, 15, 15, 0.92);
@@ -860,6 +931,7 @@ details p {
   color: rgba(255, 255, 255, 0.58);
   cursor: pointer;
   transition: transform var(--ease), color var(--ease), background var(--ease);
+  touch-action: manipulation;
 }
 
 .bottom-nav svg {
@@ -936,11 +1008,11 @@ details p {
 
 @media (max-width: 430px) {
   .phone-shell {
-    padding-left: var(--space-5);
-    padding-right: var(--space-5);
+    width: calc(100vw - 40px);
   }
 
-  .section-head {
+  .section-head,
+  .view-toolbar {
     grid-template-columns: 1fr;
   }
 
@@ -957,8 +1029,7 @@ details p {
 
 @media (max-width: 380px) {
   .phone-shell {
-    padding-left: var(--space-4);
-    padding-right: var(--space-4);
+    width: calc(100vw - 28px);
   }
 
   .summary-card,
@@ -979,11 +1050,17 @@ details p {
   .bottom-nav {
     width: calc(100% - 20px);
   }
+
+  .section-toggle {
+    width: 100%;
+  }
 }
 
 @media (min-width: 760px) {
   .phone-shell {
     padding-top: var(--space-3);
+    width: 430px;
+    max-width: 430px;
   }
 
   body {
