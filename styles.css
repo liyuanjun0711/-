@@ -64,7 +64,7 @@ body {
   width: 100%;
   margin: 0;
   overflow-x: hidden;
-  padding-bottom: calc(112px + env(safe-area-inset-bottom));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
   color: var(--color-text);
   background:
     linear-gradient(140deg, rgba(255, 242, 204, 0.55), transparent 34%),
@@ -204,7 +204,7 @@ svg {
   width: min(calc(100vw - 40px), 390px);
   max-width: 390px;
   margin: 0 auto;
-  padding: 0 0 calc(124px + env(safe-area-inset-bottom));
+  padding: 0 0 calc(40px + env(safe-area-inset-bottom));
   overflow: clip;
 }
 
@@ -290,6 +290,13 @@ svg {
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   min-width: 0;
+}
+
+.hero-actions,
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
 }
 
 .status-text {
@@ -402,8 +409,8 @@ svg {
 
 .segment {
   position: sticky;
-  top: var(--space-2);
-  z-index: 20;
+  top: calc(var(--space-2) + env(safe-area-inset-top));
+  z-index: 80;
   display: grid;
   grid-template-columns: repeat(4, minmax(70px, 1fr));
   gap: 0;
@@ -414,8 +421,8 @@ svg {
   border-radius: var(--radius-pill);
   background: rgba(255, 255, 255, 0.62);
   box-shadow: 0 16px 34px rgba(35, 31, 22, 0.1);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   overflow-x: auto;
   scrollbar-width: none;
   max-width: 100%;
@@ -597,7 +604,12 @@ svg {
 .learning-list,
 .timeline,
 .action-list,
-.hero-metrics {
+.hero-metrics,
+.holding-list,
+.expectation-list,
+.watch-card-list,
+.short-card-list,
+.risk-list {
   display: grid;
   gap: var(--space-3);
   min-width: 0;
@@ -653,7 +665,10 @@ svg {
 .explain-item,
 .learning-item,
 .action-card,
-.risk-item {
+.risk-item,
+.holding-card,
+.expect-card,
+.watch-card {
   border: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.72);
@@ -703,7 +718,10 @@ svg {
 .news-item,
 .timeline-item,
 .explain-item,
-.learning-item {
+.learning-item,
+.holding-card,
+.expect-card,
+.watch-card {
   padding: var(--space-4);
 }
 
@@ -840,6 +858,146 @@ svg {
   animation: breathe 4.8s ease-in-out infinite;
 }
 
+.holding-card,
+.expect-card {
+  background: var(--expect-bg, #fffdf8);
+}
+
+.holding-head,
+.expect-top,
+.watch-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  margin-bottom: var(--space-3);
+}
+
+.holding-head strong,
+.expect-top strong,
+.watch-head strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.holding-head span,
+.expect-top span,
+.watch-head span,
+.chart-note {
+  display: block;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.quote-box {
+  min-width: 72px;
+  text-align: right;
+}
+
+.quote-box strong,
+.quote-box span {
+  text-align: right;
+}
+
+.quote-box strong {
+  display: block;
+  font-size: 20px;
+  line-height: 1.15;
+}
+
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.chart-toolbar::-webkit-scrollbar {
+  display: none;
+}
+
+.chart-tab,
+.chart-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, .6);
+  color: var(--color-text);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+  touch-action: manipulation;
+}
+
+.chart-tab.active {
+  border-color: transparent;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.kline-canvas {
+  display: block;
+  width: 100%;
+  height: 132px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, .45);
+}
+
+.expect-card dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.expect-card dl div {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: var(--space-3);
+}
+
+.expect-card dt {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.expect-card dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.expect-pill,
+.watch-head em {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  border-radius: var(--radius-pill);
+  padding: 0 var(--space-3);
+  background: rgba(255, 255, 255, .65);
+  color: var(--color-text);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.watch-card p {
+  margin-bottom: var(--space-2);
+  font-size: 14px;
+}
+
 .news-item.positive {
   background: var(--tone-news);
 }
@@ -861,7 +1019,10 @@ svg {
 }
 
 .watch-list,
-.risk-notes {
+.risk-notes,
+.bullet-list,
+.no-trade-list,
+.invalid-list {
   display: grid;
   gap: var(--space-3);
   margin: 0;
@@ -870,7 +1031,10 @@ svg {
 }
 
 .watch-list li,
-.risk-notes li {
+.risk-notes li,
+.bullet-list li,
+.no-trade-list li,
+.invalid-list li {
   position: relative;
   padding: var(--space-4) var(--space-4) var(--space-4) 42px;
   border: 1px solid rgba(255, 255, 255, .72);
@@ -882,7 +1046,10 @@ svg {
 }
 
 .watch-list li::before,
-.risk-notes li::before {
+.risk-notes li::before,
+.bullet-list li::before,
+.no-trade-list li::before,
+.invalid-list li::before {
   content: "";
   position: absolute;
   left: var(--space-4);
@@ -893,71 +1060,10 @@ svg {
   background: var(--tone-watch-strong);
 }
 
-.risk-notes li::before {
+.risk-notes li::before,
+.no-trade-list li::before,
+.invalid-list li::before {
   background: var(--tone-risk-strong);
-}
-
-.bottom-nav {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
-  z-index: 40;
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: var(--space-1);
-  width: min(calc(100% - 32px), 440px);
-  max-width: calc(100vw - 20px);
-  min-height: 70px;
-  padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-pill);
-  background: rgba(15, 15, 15, 0.92);
-  box-shadow: var(--shadow-float);
-  transform: translateX(-50%);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.bottom-nav button {
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  gap: var(--space-1);
-  min-width: 0;
-  min-height: 54px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: rgba(255, 255, 255, 0.58);
-  cursor: pointer;
-  transition: transform var(--ease), color var(--ease), background var(--ease);
-  touch-action: manipulation;
-}
-
-.bottom-nav svg {
-  width: 18px;
-  height: 18px;
-  transition: transform var(--ease);
-}
-
-.bottom-nav span {
-  font-size: 11px;
-  font-weight: 800;
-  text-align: center;
-}
-
-.bottom-nav button.active {
-  background: rgba(255, 255, 255, 0.14);
-  color: white;
-  transform: translateY(-2px);
-}
-
-.bottom-nav button.active svg {
-  transform: translateY(-2px);
-}
-
-.bottom-nav button:active {
-  transform: scale(.96);
 }
 
 @keyframes heroEnter {
@@ -1025,6 +1131,20 @@ svg {
   .risk-grid {
     grid-template-columns: 1fr;
   }
+
+  .hero-actions,
+  .quick-actions,
+  .holding-head,
+  .expect-top,
+  .watch-head {
+    grid-template-columns: 1fr;
+  }
+
+  .quote-box,
+  .quote-box strong,
+  .quote-box span {
+    text-align: left;
+  }
 }
 
 @media (max-width: 380px) {
@@ -1045,10 +1165,6 @@ svg {
   .action-price strong,
   .action-price span {
     text-align: left;
-  }
-
-  .bottom-nav {
-    width: calc(100% - 20px);
   }
 
   .section-toggle {

@@ -18,22 +18,19 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
         </button>
         <div class="toolbar-actions">
-          <button class="icon-btn" type="button" data-view="news" aria-label="搜索新闻">
+          <button class="icon-btn" type="button" data-view="news" aria-label="查看新闻">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3"/><circle cx="10.8" cy="10.8" r="6.8"/></svg>
           </button>
-          <button class="icon-btn" id="heroRefresh" type="button" data-action="refresh" aria-label="刷新行情">
+          <button class="icon-btn" type="button" data-action="refresh-quotes" aria-label="刷新行情">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.5 9a7 7 0 0 1 11.4-2.2L20 9"/><path d="M17.5 15a7 7 0 0 1-11.4 2.2L4 15"/></svg>
-          </button>
-          <button class="icon-btn" type="button" data-view="logic" aria-label="设置与说明">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
           </button>
         </div>
       </div>
 
       <div class="hero-copy">
-        <p class="eyebrow">Morning Dashboard</p>
+        <p class="eyebrow">Trading Dashboard</p>
         <h1>每日持仓晨报</h1>
-        <p class="subline">先看怎么做，再看为什么</p>
+        <p class="subline">先看怎么做，再看持仓怎么走</p>
       </div>
 
       <div class="hero-status-card">
@@ -41,8 +38,12 @@
           <span id="reportDate">--</span>
           <strong id="liveQuoteStatus">行情未刷新</strong>
           <small id="reportTime">--</small>
+          <small id="analysisStatus">分析未刷新</small>
         </div>
-        <button class="primary-btn" id="refreshQuotes" type="button" data-action="refresh">刷新行情</button>
+        <div class="hero-actions">
+          <button class="primary-btn" id="refreshQuotes" type="button" data-action="refresh-quotes">刷新行情</button>
+          <button class="secondary-btn" id="refreshAnalysis" type="button" data-action="refresh-analysis">刷新分析</button>
+        </div>
       </div>
     </header>
 
@@ -56,25 +57,6 @@
 
     <main class="layout" id="moduleRoot" aria-live="polite"></main>
   </div>
-
-  <nav class="bottom-nav" aria-label="底部导航">
-    <button class="active" type="button" data-view="action">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20H4z"/></svg>
-      <span>操作</span>
-    </button>
-    <button type="button" data-view="trend">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18 9 11l4 4 7-9"/><path d="M4 20h16"/></svg>
-      <span>走势</span>
-    </button>
-    <button type="button" data-view="news">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>
-      <span>新闻</span>
-    </button>
-    <button type="button" data-view="logic">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h12v14H6z"/><path d="M9 9h6M9 13h6"/></svg>
-      <span>逻辑</span>
-    </button>
-  </nav>
 
   <script src="./report-data.js"></script>
   <script src="./app.js"></script>
