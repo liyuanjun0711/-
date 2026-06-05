@@ -142,13 +142,17 @@ h3 {
 }
 
 .news-list,
-.explain-list {
+.explain-list,
+.learning-list,
+.timeline {
   display: grid;
   gap: 12px;
 }
 
 .news-item,
-.explain-item {
+.explain-item,
+.learning-item,
+.timeline-item {
   padding: 14px;
   border-left: 4px solid var(--blue);
   background: #f9fafc;
@@ -228,6 +232,35 @@ th {
   gap: 10px;
 }
 
+.outlook-grid,
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.outlook-card,
+.scenario-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f9fafc;
+}
+
+.outlook-card .meta,
+.scenario-card .meta {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.outlook-card p,
+.scenario-card p,
+.learning-item p,
+.timeline-item p {
+  margin-bottom: 8px;
+}
+
 .watch-list,
 .risk-notes {
   margin: 0;
@@ -267,7 +300,9 @@ th {
 
   .hero-metrics,
   .split,
-  .risk-grid {
+  .risk-grid,
+  .outlook-grid,
+  .scenario-grid {
     grid-template-columns: 1fr;
   }
 

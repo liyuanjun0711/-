@@ -69,6 +69,41 @@ function renderRisk() {
   });
 }
 
+function renderOutlook() {
+  const wrap = document.getElementById("outlookGrid");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  (data.outlooks || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = "outlook-card";
+    box.innerHTML = `
+      <span class="meta">${item.bias || "观察"}</span>
+      <h3>${item.name}</h3>
+      <p><strong>预期：</strong>${item.expectation}</p>
+      <p><strong>关键位：</strong>${item.levels}</p>
+      <p><strong>操作：</strong>${item.plan}</p>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
+function renderScenarios() {
+  const wrap = document.getElementById("scenarioGrid");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  (data.scenarios || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = "scenario-card";
+    box.innerHTML = `
+      <span class="meta">${item.probability || "情景"}</span>
+      <h3>${item.title}</h3>
+      <p>${item.body}</p>
+      <p><strong>动作：</strong>${item.action}</p>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
 function renderList(id, items) {
   const wrap = document.getElementById(id);
   wrap.innerHTML = "";
@@ -85,6 +120,18 @@ function renderExplain() {
   (data.explanations || []).forEach((item) => {
     const box = document.createElement("article");
     box.className = "explain-item";
+    box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
+    wrap.appendChild(box);
+  });
+}
+
+function renderRichList(id, items, className) {
+  const wrap = document.getElementById(id);
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  (items || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = className;
     box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
     wrap.appendChild(box);
   });
@@ -110,8 +157,12 @@ setText("oneLine", data.oneLine);
 renderMetrics();
 renderNews();
 renderActions();
+renderOutlook();
 renderRisk();
 renderList("watchList", data.watchList);
+renderScenarios();
 renderExplain();
+renderRichList("timelineList", data.timeline, "timeline-item");
 renderList("riskNotes", data.riskNotes);
+renderRichList("learningList", data.learning, "learning-item");
 renderSources();
