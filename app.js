@@ -11,13 +11,21 @@ function pctClass(value) {
   return "flat";
 }
 
+function escapeText(value) {
+  return String(value ?? "");
+}
+
 function renderMetrics() {
   const wrap = document.getElementById("heroMetrics");
   wrap.innerHTML = "";
   (data.metrics || []).forEach((item) => {
-    const box = document.createElement("div");
-    box.className = "metric";
-    box.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong><small>${item.note || ""}</small>`;
+    const box = document.createElement("article");
+    box.className = "metric mini-card";
+    box.innerHTML = `
+      <span>${escapeText(item.label)}</span>
+      <strong>${escapeText(item.value)}</strong>
+      <small>${escapeText(item.note)}</small>
+    `;
     wrap.appendChild(box);
   });
 }
@@ -27,13 +35,13 @@ function renderDecisions() {
   wrap.innerHTML = "";
   (data.decisions || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = `decision-card ${item.tone || "hold"}`;
+    box.className = `decision-card mini-card ${item.tone || "hold"}`;
     box.innerHTML = `
-      <span class="label">${item.type}</span>
-      <strong>${item.title}</strong>
-      <p>${item.action}</p>
-      <p><b>触发：</b>${item.trigger}</p>
-      <p><b>不触发：</b>${item.fallback}</p>
+      <span class="label">${escapeText(item.type)}</span>
+      <strong>${escapeText(item.title)}</strong>
+      <p>${escapeText(item.action)}</p>
+      <p><b>触发：</b>${escapeText(item.trigger)}</p>
+      <p><b>不触发：</b>${escapeText(item.fallback)}</p>
     `;
     wrap.appendChild(box);
   });
@@ -45,25 +53,25 @@ function renderActions() {
   (data.actions || []).forEach((item) => {
     const card = document.createElement("article");
     const priceClass = pctClass(item.changePct || 0);
-    card.className = `action-card ${item.tone || ""}`;
+    card.className = `action-card mini-card ${item.tone || "hold"}`;
     card.innerHTML = `
       <div class="action-top">
         <div>
-          <strong>${item.name}</strong>
-          <span>${item.code}</span>
+          <strong>${escapeText(item.name)}</strong>
+          <span>${escapeText(item.code)}</span>
         </div>
         <div class="action-price">
-          <strong>${item.price}</strong>
-          <span class="${priceClass}">${item.changeText}</span>
+          <strong>${escapeText(item.price)}</strong>
+          <span class="${priceClass}">${escapeText(item.changeText)}</span>
         </div>
       </div>
-      <div class="action-chip">${item.action}</div>
+      <div class="action-chip">${escapeText(item.action)}</div>
       <dl>
-        <div><dt>触发</dt><dd>${item.trigger}</dd></div>
-        <div><dt>手数</dt><dd>${item.lots}</dd></div>
-        <div><dt>没到价</dt><dd>${item.fallback}</dd></div>
-        <div><dt>把握度</dt><dd>${item.confidence || "中"}</dd></div>
-        ${item.liveMeta ? `<div><dt>实时</dt><dd>${item.liveMeta}</dd></div>` : ""}
+        <div><dt>触发</dt><dd>${escapeText(item.trigger)}</dd></div>
+        <div><dt>手数</dt><dd>${escapeText(item.lots)}</dd></div>
+        <div><dt>没到价</dt><dd>${escapeText(item.fallback)}</dd></div>
+        <div><dt>把握度</dt><dd>${escapeText(item.confidence || "中")}</dd></div>
+        ${item.liveMeta ? `<div><dt>实时</dt><dd>${escapeText(item.liveMeta)}</dd></div>` : ""}
       </dl>
     `;
     body.appendChild(card);
@@ -77,6 +85,13 @@ function inferSecid(code) {
 
 function setLiveStatus(message) {
   setText("liveQuoteStatus", message);
+}
+
+function setRefreshing(isRefreshing) {
+  document.querySelectorAll("#refreshQuotes, #heroRefresh").forEach((button) => {
+    button.classList.toggle("is-refreshing", isRefreshing);
+    button.disabled = isRefreshing;
+  });
 }
 
 function fetchJsonp(url, callbackName) {
@@ -104,6 +119,7 @@ async function refreshQuotes() {
   const secids = [...new Set(actions.map((item) => inferSecid(item.code)).filter(Boolean))];
   if (!secids.length) return;
 
+  setRefreshing(true);
   setLiveStatus("正在刷新行情...");
   const callbackName = `quote_cb_${Date.now()}`;
   const fields = "f12,f14,f2,f3,f4,f15,f16,f17,f18";
@@ -122,10 +138,13 @@ async function refreshQuotes() {
       item.liveMeta = `开 ${quote.f17} / 高 ${quote.f15} / 低 ${quote.f16} / 昨 ${quote.f18}`;
     });
     renderActions();
+    revealCards();
     const now = new Date();
-    setLiveStatus(`实时行情 ${now.toLocaleTimeString("zh-CN", { hour12: false })}`);
+    setLiveStatus(`已更新 ${now.toLocaleTimeString("zh-CN", { hour12: false })}`);
   } catch {
     setLiveStatus("行情刷新失败，显示晨报报价");
+  } finally {
+    setRefreshing(false);
   }
 }
 
@@ -133,9 +152,13 @@ function renderRisk() {
   const wrap = document.getElementById("riskGrid");
   wrap.innerHTML = "";
   (data.positionRisks || []).forEach((item) => {
-    const box = document.createElement("div");
-    box.className = "risk-item";
-    box.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong><p>${item.note || ""}</p>`;
+    const box = document.createElement("article");
+    box.className = "risk-item mini-card";
+    box.innerHTML = `
+      <span>${escapeText(item.label)}</span>
+      <strong>${escapeText(item.value)}</strong>
+      <p>${escapeText(item.note)}</p>
+    `;
     wrap.appendChild(box);
   });
 }
@@ -145,13 +168,13 @@ function renderOutlook() {
   wrap.innerHTML = "";
   (data.outlooks || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = `outlook-card ${item.tone || ""}`;
+    box.className = `outlook-card mini-card ${item.tone || "hold"}`;
     box.innerHTML = `
-      <span class="meta">${item.bias || "观察"}</span>
-      <h3>${item.name}</h3>
-      <p><b>预期：</b>${item.expectation}</p>
-      <p><b>关键位：</b>${item.levels}</p>
-      <p><b>操作：</b>${item.plan}</p>
+      <span class="meta">${escapeText(item.bias || "观察")}</span>
+      <h3>${escapeText(item.name)}</h3>
+      <p><b>预期：</b>${escapeText(item.expectation)}</p>
+      <p><b>关键位：</b>${escapeText(item.levels)}</p>
+      <p><b>操作：</b>${escapeText(item.plan)}</p>
     `;
     wrap.appendChild(box);
   });
@@ -162,12 +185,12 @@ function renderScenarios() {
   wrap.innerHTML = "";
   (data.scenarios || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = "scenario-card";
+    box.className = "scenario-card mini-card";
     box.innerHTML = `
-      <span class="meta">${item.probability || "情景"}</span>
-      <h3>${item.title}</h3>
-      <p>${item.body}</p>
-      <p><b>动作：</b>${item.action}</p>
+      <span class="meta">${escapeText(item.probability || "情景")}</span>
+      <h3>${escapeText(item.title)}</h3>
+      <p>${escapeText(item.body)}</p>
+      <p><b>动作：</b>${escapeText(item.action)}</p>
     `;
     wrap.appendChild(box);
   });
@@ -178,13 +201,13 @@ function renderNews() {
   wrap.innerHTML = "";
   (data.marketRadar || []).forEach((item) => {
     const box = document.createElement("article");
-    box.className = `news-item ${item.type || "neutral"}`;
+    box.className = `news-item mini-card ${item.type || "neutral"}`;
     box.innerHTML = `
-      <span class="tag">${item.impact || "观察"}</span>
-      <h3>${item.title}</h3>
-      <p>${item.summary}</p>
-      <p><b>行动：</b>${item.action}</p>
-      ${item.source ? `<small>${item.source}</small>` : ""}
+      <span class="tag">${escapeText(item.impact || "观察")}</span>
+      <h3>${escapeText(item.title)}</h3>
+      <p>${escapeText(item.summary)}</p>
+      <p><b>行动：</b>${escapeText(item.action)}</p>
+      ${item.source ? `<small>${escapeText(item.source)}</small>` : ""}
     `;
     wrap.appendChild(box);
   });
@@ -205,9 +228,9 @@ function renderExplain() {
   wrap.innerHTML = "";
   (data.explanations || []).forEach((item, index) => {
     const box = document.createElement("details");
-    box.className = "explain-item";
+    box.className = "explain-item mini-card";
     if (index < 3) box.open = true;
-    box.innerHTML = `<summary>${item.title}</summary><p>${item.body}</p>`;
+    box.innerHTML = `<summary>${escapeText(item.title)}</summary><p>${escapeText(item.body)}</p>`;
     wrap.appendChild(box);
   });
 }
@@ -217,26 +240,58 @@ function renderRichList(id, items, className) {
   wrap.innerHTML = "";
   (items || []).forEach((item, index) => {
     const box = className === "learning-item" ? document.createElement("details") : document.createElement("article");
-    box.className = className;
+    box.className = `${className} mini-card`;
     if (box.tagName === "DETAILS") {
       if (index < 2) box.open = true;
-      box.innerHTML = `<summary>${item.title}</summary><p>${item.body}</p>`;
+      box.innerHTML = `<summary>${escapeText(item.title)}</summary><p>${escapeText(item.body)}</p>`;
     } else {
-      box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
+      box.innerHTML = `<h3>${escapeText(item.title)}</h3><p>${escapeText(item.body)}</p>`;
     }
     wrap.appendChild(box);
   });
 }
 
-function setupSegments() {
+function scrollToTarget(targetId) {
+  const target = document.getElementById(targetId);
+  if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function updateSegmentIndicator(activeButton) {
+  const segment = document.querySelector(".segment");
+  const indicator = document.querySelector(".segment-indicator");
+  if (!segment || !indicator || !activeButton) return;
+  const segmentRect = segment.getBoundingClientRect();
+  const buttonRect = activeButton.getBoundingClientRect();
+  indicator.style.width = `${buttonRect.width}px`;
+  indicator.style.transform = `translateX(${buttonRect.left - segmentRect.left}px)`;
+}
+
+function setActiveTarget(targetId) {
   document.querySelectorAll(".segment button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.target === targetId);
+    if (button.dataset.target === targetId) updateSegmentIndicator(button);
+  });
+  document.querySelectorAll(".bottom-nav button").forEach((button) => {
+    button.classList.toggle("active", button.dataset.target === targetId);
+  });
+}
+
+function setupNavigation() {
+  document.querySelectorAll("[data-target]").forEach((button) => {
     button.addEventListener("click", () => {
-      document.querySelectorAll(".segment button").forEach((node) => node.classList.remove("active"));
-      button.classList.add("active");
-      const target = document.getElementById(button.dataset.target);
-      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      const targetId = button.dataset.target;
+      setActiveTarget(targetId);
+      scrollToTarget(targetId);
     });
   });
+  document.querySelectorAll("[data-scroll-top]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setActiveTarget("topSection");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+  updateSegmentIndicator(document.querySelector(".segment button.active"));
+  window.addEventListener("resize", () => updateSegmentIndicator(document.querySelector(".segment button.active")));
 }
 
 function setupExpandButton() {
@@ -253,9 +308,44 @@ function setupExpandButton() {
 }
 
 function setupQuoteRefresh() {
-  const button = document.getElementById("refreshQuotes");
-  if (button) button.addEventListener("click", refreshQuotes);
+  document.querySelectorAll("#refreshQuotes, #heroRefresh").forEach((button) => {
+    button.addEventListener("click", refreshQuotes);
+  });
   refreshQuotes();
+}
+
+function revealCards() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll(".reveal-card, .mini-card").forEach((node, index) => {
+      node.style.setProperty("--reveal-delay", `${Math.min(index * 60, 720)}ms`);
+      node.classList.add("is-visible");
+    });
+  });
+}
+
+function setupScrollSpy() {
+  const sections = ["topSection", "decisionSection", "outlookSection", "newsSection", "logicSection", "riskSection", "settingsSection"]
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+  const observer = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible) return;
+    const id = visible.target.id;
+    if (["decisionSection", "outlookSection", "newsSection", "logicSection"].includes(id)) {
+      setActiveTarget(id);
+    } else if (id === "riskSection") {
+      document.querySelectorAll(".bottom-nav button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.target === "riskSection");
+      });
+    } else if (id === "topSection") {
+      document.querySelectorAll(".bottom-nav button").forEach((button) => {
+        button.classList.toggle("active", button.dataset.target === "topSection");
+      });
+    }
+  }, { rootMargin: "-18% 0px -68% 0px", threshold: [0.1, 0.35, 0.6] });
+  sections.forEach((section) => observer.observe(section));
 }
 
 setText("reportDate", data.date);
@@ -273,6 +363,8 @@ renderList("watchList", data.watchList);
 renderExplain();
 renderList("riskNotes", data.riskNotes);
 renderRichList("learningList", data.learning, "learning-item");
-setupSegments();
+setupNavigation();
 setupExpandButton();
 setupQuoteRefresh();
+setupScrollSpy();
+revealCards();

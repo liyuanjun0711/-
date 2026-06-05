@@ -3,151 +3,208 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f5f5f7">
+  <meta name="theme-color" content="#f4f1e9">
   <title>每日持仓晨报</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <h1>每日持仓晨报</h1>
-      <p class="subline">先看怎么做，再看为什么。</p>
-    </div>
-    <div class="status">
-      <span id="reportDate">--</span>
-      <span id="reportTime">--</span>
-      <span id="liveQuoteStatus">行情未刷新</span>
-      <button class="refresh-btn" id="refreshQuotes" type="button">刷新行情</button>
-    </div>
-  </header>
+  <div class="ambient ambient-a"></div>
+  <div class="ambient ambient-b"></div>
 
-  <nav class="segment" aria-label="页面导航">
-    <button data-target="decisionSection" class="active">操作</button>
-    <button data-target="outlookSection">走势</button>
-    <button data-target="newsSection">新闻</button>
-    <button data-target="logicSection">逻辑</button>
+  <div class="phone-shell">
+    <header class="app-hero" id="topSection">
+      <div class="hero-toolbar" aria-label="页面工具">
+        <button class="icon-btn" type="button" data-scroll-top aria-label="返回顶部">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div class="toolbar-actions">
+          <button class="icon-btn" type="button" data-target="newsSection" aria-label="查看新闻">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>
+          </button>
+          <button class="icon-btn" id="heroRefresh" type="button" aria-label="刷新行情">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.5 9a7 7 0 0 1 11.4-2.2L20 9"/><path d="M17.5 15a7 7 0 0 1-11.4 2.2L4 15"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-copy">
+        <p class="eyebrow">Morning Dashboard</p>
+        <h1>每日持仓晨报</h1>
+        <p class="subline">先看怎么做，再看为什么</p>
+      </div>
+
+      <div class="hero-status-card">
+        <div class="status-text">
+          <span id="reportDate">--</span>
+          <strong id="liveQuoteStatus">行情未刷新</strong>
+          <small id="reportTime">--</small>
+        </div>
+        <button class="primary-btn" id="refreshQuotes" type="button">刷新行情</button>
+      </div>
+    </header>
+
+    <nav class="segment" aria-label="页面导航">
+      <span class="segment-indicator" aria-hidden="true"></span>
+      <button data-target="decisionSection" class="active" type="button">操作</button>
+      <button data-target="outlookSection" type="button">走势</button>
+      <button data-target="newsSection" type="button">新闻</button>
+      <button data-target="logicSection" type="button">逻辑</button>
+    </nav>
+
+    <main class="layout">
+      <section class="summary-card hero-summary reveal-card">
+        <div>
+          <p class="section-label">今日一句话</p>
+          <h2 id="oneLine">等待数据更新</h2>
+        </div>
+        <button class="secondary-btn" type="button" data-target="decisionSection">查看执行清单</button>
+      </section>
+
+      <section class="module-card priority-card reveal-card" id="decisionSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">最高优先级</p>
+            <h2>今天到底买卖什么</h2>
+          </div>
+          <button class="secondary-btn" id="expandActions" type="button">展开全部</button>
+        </div>
+        <div class="decision-grid" id="decisionGrid"></div>
+      </section>
+
+      <section class="module-card metrics-card reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">组合快照</p>
+            <h2>执行前先看账户约束</h2>
+          </div>
+        </div>
+        <div class="hero-metrics" id="heroMetrics"></div>
+      </section>
+
+      <section class="module-card reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">执行清单</p>
+            <h2>逐笔操作计划</h2>
+          </div>
+        </div>
+        <div class="action-list" id="actionRows"></div>
+      </section>
+
+      <section class="module-card reveal-card" id="outlookSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">持仓判断</p>
+            <h2>持仓今日走势预期</h2>
+          </div>
+        </div>
+        <div class="outlook-grid" id="outlookGrid"></div>
+      </section>
+
+      <section class="module-card risk-zone reveal-card" id="riskSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">风险总览</p>
+            <h2>组合今天最怕什么</h2>
+          </div>
+        </div>
+        <div class="risk-grid" id="riskGrid"></div>
+      </section>
+
+      <section class="module-card reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">盘中应对</p>
+            <h2>三套交易剧本</h2>
+          </div>
+        </div>
+        <div class="scenario-grid" id="scenarioGrid"></div>
+      </section>
+
+      <section class="module-card news-zone reveal-card" id="newsSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">市场雷达</p>
+            <h2>全市场重大利好与风险</h2>
+          </div>
+        </div>
+        <div class="news-list" id="newsList"></div>
+      </section>
+
+      <section class="module-card reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">24h</p>
+            <h2>过去24小时热点复盘</h2>
+          </div>
+        </div>
+        <div class="timeline" id="timelineList"></div>
+      </section>
+
+      <section class="module-card watch-zone reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">观察池</p>
+            <h2>可关注但暂不一定买</h2>
+          </div>
+        </div>
+        <ul class="watch-list" id="watchList"></ul>
+      </section>
+
+      <section class="module-card logic-zone reveal-card" id="logicSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">为什么</p>
+            <h2>逐项说明</h2>
+          </div>
+        </div>
+        <div class="explain-list" id="explainList"></div>
+      </section>
+
+      <section class="module-card risk-zone reveal-card">
+        <div class="section-head">
+          <div>
+            <p class="section-label">失效条件</p>
+            <h2>哪些情况会推翻计划</h2>
+          </div>
+        </div>
+        <ul class="risk-notes" id="riskNotes"></ul>
+      </section>
+
+      <section class="module-card logic-zone reveal-card" id="settingsSection">
+        <div class="section-head">
+          <div>
+            <p class="section-label">理解框架</p>
+            <h2>需要理解的市场逻辑</h2>
+          </div>
+        </div>
+        <div class="learning-list" id="learningList"></div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="底部导航">
+    <button class="active" type="button" data-target="topSection">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20H4z"/></svg>
+      <span>首页</span>
+    </button>
+    <button type="button" data-target="decisionSection">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14"/></svg>
+      <span>操作</span>
+    </button>
+    <button type="button" data-target="riskSection">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 21 20H3z"/><path d="M12 9v4M12 17h.01"/></svg>
+      <span>风险</span>
+    </button>
+    <button type="button" data-target="logicSection">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h12v14H6z"/><path d="M9 9h6M9 13h6"/></svg>
+      <span>逻辑</span>
+    </button>
+    <button type="button" data-target="settingsSection">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg>
+      <span>设置</span>
+    </button>
   </nav>
-
-  <main class="layout">
-    <section class="hero">
-      <div>
-        <p class="section-label">今日一句话</p>
-        <h2 id="oneLine">等待数据更新</h2>
-      </div>
-      <div class="hero-metrics" id="heroMetrics"></div>
-    </section>
-
-    <section class="band priority-band" id="decisionSection">
-      <div class="section-head">
-        <div>
-          <p class="section-label">先看这里</p>
-          <h2>今天到底买卖什么</h2>
-        </div>
-        <button class="ghost-btn" id="expandActions" type="button">展开全部</button>
-      </div>
-      <div class="decision-grid" id="decisionGrid"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">执行清单</p>
-          <h2>逐笔操作计划</h2>
-        </div>
-      </div>
-      <div class="action-list" id="actionRows"></div>
-    </section>
-
-    <section class="band" id="outlookSection">
-      <div class="section-head">
-        <div>
-          <p class="section-label">持仓判断</p>
-          <h2>持仓今日走势预期</h2>
-        </div>
-      </div>
-      <div class="outlook-grid" id="outlookGrid"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">风险总览</p>
-          <h2>组合今天最怕什么</h2>
-        </div>
-      </div>
-      <div class="risk-grid" id="riskGrid"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">盘中应对</p>
-          <h2>三套交易剧本</h2>
-        </div>
-      </div>
-      <div class="scenario-grid" id="scenarioGrid"></div>
-    </section>
-
-    <section class="band" id="newsSection">
-      <div class="section-head">
-        <div>
-          <p class="section-label">市场雷达</p>
-          <h2>全市场重大利好与风险</h2>
-        </div>
-      </div>
-      <div class="news-list" id="newsList"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">24h</p>
-          <h2>过去24小时热点复盘</h2>
-        </div>
-      </div>
-      <div class="timeline" id="timelineList"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">观察池</p>
-          <h2>可关注但暂不一定买</h2>
-        </div>
-      </div>
-      <ul class="watch-list" id="watchList"></ul>
-    </section>
-
-    <section class="band" id="logicSection">
-      <div class="section-head">
-        <div>
-          <p class="section-label">为什么</p>
-          <h2>逐项说明</h2>
-        </div>
-      </div>
-      <div class="explain-list" id="explainList"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">失效条件</p>
-          <h2>哪些情况会推翻计划</h2>
-        </div>
-      </div>
-      <ul class="risk-notes" id="riskNotes"></ul>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">理解框架</p>
-          <h2>需要理解的市场逻辑</h2>
-        </div>
-      </div>
-      <div class="learning-list" id="learningList"></div>
-    </section>
-  </main>
 
   <script src="./report-data.js"></script>
   <script src="./app.js"></script>
