@@ -971,10 +971,6 @@ svg {
   font-weight: 850;
 }
 
-.quote-status-panel.mode-mock {
-  background: #fff3d7;
-}
-
 .quote-status-panel.mode-realtime {
   background: #ffe4de;
 }
@@ -1263,11 +1259,6 @@ svg {
   background: #e7eef2;
 }
 
-.data-mode.mock {
-  background: #fff1cf;
-  color: #8d6a2c;
-}
-
 .chart-host {
   position: relative;
   height: 190px;
@@ -1384,11 +1375,16 @@ svg {
 }
 
 .news-item.positive {
-  background: var(--tone-news);
+  background: #ffe5df;
 }
 
 .news-item.neutral {
-  background: var(--tone-action);
+  background: #fffdf8;
+}
+
+.news-item.risk,
+.news-item.negative {
+  background: #e1f2e3;
 }
 
 .up {
@@ -1401,6 +1397,149 @@ svg {
 
 .flat {
   color: var(--color-muted);
+}
+
+.clickable-card {
+  cursor: pointer;
+}
+
+.clickable-card:active {
+  transform: scale(.99);
+}
+
+.score-strip {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--score-bg, rgba(255,255,255,.64));
+}
+
+.score-strip strong {
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.score-strip span,
+.score-strip em {
+  color: rgba(23, 23, 19, .78);
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 750;
+  line-height: 1.45;
+}
+
+.detail-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  align-items: end;
+}
+
+.detail-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 18, .28);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.detail-panel {
+  position: relative;
+  z-index: 1;
+  width: min(100vw, 430px);
+  max-height: min(88vh, 820px);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5) calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-radius: 30px 30px 0 0;
+  background: rgba(255,253,248,.96);
+  box-shadow: 0 -24px 60px rgba(0,0,0,.2);
+  overflow-y: auto;
+}
+
+.detail-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: start;
+  margin-bottom: var(--space-4);
+}
+
+.detail-head h2 {
+  margin-bottom: var(--space-1);
+}
+
+.detail-head span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.detail-price {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+  background: rgba(255,255,255,.72);
+  box-shadow: var(--shadow-card);
+}
+
+.detail-price.failed {
+  background: #e1f2e3;
+}
+
+.detail-price > strong {
+  font-size: 36px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.detail-price p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.price-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.price-grid span {
+  min-height: 34px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,.7);
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.detail-chart,
+.detail-actions {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.chart-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.detail-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail-actions .primary-btn,
+.detail-actions .secondary-btn {
+  width: 100%;
 }
 
 .watch-list,

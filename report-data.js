@@ -3,241 +3,175 @@ window.MARKET_BRIEFING_DATA = {
   time: "样例版 08:30 北京时间",
   lastUpdated: null,
   apiBase: "",
-  quoteMode: "mock",
   refreshInterval: 10000,
-  oneLine: "满仓账户今天不追新方向；黄金、白银反弹到价先减，军工确认强势后只用腾出的资金小买。",
+  oneLine: "没有真实行情接口时，不显示假价格；今天只按触发条件做仓内调整。",
   tradeDecision: [
     {
       type: "先卖",
       title: "黄金LOF 164701",
-      conclusion: "反弹到价卖2-3手。",
-      reason: "贵金属仓位偏重，先降集中度。",
-      action: "1.765卖2手；1.774上方可卖3手。",
-      trigger: "不到1.765不动。"
+      conclusion: "只在真实行情触发价到达后卖2-3手。",
+      action: "真实成交价到1.765卖2手，1.774上方可卖3手。",
+      trigger: "真实行情不到1.765不动。",
+      reason: "贵金属仓位偏重，优先降集中度。"
     },
     {
       type: "再卖",
       title: "国投白银LOF 161226",
-      conclusion: "不补仓，只等强反弹减1手。",
-      reason: "亏损深但波动更大，补仓会放大风险。",
-      action: "2.132上方卖1手。",
-      trigger: "不到2.132不动。"
+      conclusion: "不补仓，只等真实反弹价减1手。",
+      action: "真实成交价到2.132上方卖1手。",
+      trigger: "不到2.132不动。",
+      reason: "白银波动大，补仓会放大回撤。"
     },
     {
       type: "再买",
       title: "军工龙头ETF 512710",
       conclusion: "只允许用卖出资金买1手。",
-      reason: "板块有弹性，但不能满仓硬追。",
-      action: "尾盘站稳0.696且强于大盘再买。",
-      trigger: "没有卖出资金就不买。"
+      action: "尾盘真实价格站稳0.696且强于大盘再买。",
+      trigger: "没有卖出资金或没有真实行情，不买。",
+      reason: "满仓账户不能凭感觉加仓。"
     },
     {
       type: "禁止",
       title: "恒生科技 / 稀有金属",
-      conclusion: "今天不加仓。",
-      reason: "已有底仓，继续加会提高集中度。",
+      conclusion: "今天不新增。",
       action: "只看关键位，不追。",
-      trigger: "恒生科技站上0.628也只是持有信号。"
+      trigger: "恒生科技站上0.628也只是持有信号。",
+      reason: "已有底仓，继续加会提高集中度。"
     }
   ],
   executionOrder: [
-    "1. 先看黄金164701是否到1.765，未到不动。",
-    "2. 再看白银161226是否到2.132，未到不动。",
-    "3. 若已卖出资金，再看512710尾盘是否站稳0.696。",
-    "4. 恒生科技159740、稀有金属159608今天不新增。"
+    "1. 先确认页面是否显示实时或延迟行情；如果显示失败，不按价格执行。",
+    "2. 黄金164701真实价格到1.765，才考虑卖2手。",
+    "3. 白银161226真实价格到2.132，才考虑卖1手。",
+    "4. 已卖出资金后，再看512710是否站稳0.696。"
   ],
   noTradeList: [
-    "不追天齐锂业等高价单股。",
+    "不按模拟价格下单。",
+    "不在真实行情失败时追买。",
     "不因亏损深补白银。",
-    "不在没有现金来源时买新方向。",
-    "不处理小仓位防守品种。"
+    "不在没有现金来源时买新方向。"
   ],
   holdings: [
     {
       name: "恒生科技ETF大成",
       code: "159740",
+      symbol: "SZ159740",
       market: "SZ",
-      price: 0.616,
-      previousClose: 0.622,
-      changePercent: -0.96,
-      volume: 126800,
-      sectorStrength: 0,
-      newsStrength: 0,
-      expectation: "flat",
-      strength: 0,
+      type: "exchange_fund",
       support: "0.600",
       resistance: "0.628",
       action: "持有，不加仓",
-      invalidCondition: "跌破0.600且港股科技权重同步走弱"
+      invalidCondition: "跌破0.600且港股科技权重同步走弱",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "flat",
+      reason: "仓位较高，未突破关键压力位。",
+      riskLevel: "中"
     },
     {
       name: "黄金LOF",
       code: "164701",
+      symbol: "SZ164701",
       market: "SZ",
-      price: 1.737,
-      previousClose: 1.748,
-      changePercent: -0.63,
-      volume: 89200,
-      sectorStrength: -1,
-      newsStrength: -1,
-      expectation: "down",
-      strength: -1,
+      type: "exchange_fund",
       support: "1.720",
       resistance: "1.765 / 1.774",
       action: "反弹到价卖2-3手",
-      invalidCondition: "美元、美债同步走弱且黄金强势放量"
+      invalidCondition: "美元、美债同步走弱且黄金强势放量",
+      predictionScore: 4,
+      predictionLabel: "轻度看跌",
+      expectedDirection: "down",
+      reason: "贵金属集中度偏高，先降风险。",
+      riskLevel: "中"
     },
     {
       name: "军工龙头ETF富国",
       code: "512710",
+      symbol: "SH512710",
       market: "SH",
-      price: 0.695,
-      previousClose: 0.686,
-      changePercent: 1.31,
-      volume: 231600,
-      sectorStrength: 1,
-      newsStrength: 1,
-      expectation: "up",
-      strength: 2,
+      type: "exchange_fund",
       support: "0.686",
       resistance: "0.696",
       action: "有卖出资金才买1手",
-      invalidCondition: "冲高回落并弱于大盘"
+      invalidCondition: "冲高回落并弱于大盘",
+      predictionScore: 7,
+      predictionLabel: "轻度看涨",
+      expectedDirection: "up",
+      reason: "相对强度好，但必须尾盘确认。",
+      riskLevel: "中"
     },
     {
       name: "国投白银LOF",
       code: "161226",
+      symbol: "SZ161226",
       market: "SZ",
-      price: 2.118,
-      previousClose: 2.154,
-      changePercent: -1.67,
-      volume: 73400,
-      sectorStrength: -1,
-      newsStrength: -1,
-      expectation: "down",
-      strength: -2,
+      type: "exchange_fund",
       support: "2.080",
       resistance: "2.132",
       action: "不补仓，反弹卖1手",
-      invalidCondition: "白银放量站回2.132并强于黄金"
+      invalidCondition: "白银放量站回2.132并强于黄金",
+      predictionScore: 3,
+      predictionLabel: "轻度看跌",
+      expectedDirection: "down",
+      reason: "亏损深但波动更大，不适合补仓。",
+      riskLevel: "高"
     },
     {
       name: "稀有金属ETF广发",
       code: "159608",
+      symbol: "SZ159608",
       market: "SZ",
-      price: 1.210,
-      previousClose: 1.212,
-      changePercent: -0.17,
-      volume: 68100,
-      sectorStrength: 0,
-      newsStrength: 0,
-      expectation: "flat",
-      strength: 0,
+      type: "exchange_fund",
       support: "1.190",
       resistance: "1.224",
       action: "观察，不加仓",
-      invalidCondition: "跌破1.190且锂矿板块走弱"
+      invalidCondition: "跌破1.190且锂矿板块走弱",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "flat",
+      reason: "已有资源品敞口，等突破再看。",
+      riskLevel: "中"
     },
     {
       name: "航空航天ETF天弘",
       code: "159241",
+      symbol: "SZ159241",
       market: "SZ",
-      price: 1.182,
-      previousClose: 1.159,
-      changePercent: 1.98,
-      volume: 42300,
-      sectorStrength: 1,
-      newsStrength: 0,
-      expectation: "up",
-      strength: 1,
+      type: "exchange_fund",
       support: "1.171",
       resistance: "1.200",
       action: "小仓持有",
-      invalidCondition: "军工主线转弱"
+      invalidCondition: "军工主线转弱",
+      predictionScore: 6,
+      predictionLabel: "轻度看涨",
+      expectedDirection: "up",
+      reason: "方向跟随军工，但仓位小。",
+      riskLevel: "中"
     },
     {
       name: "电力ETF银华",
       code: "562350",
+      symbol: "SH562350",
       market: "SH",
-      price: 1.262,
-      previousClose: 1.295,
-      changePercent: -2.55,
-      volume: 18800,
-      sectorStrength: -1,
-      newsStrength: 0,
-      expectation: "flat",
-      strength: 0,
+      type: "exchange_fund",
       support: "1.240",
       resistance: "1.280",
       action: "小仓观察",
-      invalidCondition: "防守板块继续走弱"
+      invalidCondition: "防守板块继续走弱",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "flat",
+      reason: "小仓防守，今天不是主线。",
+      riskLevel: "低"
     }
-  ],
-  riskOverview: [
-    {
-      title: "最大风险",
-      conclusion: "贵金属集中度偏高。",
-      trigger: "黄金、白银同时弱于预期。",
-      action: "只在反弹触发价减，不下跌补。"
-    },
-    {
-      title: "交易风险",
-      conclusion: "满仓追新方向会失控。",
-      trigger: "没有卖出资金还想买军工或新热点。",
-      action: "强制先卖后买。"
-    },
-    {
-      title: "港股科技风险",
-      conclusion: "恒生科技是最大仓位。",
-      trigger: "159740跌破0.600且权重股同步走弱。",
-      action: "不加仓，等次日确认。"
-    }
-  ],
-  scenarioPlan: [
-    { title: "强势盘", conclusion: "军工强，恒生科技修复。", action: "黄金到价卖，军工用腾出资金买1手。" },
-    { title: "震荡盘", conclusion: "多数持仓横盘。", action: "只执行黄金/白银触发价，其余不动。" },
-    { title: "风险盘", conclusion: "贵金属和港股科技同步弱。", action: "不补仓，不追热点，收盘后再评估。"}
-  ],
-  marketRadar: [
-    {
-      type: "risk",
-      title: "贵金属看美元和美债",
-      summary: "美元、美债走强会压制黄金白银。",
-      action: "反弹到价减，不补。"
-    },
-    {
-      type: "positive",
-      title: "军工相对强度可跟踪",
-      summary: "若军工尾盘仍强于大盘，512710有小仓切换价值。",
-      action: "只买1手，资金来自卖出。"
-    },
-    {
-      type: "neutral",
-      title: "港股科技看权重同步",
-      summary: "腾讯、阿里、美团不同步时，不把ETF反弹当加仓信号。",
-      action: "159740不加仓。"
-    }
-  ],
-  newsReview: [
-    { title: "过去24小时：港股科技仍是组合体感核心", body: "看权重同步，不看单日小反弹。" },
-    { title: "过去24小时：贵金属等待宏观变量", body: "美元、美债、美国数据预期决定短线弹性。" },
-    { title: "过去24小时：军工有相对强度", body: "只认尾盘站稳，不追上午冲高。" }
-  ],
-  holdingNews: [
-    { type: "risk", title: "贵金属仓位仍是组合主要波动源", summary: "黄金、白银方向若同步走弱，优先按触发价减风险。", action: "164701、161226只反弹减，不下跌补。" },
-    { type: "positive", title: "军工ETF是仓内切换候选", summary: "512710若强于大盘且尾盘站稳压力位，才有小仓切换意义。", action: "只用卖出资金买1手。" },
-    { type: "neutral", title: "恒生科技不新增", summary: "159740仓位已经高，今天只看关键位，不再提高集中度。", action: "0.600守住则持有，跌破不补。" }
-  ],
-  sectorMove: [
-    { type: "positive", title: "军工/航空航天", summary: "若板块相对强度延续，持仓内512710和159241优先观察。", action: "只看尾盘确认。" },
-    { type: "neutral", title: "港股科技", summary: "权重不同步时，ETF反弹不等于加仓信号。", action: "159740持有，不追。" },
-    { type: "risk", title: "贵金属", summary: "美元、美债若压制贵金属，组合波动会放大。", action: "触发价减仓优先。" }
   ],
   watchlist: [
     {
       name: "中国联通",
       code: "600050",
+      symbol: "SH600050",
       market: "SH",
+      type: "stock",
       sector: "通信/6G",
       status: "观察，不买",
       reason: "通信方向有政策催化。",
@@ -248,10 +182,12 @@ window.MARKET_BRIEFING_DATA = {
     {
       name: "天齐锂业",
       code: "002466",
+      symbol: "SZ002466",
       market: "SZ",
+      type: "stock",
       sector: "锂矿",
       status: "观察，不买",
-      reason: "三个月资源股弹性仍在。",
+      reason: "资源股有弹性，但账户已有稀有金属ETF。",
       buyTrigger: "锂矿板块放量转强，159608同步站上1.224。",
       avoidReason: "单股波动大，当前账户已满仓。",
       risk: "资源品价格反复。"
@@ -259,7 +195,9 @@ window.MARKET_BRIEFING_DATA = {
     {
       name: "中芯国际",
       code: "688981",
+      symbol: "SH688981",
       market: "SH",
+      type: "stock",
       sector: "半导体",
       status: "观察，不买",
       reason: "芯片若连续强于大盘可关注。",
@@ -268,27 +206,41 @@ window.MARKET_BRIEFING_DATA = {
       risk: "高位分化。"
     }
   ],
+  riskOverview: [
+    { title: "最大风险", conclusion: "贵金属集中度偏高。", trigger: "黄金、白银同时弱于预期。", action: "只在真实反弹触发价减，不下跌补。" },
+    { title: "行情风险", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示行情失败或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
+    { title: "满仓风险", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
+  ],
+  marketRadar: [
+    { type: "risk", title: "贵金属看美元和美债", summary: "美元、美债走强会压制黄金白银。", action: "反弹到价减，不补。" },
+    { type: "positive", title: "军工相对强度可跟踪", summary: "若军工尾盘仍强于大盘，512710有小仓切换价值。", action: "只买1手，资金来自卖出。" },
+    { type: "neutral", title: "港股科技看权重同步", summary: "腾讯、阿里、美团不同步时，不把ETF反弹当加仓信号。", action: "159740不加仓。" }
+  ],
+  newsReview: [
+    { title: "港股科技仍是组合体感核心", body: "看权重同步，不看单日小反弹。" },
+    { title: "贵金属等待宏观变量", body: "美元、美债、美国数据预期决定短线弹性。" },
+    { title: "军工有相对强度", body: "只认尾盘站稳，不追上午冲高。" }
+  ],
   reasoning: [
     { title: "为什么先卖", body: "贵金属仓位偏重，反弹减仓比下跌割肉更合适。" },
     { title: "为什么不追高", body: "满仓状态下，追新方向必须先有卖出资金。" },
-    { title: "为什么只观察天齐锂业", body: "已有稀有金属ETF，单股会提高波动和集中度。" }
+    { title: "为什么不按模拟价做", body: "行情字段必须来自真实接口，失败时只做复盘不做交易。" }
   ],
   invalidConditions: [
+    "行情失败或暂无真实数据，所有价格触发计划暂停。",
     "黄金未到1.765，减仓计划不执行。",
     "白银未到2.132，不卖也不补。",
-    "军工未站稳0.696，买1手计划作废。",
-    "行情异常或基金停牌，停止按本页执行。"
+    "军工未站稳0.696，买1手计划作废。"
   ],
   learningFramework: [
-    { title: "今日只看四个价格", body: "159740看0.628，164701看1.765/1.774，161226看2.132，512710看0.696。" },
-    { title: "仓位优先级", body: "先降集中风险，再考虑切到强势方向。" },
-    { title: "复盘标准", body: "收盘只看触发价是否有效，不复盘盘中噪音。" }
+    { title: "真实行情", body: "价格、涨跌幅、成交量、K线只认代理接口返回。" },
+    { title: "主观评分", body: "评分只表达预期，不替代行情。" },
+    { title: "复盘标准", body: "收盘只看真实触发价是否有效，不复盘盘中噪音。" }
   ],
   cancelPlan: [
+    "代理行情不可用时，不按页面价格执行。",
     "164701未到1.765，黄金减仓计划作废。",
-    "512710未站稳0.696，军工买入计划作废。",
-    "159740跌破0.600，恒生科技加仓想法全部取消。",
-    "代理行情不可用时，不按模拟价下单。"
+    "512710未站稳0.696，军工买入计划作废。"
   ],
   nextWatch: [
     { title: "164701 黄金LOF", body: "明天继续看1.765/1.774能否触发减仓。" },
@@ -296,12 +248,11 @@ window.MARKET_BRIEFING_DATA = {
     { title: "159608 稀有金属ETF", body: "明天看1.224是否放量突破，否则不加。" }
   ],
   searchUniverse: [
-    { name: "东材科技", code: "601208", market: "SH", sector: "新材料", price: 8.36, changePercent: 0.72, support: "8.20", resistance: "8.80" },
-    { name: "天齐锂业", code: "002466", market: "SZ", sector: "锂矿", price: 31.42, changePercent: -0.35, support: "30.80", resistance: "33.20" },
-    { name: "中国联通", code: "600050", market: "SH", sector: "通信/6G", price: 5.12, changePercent: 0.39, support: "4.98", resistance: "5.28" },
-    { name: "中芯国际", code: "688981", market: "SH", sector: "半导体", price: 74.2, changePercent: 1.06, support: "71.50", resistance: "76.80" },
-    { name: "恒生科技ETF大成", code: "159740", market: "SZ", sector: "港股科技", price: 0.616, changePercent: -0.96, support: "0.600", resistance: "0.628" },
-    { name: "黄金LOF", code: "164701", market: "SZ", sector: "黄金", price: 1.737, changePercent: -0.63, support: "1.720", resistance: "1.765" },
-    { name: "军工龙头ETF富国", code: "512710", market: "SH", sector: "军工", price: 0.695, changePercent: 1.31, support: "0.686", resistance: "0.696" }
+    { name: "东材科技", code: "601208", symbol: "SH601208", market: "SH", type: "stock", sector: "新材料", support: "8.20", resistance: "8.80" },
+    { name: "天齐锂业", code: "002466", symbol: "SZ002466", market: "SZ", type: "stock", sector: "锂矿", support: "30.80", resistance: "33.20" },
+    { name: "中国联通", code: "600050", symbol: "SH600050", market: "SH", type: "stock", sector: "通信/6G", support: "4.98", resistance: "5.28" },
+    { name: "中芯国际", code: "688981", symbol: "SH688981", market: "SH", type: "stock", sector: "半导体", support: "71.50", resistance: "76.80" },
+    { name: "白酒基金LOF", code: "161725", symbol: "SZ161725", market: "SZ", type: "exchange_fund", sector: "消费", support: "", resistance: "" },
+    { name: "易方达蓝筹精选混合", code: "005827", symbol: "OF005827", market: "OF", type: "open_fund", sector: "开放式基金", support: "", resistance: "" }
   ]
 };
