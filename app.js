@@ -66,7 +66,7 @@ function renderActions() {
     const priceClass = pctClass(item.changePct || 0);
     row.innerHTML = `
       <td><strong>${item.name}</strong><br><span class="flat">${item.code}</span></td>
-      <td class="price">${item.price}<br><span class="${priceClass}">${item.changeText}</span></td>
+      <td class="price">${item.price}<br><span class="${priceClass}">${item.changeText}</span><br><span class="flat">${item.liveMeta || ""}</span></td>
       <td><strong>${item.action}</strong></td>
       <td>${item.trigger}</td>
       <td>${item.lots}</td>
@@ -74,6 +74,65 @@ function renderActions() {
     `;
     body.appendChild(row);
   });
+}
+
+function inferSecid(code) {
+  return code && /^[56]/.test(code) ? `1.${code}` : `0.${code}`;
+}
+
+function setLiveStatus(message) {
+  const node = document.getElementById("liveQuoteStatus");
+  if (node) node.textContent = message;
+}
+
+function fetchJsonp(url, callbackName) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callbackName];
+      script.remove();
+    };
+    window[callbackName] = (payload) => {
+      cleanup();
+      resolve(payload);
+    };
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("quote request failed"));
+    };
+    script.src = url;
+    document.body.appendChild(script);
+  });
+}
+
+async function refreshQuotes() {
+  const actions = data.actions || [];
+  const secids = [...new Set(actions.map((item) => inferSecid(item.code)).filter(Boolean))];
+  if (!secids.length) return;
+
+  setLiveStatus("正在刷新行情...");
+  const callbackName = `quote_cb_${Date.now()}`;
+  const fields = "f12,f14,f2,f3,f4,f15,f16,f17,f18";
+  const url = `https://push2.eastmoney.com/api/qt/ulist.np/get?cb=${callbackName}&fltt=2&invt=2&fields=${fields}&secids=${secids.join(",")}`;
+
+  try {
+    const payload = await fetchJsonp(url, callbackName);
+    const quotes = payload?.data?.diff || [];
+    const byCode = new Map(quotes.map((quote) => [quote.f12, quote]));
+    actions.forEach((item) => {
+      const quote = byCode.get(item.code);
+      if (!quote || quote.f2 == null || quote.f2 === "-") return;
+      item.price = String(quote.f2);
+      item.changePct = Number(quote.f3) || 0;
+      item.changeText = `${item.changePct > 0 ? "+" : ""}${item.changePct.toFixed(2)}%`;
+      item.liveMeta = `开${quote.f17} 高${quote.f15} 低${quote.f16} 昨${quote.f18}`;
+    });
+    renderActions();
+    const now = new Date();
+    setLiveStatus(`实时行情 ${now.toLocaleTimeString("zh-CN", { hour12: false })}`);
+  } catch {
+    setLiveStatus("行情刷新失败，显示晨报价格");
+  }
 }
 
 function renderRisk() {
@@ -180,6 +239,12 @@ function setupSegments() {
   });
 }
 
+function setupQuoteRefresh() {
+  const button = document.getElementById("refreshQuotes");
+  if (button) button.addEventListener("click", refreshQuotes);
+  refreshQuotes();
+}
+
 setText("reportDate", data.date);
 setText("reportTime", data.time);
 setText("oneLine", data.oneLine);
@@ -197,3 +262,4 @@ renderList("riskNotes", data.riskNotes);
 renderRichList("learningList", data.learning, "learning-item");
 renderSources();
 setupSegments();
+setupQuoteRefresh();
