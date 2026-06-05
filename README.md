@@ -20,3 +20,20 @@
 4. 未配置代理时，页面明确显示“暂无真实数据 / 行情获取失败”，不会生成假价格。
 5. 部署代理后，在 `report-data.js` 设置 `apiBase: "https://你的-worker域名"`，页面会请求自己的 API，再由代理请求真实行情源。
 6. 实际交易前仍以券商 App 实时价格、可用资金和可卖数量为准。
+
+## 行情代理接口
+
+前端只请求自己的代理接口，不直接请求第三方行情源。代理应提供：
+
+- `/api/search`
+- `/api/market-status`
+- `/api/last-trading-day`
+- `/api/quote`
+- `/api/intraday`
+- `/api/kline`
+- `/api/daily-summary`
+- `/api/last-valid-quote`
+- `/api/fund`
+- `/api/news`
+
+如果代理或上游行情源不可用，接口应返回 `ok:false` 和错误信息；前端会显示接口失败并保留最后一次成功数据，不生成价格或K线。

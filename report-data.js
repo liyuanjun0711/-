@@ -1,10 +1,10 @@
 window.MARKET_BRIEFING_DATA = {
   date: "2026-06-06",
-  time: "样例版 08:30 北京时间",
+  time: "08:30 北京时间",
   lastUpdated: null,
   apiBase: "",
   refreshInterval: 10000,
-  oneLine: "没有真实行情接口时，不显示假价格；今天只按触发条件做仓内调整。",
+  oneLine: "没有真实行情接口时，不按页面价格交易；今天先降贵金属集中度，再考虑军工小仓切换。",
   tradeDecision: [
     {
       type: "先卖",
@@ -20,14 +20,14 @@ window.MARKET_BRIEFING_DATA = {
       conclusion: "不补仓，只等真实反弹价减1手。",
       action: "真实成交价到2.132上方卖1手。",
       trigger: "不到2.132不动。",
-      reason: "白银波动大，补仓会放大回撤。"
+      reason: "白银波动更大，补仓会放大回撤。"
     },
     {
       type: "再买",
       title: "军工龙头ETF 512710",
       conclusion: "只允许用卖出资金买1手。",
       action: "尾盘真实价格站稳0.696且强于大盘再买。",
-      trigger: "没有卖出资金或没有真实行情，不买。",
+      trigger: "没有卖出资金、没有真实行情或没有站稳0.696，不买。",
       reason: "满仓账户不能凭感觉加仓。"
     },
     {
@@ -40,16 +40,16 @@ window.MARKET_BRIEFING_DATA = {
     }
   ],
   executionOrder: [
-    "1. 先确认页面是否显示实时或延迟行情；如果显示失败，不按价格执行。",
+    "1. 先确认页面是否显示实时、午间休市、已收盘、历史数据或停牌；如果显示接口失败，不按价格执行。",
     "2. 黄金164701真实价格到1.765，才考虑卖2手。",
     "3. 白银161226真实价格到2.132，才考虑卖1手。",
     "4. 已卖出资金后，再看512710是否站稳0.696。"
   ],
   noTradeList: [
-    "不按模拟价格下单。",
     "不在真实行情失败时追买。",
     "不因亏损深补白银。",
-    "不在没有现金来源时买新方向。"
+    "不在没有现金来源时买新方向。",
+    "不把主观评分当成真实行情。"
   ],
   holdings: [
     {
@@ -58,13 +58,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SZ159740",
       market: "SZ",
       type: "exchange_fund",
+      sector: "港股科技",
       support: "0.600",
       resistance: "0.628",
       action: "持有，不加仓",
       invalidCondition: "跌破0.600且港股科技权重同步走弱",
       predictionScore: 5,
       predictionLabel: "中性",
-      expectedDirection: "flat",
+      expectedDirection: "震荡",
       reason: "仓位较高，未突破关键压力位。",
       riskLevel: "中"
     },
@@ -74,13 +75,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SZ164701",
       market: "SZ",
       type: "exchange_fund",
+      sector: "黄金",
       support: "1.720",
       resistance: "1.765 / 1.774",
       action: "反弹到价卖2-3手",
       invalidCondition: "美元、美债同步走弱且黄金强势放量",
       predictionScore: 4,
       predictionLabel: "轻度看跌",
-      expectedDirection: "down",
+      expectedDirection: "看跌",
       reason: "贵金属集中度偏高，先降风险。",
       riskLevel: "中"
     },
@@ -90,13 +92,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SH512710",
       market: "SH",
       type: "exchange_fund",
+      sector: "军工",
       support: "0.686",
       resistance: "0.696",
       action: "有卖出资金才买1手",
       invalidCondition: "冲高回落并弱于大盘",
       predictionScore: 7,
       predictionLabel: "轻度看涨",
-      expectedDirection: "up",
+      expectedDirection: "看涨",
       reason: "相对强度好，但必须尾盘确认。",
       riskLevel: "中"
     },
@@ -106,13 +109,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SZ161226",
       market: "SZ",
       type: "exchange_fund",
+      sector: "白银",
       support: "2.080",
       resistance: "2.132",
       action: "不补仓，反弹卖1手",
       invalidCondition: "白银放量站回2.132并强于黄金",
       predictionScore: 3,
       predictionLabel: "轻度看跌",
-      expectedDirection: "down",
+      expectedDirection: "看跌",
       reason: "亏损深但波动更大，不适合补仓。",
       riskLevel: "高"
     },
@@ -122,13 +126,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SZ159608",
       market: "SZ",
       type: "exchange_fund",
+      sector: "稀有金属",
       support: "1.190",
       resistance: "1.224",
       action: "观察，不加仓",
       invalidCondition: "跌破1.190且锂矿板块走弱",
       predictionScore: 5,
       predictionLabel: "中性",
-      expectedDirection: "flat",
+      expectedDirection: "震荡",
       reason: "已有资源品敞口，等突破再看。",
       riskLevel: "中"
     },
@@ -138,13 +143,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SZ159241",
       market: "SZ",
       type: "exchange_fund",
+      sector: "航空航天",
       support: "1.171",
       resistance: "1.200",
       action: "小仓持有",
       invalidCondition: "军工主线转弱",
       predictionScore: 6,
       predictionLabel: "轻度看涨",
-      expectedDirection: "up",
+      expectedDirection: "看涨",
       reason: "方向跟随军工，但仓位小。",
       riskLevel: "中"
     },
@@ -154,13 +160,14 @@ window.MARKET_BRIEFING_DATA = {
       symbol: "SH562350",
       market: "SH",
       type: "exchange_fund",
+      sector: "电力",
       support: "1.240",
       resistance: "1.280",
       action: "小仓观察",
       invalidCondition: "防守板块继续走弱",
       predictionScore: 5,
       predictionLabel: "中性",
-      expectedDirection: "flat",
+      expectedDirection: "震荡",
       reason: "小仓防守，今天不是主线。",
       riskLevel: "低"
     }
@@ -177,7 +184,15 @@ window.MARKET_BRIEFING_DATA = {
       reason: "通信方向有政策催化。",
       buyTrigger: "连续两天强于大盘且放量突破短压。",
       avoidReason: "第一天消息刺激不追。",
-      risk: "低价股也会高开低走。"
+      risk: "低价股也会高开低走。",
+      support: "4.98",
+      resistance: "5.28",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "震荡",
+      action: "观察，不追",
+      invalidCondition: "跌破支撑并缩量走弱",
+      riskLevel: "中"
     },
     {
       name: "天齐锂业",
@@ -190,7 +205,15 @@ window.MARKET_BRIEFING_DATA = {
       reason: "资源股有弹性，但账户已有稀有金属ETF。",
       buyTrigger: "锂矿板块放量转强，159608同步站上1.224。",
       avoidReason: "单股波动大，当前账户已满仓。",
-      risk: "资源品价格反复。"
+      risk: "资源品价格反复。",
+      support: "30.80",
+      resistance: "33.20",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "震荡",
+      action: "观察，不追",
+      invalidCondition: "锂矿板块继续弱于大盘",
+      riskLevel: "高"
     },
     {
       name: "中芯国际",
@@ -203,44 +226,103 @@ window.MARKET_BRIEFING_DATA = {
       reason: "芯片若连续强于大盘可关注。",
       buyTrigger: "板块连续两天强于大盘且成交放大。",
       avoidReason: "单日反弹不买。",
-      risk: "高位分化。"
+      risk: "高位分化。",
+      support: "71.50",
+      resistance: "76.80",
+      predictionScore: 5,
+      predictionLabel: "中性",
+      expectedDirection: "震荡",
+      action: "观察，不追",
+      invalidCondition: "半导体板块冲高回落",
+      riskLevel: "高"
     }
   ],
   riskOverview: [
-    { title: "最大风险", conclusion: "贵金属集中度偏高。", trigger: "黄金、白银同时弱于预期。", action: "只在真实反弹触发价减，不下跌补。" },
-    { title: "行情风险", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示行情失败或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
-    { title: "满仓风险", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
+    { title: "最大风险", priority: "高", conclusion: "贵金属集中度偏高。", trigger: "黄金、白银同时弱于预期。", action: "只在真实反弹触发价减，不下跌补。" },
+    { title: "行情风险", priority: "高", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示接口失败、行情接口未配置或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
+    { title: "满仓风险", priority: "中", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
   ],
-  marketRadar: [
-    { type: "risk", title: "贵金属看美元和美债", summary: "美元、美债走强会压制黄金白银。", action: "反弹到价减，不补。" },
-    { type: "positive", title: "军工相对强度可跟踪", summary: "若军工尾盘仍强于大盘，512710有小仓切换价值。", action: "只买1手，资金来自卖出。" },
-    { type: "neutral", title: "港股科技看权重同步", summary: "腾讯、阿里、美团不同步时，不把ETF反弹当加仓信号。", action: "159740不加仓。" }
-  ],
-  newsReview: [
-    { title: "港股科技仍是组合体感核心", body: "看权重同步，不看单日小反弹。" },
-    { title: "贵金属等待宏观变量", body: "美元、美债、美国数据预期决定短线弹性。" },
-    { title: "军工有相对强度", body: "只认尾盘站稳，不追上午冲高。" }
+  newsFlow: [
+    {
+      id: "holding-metals-risk",
+      title: "贵金属短线仍受美元和美债影响",
+      source: "晨报规则",
+      publishTime: "2026-06-06 08:30",
+      summary: "美元和美债若继续偏强，会压制黄金、白银弹性。",
+      relatedStocks: ["164701", "161226"],
+      impactType: "negative",
+      impactScore: 4,
+      url: "",
+      fullContent: "贵金属持仓今天不适合下跌补仓。只在真实价格反弹到触发价后减风险，未触发则保持观察。",
+      holdingImpact: "影响黄金LOF、国投白银LOF。",
+      watchImpact: "不影响观察池新增买入。",
+      priceCondition: "164701看1.765/1.774；161226看2.132。",
+      planChange: "不改变计划，仍然反弹减仓。"
+    },
+    {
+      id: "holding-defense-positive",
+      title: "军工相对强度可继续跟踪",
+      source: "晨报规则",
+      publishTime: "2026-06-06 08:30",
+      summary: "若军工尾盘仍强于大盘，512710有仓内切换价值。",
+      relatedStocks: ["512710", "159241"],
+      impactType: "positive",
+      impactScore: 7,
+      url: "",
+      fullContent: "军工方向不是无条件买。只有先卖出贵金属获得资金，并且512710尾盘站稳0.696，才考虑小仓切换。",
+      holdingImpact: "影响512710、159241。",
+      watchImpact: "观察军工和航空航天方向是否延续。",
+      priceCondition: "512710尾盘站稳0.696且强于大盘。",
+      planChange: "满足条件才新增1手。"
+    },
+    {
+      id: "watch-lithium-neutral",
+      title: "锂矿观察但不追",
+      source: "晨报规则",
+      publishTime: "2026-06-06 08:30",
+      summary: "天齐锂业有弹性，但账户已有稀有金属ETF，不能重复堆资源品。",
+      relatedStocks: ["002466", "159608"],
+      impactType: "neutral",
+      impactScore: 5,
+      url: "",
+      fullContent: "天齐锂业只适合观察，不适合在满仓状态下直接追。需要锂矿板块转强，同时稀有金属ETF突破关键位。",
+      holdingImpact: "影响159608观察，不改变持仓。",
+      watchImpact: "影响天齐锂业观察条件。",
+      priceCondition: "159608站上1.224，锂矿板块放量强于大盘。",
+      planChange: "不改变今日操作计划。"
+    },
+    {
+      id: "market-tech-neutral",
+      title: "港股科技看权重同步",
+      source: "晨报规则",
+      publishTime: "2026-06-06 08:30",
+      summary: "腾讯、阿里、美团不同步时，不把ETF反弹当加仓信号。",
+      relatedStocks: ["159740"],
+      impactType: "neutral",
+      impactScore: 5,
+      url: "",
+      fullContent: "恒生科技ETF是组合体感核心，但今天不加仓。只看0.600支撑和0.628压力。",
+      holdingImpact: "影响159740持有判断。",
+      watchImpact: "无。",
+      priceCondition: "159740守住0.600，突破0.628也不追。",
+      planChange: "不改变，持有不加。"
+    }
   ],
   reasoning: [
     { title: "为什么先卖", body: "贵金属仓位偏重，反弹减仓比下跌割肉更合适。" },
     { title: "为什么不追高", body: "满仓状态下，追新方向必须先有卖出资金。" },
-    { title: "为什么不按模拟价做", body: "行情字段必须来自真实接口，失败时只做复盘不做交易。" }
+    { title: "为什么真实行情优先", body: "价格、涨跌幅、成交量、K线只认代理接口返回；接口失败只做复盘。" }
   ],
   invalidConditions: [
-    "行情失败或暂无真实数据，所有价格触发计划暂停。",
+    "行情接口未配置或真实行情失败，所有价格触发计划暂停。",
     "黄金未到1.765，减仓计划不执行。",
     "白银未到2.132，不卖也不补。",
     "军工未站稳0.696，买1手计划作废。"
   ],
   learningFramework: [
-    { title: "真实行情", body: "价格、涨跌幅、成交量、K线只认代理接口返回。" },
-    { title: "主观评分", body: "评分只表达预期，不替代行情。" },
-    { title: "复盘标准", body: "收盘只看真实触发价是否有效，不复盘盘中噪音。" }
-  ],
-  cancelPlan: [
-    "代理行情不可用时，不按页面价格执行。",
-    "164701未到1.765，黄金减仓计划作废。",
-    "512710未站稳0.696，军工买入计划作废。"
+    { title: "真实行情", body: "来自代理接口，显示价格、涨跌幅、K线和更新时间。" },
+    { title: "新闻事实", body: "显示来源和时间，站内先看摘要和影响判断。" },
+    { title: "主观评分", body: "只是今日预期判断，不替代真实行情和下单确认。" }
   ],
   nextWatch: [
     { title: "164701 黄金LOF", body: "明天继续看1.765/1.774能否触发减仓。" },
