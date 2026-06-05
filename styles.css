@@ -89,6 +89,11 @@ h3 {
   border-radius: 8px;
 }
 
+.priority-band {
+  border-color: #b8c7dc;
+  background: #fbfdff;
+}
+
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -106,6 +111,37 @@ h3 {
   display: grid;
   grid-template-columns: repeat(2, minmax(130px, 1fr));
   gap: 10px;
+}
+
+.decision-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.decision-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.decision-card strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+}
+
+.decision-card .label {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.decision-card p {
+  margin-bottom: 8px;
 }
 
 .metric,
@@ -299,6 +335,7 @@ th {
   }
 
   .hero-metrics,
+  .decision-grid,
   .split,
   .risk-grid,
   .outlook-grid,

@@ -40,6 +40,24 @@ function renderNews() {
   });
 }
 
+function renderDecisions() {
+  const wrap = document.getElementById("decisionGrid");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  (data.decisions || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = "decision-card";
+    box.innerHTML = `
+      <span class="label">${item.type}</span>
+      <strong>${item.title}</strong>
+      <p>${item.action}</p>
+      <p><strong>触发：</strong>${item.trigger}</p>
+      <p><strong>不触发：</strong>${item.fallback}</p>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
 function renderActions() {
   const body = document.getElementById("actionRows");
   body.innerHTML = "";
@@ -155,6 +173,7 @@ setText("reportDate", data.date);
 setText("reportTime", data.time);
 setText("oneLine", data.oneLine);
 renderMetrics();
+renderDecisions();
 renderNews();
 renderActions();
 renderOutlook();
