@@ -3,20 +3,28 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>每日持仓简报</title>
+  <title>每日持仓晨报</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
   <header class="topbar">
     <div>
-      <p class="eyebrow">每日更新</p>
-      <h1>持仓与调仓简报</h1>
+      <p class="eyebrow">Morning Brief</p>
+      <h1>每日持仓晨报</h1>
+      <p class="subline">先看买卖动作，再看市场逻辑和持仓走势。</p>
     </div>
     <div class="status">
       <span id="reportDate">--</span>
       <span id="reportTime">--</span>
     </div>
   </header>
+
+  <nav class="segment" aria-label="页面导航">
+    <button data-target="decisionSection" class="active">操作</button>
+    <button data-target="outlookSection">走势</button>
+    <button data-target="newsSection">新闻</button>
+    <button data-target="logicSection">逻辑</button>
+  </nav>
 
   <main class="layout">
     <section class="hero">
@@ -27,7 +35,7 @@
       <div class="hero-metrics" id="heroMetrics"></div>
     </section>
 
-    <section class="band priority-band">
+    <section class="band priority-band" id="decisionSection">
       <div class="section-head">
         <div>
           <p class="section-label">先看这里</p>
@@ -40,17 +48,7 @@
     <section class="band">
       <div class="section-head">
         <div>
-          <p class="section-label">A</p>
-          <h2>全市场重大利好/风险雷达</h2>
-        </div>
-      </div>
-      <div class="news-list" id="newsList"></div>
-    </section>
-
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">B</p>
+          <p class="section-label">执行表</p>
           <h2>今日买卖清单</h2>
         </div>
       </div>
@@ -71,10 +69,10 @@
       </div>
     </section>
 
-    <section class="band">
+    <section class="band" id="outlookSection">
       <div class="section-head">
         <div>
-          <p class="section-label">C</p>
+          <p class="section-label">持仓判断</p>
           <h2>持仓今日走势预期</h2>
         </div>
       </div>
@@ -85,7 +83,7 @@
       <section class="band">
         <div class="section-head">
           <div>
-            <p class="section-label">D</p>
+            <p class="section-label">风险</p>
             <h2>我的持仓风险</h2>
           </div>
         </div>
@@ -95,7 +93,7 @@
       <section class="band">
         <div class="section-head">
           <div>
-            <p class="section-label">E</p>
+            <p class="section-label">观察</p>
             <h2>可关注但暂不一定买</h2>
           </div>
         </div>
@@ -106,51 +104,63 @@
     <section class="band">
       <div class="section-head">
         <div>
-          <p class="section-label">F</p>
-          <h2>盘中三套剧本</h2>
+          <p class="section-label">盘中应对</p>
+          <h2>三套交易剧本</h2>
         </div>
       </div>
       <div class="scenario-grid" id="scenarioGrid"></div>
     </section>
 
-    <section class="band">
+    <section class="band" id="newsSection">
       <div class="section-head">
         <div>
-          <p class="section-label">G</p>
-          <h2>逐项说明</h2>
+          <p class="section-label">市场雷达</p>
+          <h2>全市场重大利好/风险</h2>
         </div>
       </div>
-      <div class="explain-list" id="explainList"></div>
+      <div class="news-list" id="newsList"></div>
     </section>
 
     <section class="band">
       <div class="section-head">
         <div>
-          <p class="section-label">H</p>
+          <p class="section-label">24h</p>
           <h2>过去24小时热点复盘</h2>
         </div>
       </div>
       <div class="timeline" id="timelineList"></div>
     </section>
 
-    <section class="band">
+    <section class="band" id="logicSection">
       <div class="section-head">
         <div>
-          <p class="section-label">I</p>
-          <h2>今日风险和失效条件</h2>
+          <p class="section-label">为什么</p>
+          <h2>逐项说明</h2>
         </div>
       </div>
-      <ul class="risk-notes" id="riskNotes"></ul>
+      <div class="explain-list" id="explainList"></div>
     </section>
 
-    <section class="band">
-      <div class="section-head">
-        <div>
-          <p class="section-label">J</p>
-          <h2>需要理解的市场逻辑</h2>
+    <section class="split">
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <p class="section-label">失效条件</p>
+            <h2>今日风险</h2>
+          </div>
         </div>
-      </div>
-      <div class="learning-list" id="learningList"></div>
+        <ul class="risk-notes" id="riskNotes"></ul>
+      </section>
+
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <p class="section-label">理解框架</p>
+            <h2>需要理解的市场逻辑</h2>
+          </div>
+        </div>
+        <div class="learning-list" id="learningList"></div>
+      </section>
     </section>
 
     <section class="band">
@@ -161,7 +171,7 @@
         </div>
       </div>
       <div class="sources" id="sources"></div>
-      <p class="disclaimer">本页面只用于辅助复盘和风险控制，不构成保证收益的交易指令。下单前以交易软件实时价格、可用资金、可卖数量为准。</p>
+      <p class="disclaimer">本页面只用于辅助复盘和风险控制，不构成保证收益的交易指令。下单前以交易软件实时价格和可交易数量为准。公开网页不展示账户具体数值。</p>
     </section>
   </main>
 

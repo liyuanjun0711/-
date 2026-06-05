@@ -24,6 +24,24 @@ function renderMetrics() {
   });
 }
 
+function renderDecisions() {
+  const wrap = document.getElementById("decisionGrid");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  (data.decisions || []).forEach((item) => {
+    const box = document.createElement("article");
+    box.className = `decision-card ${item.tone || ""}`;
+    box.innerHTML = `
+      <span class="label">${item.type}</span>
+      <strong>${item.title}</strong>
+      <p>${item.action}</p>
+      <p><strong>触发：</strong>${item.trigger}</p>
+      <p><strong>不触发：</strong>${item.fallback}</p>
+    `;
+    wrap.appendChild(box);
+  });
+}
+
 function renderNews() {
   const wrap = document.getElementById("newsList");
   wrap.innerHTML = "";
@@ -35,24 +53,6 @@ function renderNews() {
       <h3>${item.title}</h3>
       <p>${item.summary}</p>
       <p><strong>行动：</strong>${item.action}</p>
-    `;
-    wrap.appendChild(box);
-  });
-}
-
-function renderDecisions() {
-  const wrap = document.getElementById("decisionGrid");
-  if (!wrap) return;
-  wrap.innerHTML = "";
-  (data.decisions || []).forEach((item) => {
-    const box = document.createElement("article");
-    box.className = "decision-card";
-    box.innerHTML = `
-      <span class="label">${item.type}</span>
-      <strong>${item.title}</strong>
-      <p>${item.action}</p>
-      <p><strong>触发：</strong>${item.trigger}</p>
-      <p><strong>不触发：</strong>${item.fallback}</p>
     `;
     wrap.appendChild(box);
   });
@@ -169,19 +169,31 @@ function renderSources() {
   });
 }
 
+function setupSegments() {
+  document.querySelectorAll(".segment button").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".segment button").forEach((node) => node.classList.remove("active"));
+      button.classList.add("active");
+      const target = document.getElementById(button.dataset.target);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
 setText("reportDate", data.date);
 setText("reportTime", data.time);
 setText("oneLine", data.oneLine);
 renderMetrics();
 renderDecisions();
-renderNews();
 renderActions();
 renderOutlook();
 renderRisk();
 renderList("watchList", data.watchList);
 renderScenarios();
-renderExplain();
+renderNews();
 renderRichList("timelineList", data.timeline, "timeline-item");
+renderExplain();
 renderList("riskNotes", data.riskNotes);
 renderRichList("learningList", data.learning, "learning-item");
 renderSources();
+setupSegments();
