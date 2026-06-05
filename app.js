@@ -62,17 +62,29 @@ function renderActions() {
   const body = document.getElementById("actionRows");
   body.innerHTML = "";
   (data.actions || []).forEach((item) => {
-    const row = document.createElement("tr");
+    const card = document.createElement("article");
     const priceClass = pctClass(item.changePct || 0);
-    row.innerHTML = `
-      <td><strong>${item.name}</strong><br><span class="flat">${item.code}</span></td>
-      <td class="price">${item.price}<br><span class="${priceClass}">${item.changeText}</span><br><span class="flat">${item.liveMeta || ""}</span></td>
-      <td><strong>${item.action}</strong></td>
-      <td>${item.trigger}</td>
-      <td>${item.lots}</td>
-      <td>${item.fallback}</td>
+    card.className = "action-card";
+    card.innerHTML = `
+      <div class="action-top">
+        <div>
+          <strong>${item.name}</strong>
+          <span>${item.code}</span>
+        </div>
+        <div class="action-price">
+          <strong>${item.price}</strong>
+          <span class="${priceClass}">${item.changeText}</span>
+        </div>
+      </div>
+      <div class="action-chip">${item.action}</div>
+      <dl>
+        <div><dt>触发</dt><dd>${item.trigger}</dd></div>
+        <div><dt>手数</dt><dd>${item.lots}</dd></div>
+        <div><dt>不触发</dt><dd>${item.fallback}</dd></div>
+        ${item.liveMeta ? `<div><dt>实时</dt><dd>${item.liveMeta}</dd></div>` : ""}
+      </dl>
     `;
-    body.appendChild(row);
+    body.appendChild(card);
   });
 }
 
@@ -194,10 +206,11 @@ function renderList(id, items) {
 function renderExplain() {
   const wrap = document.getElementById("explainList");
   wrap.innerHTML = "";
-  (data.explanations || []).forEach((item) => {
-    const box = document.createElement("article");
+  (data.explanations || []).forEach((item, index) => {
+    const box = document.createElement("details");
     box.className = "explain-item";
-    box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
+    if (index < 3) box.open = true;
+    box.innerHTML = `<summary>${item.title}</summary><p>${item.body}</p>`;
     wrap.appendChild(box);
   });
 }
@@ -206,10 +219,15 @@ function renderRichList(id, items, className) {
   const wrap = document.getElementById(id);
   if (!wrap) return;
   wrap.innerHTML = "";
-  (items || []).forEach((item) => {
-    const box = document.createElement("article");
+  (items || []).forEach((item, index) => {
+    const box = className === "learning-item" ? document.createElement("details") : document.createElement("article");
     box.className = className;
-    box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
+    if (box.tagName === "DETAILS") {
+      if (index < 2) box.open = true;
+      box.innerHTML = `<summary>${item.title}</summary><p>${item.body}</p>`;
+    } else {
+      box.innerHTML = `<h3>${item.title}</h3><p>${item.body}</p>`;
+    }
     wrap.appendChild(box);
   });
 }
@@ -260,6 +278,5 @@ renderRichList("timelineList", data.timeline, "timeline-item");
 renderExplain();
 renderList("riskNotes", data.riskNotes);
 renderRichList("learningList", data.learning, "learning-item");
-renderSources();
 setupSegments();
 setupQuoteRefresh();

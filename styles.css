@@ -28,7 +28,7 @@ body {
     linear-gradient(180deg, #f8f8fb 0%, #f2f2f7 220px),
     var(--bg);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
-  line-height: 1.58;
+  line-height: 1.68;
 }
 
 .topbar {
@@ -79,7 +79,7 @@ h3 {
 .subline {
   margin: 0;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .status {
@@ -142,7 +142,7 @@ h3 {
 
 .layout {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 clamp(14px, 3vw, 32px) 48px;
@@ -199,7 +199,7 @@ h3 {
 }
 
 .band {
-  padding: 18px;
+  padding: 20px;
 }
 
 .priority-band {
@@ -326,40 +326,79 @@ h3 {
   background: var(--soft-orange);
 }
 
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+.action-list {
+  display: grid;
+  gap: 12px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 980px;
+.action-card {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
   background: #fff;
 }
 
-th,
-td {
-  padding: 12px 10px;
-  border-bottom: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-  font-size: 14px;
+.action-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
-tr:last-child td {
-  border-bottom: none;
+.action-top strong {
+  display: block;
+  font-size: 17px;
 }
 
-th {
+.action-top span,
+.action-price span {
+  display: block;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.action-price {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.action-price strong {
+  font-size: 18px;
+}
+
+.action-chip {
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--soft-blue);
+  color: var(--blue);
+  font-size: 13px;
   font-weight: 800;
 }
 
-.price {
-  white-space: nowrap;
+.action-card dl {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.action-card dl div {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.action-card dt {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.action-card dd {
+  margin: 0;
 }
 
 .up {
@@ -389,6 +428,16 @@ th {
 .watch-list li,
 .risk-notes li {
   margin-bottom: 10px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+details p {
+  margin: 10px 0 0;
 }
 
 .sources {
@@ -439,7 +488,28 @@ th {
   }
 
   .hero h2 {
+    font-size: 22px;
+  }
+
+  body {
+    font-size: 16px;
+  }
+
+  .layout {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .band {
+    padding: 16px;
+  }
+
+  h2 {
     font-size: 21px;
+  }
+
+  h3 {
+    font-size: 18px;
   }
 
   .hero-metrics,
@@ -453,5 +523,14 @@ th {
   .segment {
     overflow-x: auto;
     grid-template-columns: repeat(4, minmax(76px, 1fr));
+  }
+
+  .action-top {
+    align-items: flex-start;
+  }
+
+  .action-card dl div {
+    grid-template-columns: 1fr;
+    gap: 2px;
   }
 }
