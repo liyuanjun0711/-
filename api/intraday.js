@@ -10,7 +10,8 @@ module.exports = async function handler(req, res) {
   try {
     meta = normalizeSymbol(req.query?.symbol || req.query?.code || "");
     if (meta.type === "open_fund") throw new Error("普通开放式基金不显示伪实时分时");
-    const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "intraday");
+    const tradeDate = req.query?.date || req.query?.tradeDate || "";
+    const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "intraday", [tradeDate]);
     const status = marketStatus();
     json(res, 200, {
       ok: true,

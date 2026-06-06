@@ -242,6 +242,7 @@ window.MARKET_BRIEFING_DATA = {
     { title: "行情风险", priority: "高", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示接口失败或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
     { title: "满仓风险", priority: "中", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
   ],
+  newsItems: [],
   newsFlow: [
     {
       id: "holding-metals-risk",

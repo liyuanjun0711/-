@@ -15,7 +15,7 @@ const sectionMap = {
   news: {
     title: "新闻",
     subtitle: "先看影响持仓，再看观察池和市场消息",
-    sections: ["holding-news", "watch-news", "market-news", "read-news"]
+    sections: ["top-news", "holding-news", "market-news", "read-news"]
   },
   logic: {
     title: "逻辑",
@@ -35,7 +35,7 @@ const appState = {
   refreshInterval: Number(sourceData.refreshInterval || 10000),
   holdings: normalizeSecurities(sourceData.holdings || []),
   watchlist: normalizeWatchlist(sourceData.watchlist || []),
-  news: normalizeNews(sourceData.newsFlow || []),
+  news: normalizeNews(sourceData.newsItems || []),
   sections: [],
   expandedSections: new Set(["today-decision", "global-search", "holding-quotes", "holding-news", "reasoning"]),
   isRefreshingQuote: false,
@@ -89,9 +89,22 @@ const dataProvider = {
     return normalizeIntraday(payload);
   },
   async getDailyKline(symbol, count = 120, period = "day") {
-    const payload = await requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=${encodeURIComponent(period)}&count=${encodeURIComponent(count)}`);
+    const endpoint = period === "day"
+      ? `${apiBase}/api/history?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(`${count}d`)}&period=day`
+      : `${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=${encodeURIComponent(period)}&count=${encodeURIComponent(count)}`;
+    const payload = await requestJson(endpoint);
     if (!payload.ok) throw new Error(payload.message || "真实K线获取失败");
     return normalizeKline(payload);
+  },
+  async getHistory(symbol, range = "30d") {
+    const payload = await requestJson(`${apiBase}/api/history?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(range)}`);
+    if (!payload.ok) throw new Error(payload.message || "真实历史行情获取失败");
+    return normalizeKline(payload);
+  },
+  async getTradingDays(symbol) {
+    const payload = await requestJson(`${apiBase}/api/trading-days?symbol=${encodeURIComponent(symbol)}`);
+    if (!payload.ok) throw new Error(payload.message || "真实交易日获取失败");
+    return payload;
   },
   async getDailySummary(symbol, tradeDate) {
     const suffix = tradeDate ? `&tradeDate=${encodeURIComponent(tradeDate)}` : "";
@@ -131,9 +144,9 @@ function buildSections() {
     section("quote-watchlist", "quote", "观察池", "观察池行情列表", "watch", false, renderQuoteWatchlist),
     section("risk-trigger", "quote", "风险", "风险触发提醒", "risk", false, renderRiskTrigger),
     section("prediction-overview", "quote", "评分", "今日评分总览", "expectation", false, renderPredictionOverview),
-    section("holding-news", "news", "影响持仓", "影响持仓的新闻", "news", true, renderHoldingNews),
-    section("watch-news", "news", "影响观察池", "影响观察池的新闻", "news", false, renderWatchNews),
-    section("market-news", "news", "市场", "市场重大消息", "news", false, renderMarketNews),
+    section("top-news", "news", "重点", "今日重点新闻", "news", true, renderTopNews),
+    section("holding-news", "news", "持仓", "持仓相关新闻", "news", false, renderHoldingNews),
+    section("market-news", "news", "市场", "市场与行业新闻", "news", false, renderMarketNews),
     section("read-news", "news", "已读", "已读新闻", "news", false, renderReadNews),
     section("reasoning", "logic", "策略", "今日策略原因", "logic", true, renderReasoning),
     section("invalid-conditions", "logic", "失效", "计划失效条件", "risk", false, renderInvalidConditions),
@@ -374,15 +387,16 @@ function renderRiskTrigger(container) {
 }
 
 function renderHoldingNews(container) {
-  container.appendChild(renderNewsFeed(getNewsByRelation("holding"), { emptyText: "暂无直接影响持仓的新闻。" }));
+  container.appendChild(renderNewsFeed(getNewsByRelation("holding"), { emptyText: "暂无真实持仓相关新闻。" }));
 }
 
-function renderWatchNews(container) {
-  container.appendChild(renderNewsFeed(getNewsByRelation("watch"), { emptyText: "暂无直接影响观察池的新闻。" }));
+function renderTopNews(container) {
+  const items = [...appState.news].sort((a, b) => b.importance - a.importance).slice(0, 3);
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无真实新闻数据；未配置来源时不生成假新闻。" }));
 }
 
 function renderMarketNews(container) {
-  container.appendChild(renderNewsFeed(getNewsByRelation("market"), { emptyText: "暂无市场重大消息。" }));
+  container.appendChild(renderNewsFeed(getNewsByRelation("market").concat(getNewsByRelation("watch")), { emptyText: "暂无真实市场与行业新闻。" }));
 }
 
 function renderReadNews(container) {
@@ -406,9 +420,10 @@ function renderNewsFeed(items, options = {}) {
       <h3>${escapeText(item.title)}</h3>
       <p>${escapeText(item.summary)}</p>
       <div class="news-meta-row">
-        <span>${escapeText(getRelationLabel(item))}</span>
+        <span>${escapeText(item.location)} / ${escapeText(getRelationLabel(item))}</span>
         <span>${(item.relatedStocks || []).map((stock) => escapeText(stock)).join("、") || "市场整体"}</span>
       </div>
+      <small>${escapeText(item.peopleOrOrg.join("、") || "主体未披露")}：${escapeText(item.event || "事件未披露")}</small>
       <button class="secondary-btn compact" type="button" data-action="show-news-detail" data-news-id="${escapeAttr(item.id)}">查看详情</button>
     `;
     wrap.appendChild(card);
@@ -453,6 +468,7 @@ function renderSecurityDetailSheet() {
       </div>
       ${renderDetailPrice(item)}
       ${renderDetailChartArea(item)}
+      ${renderDetailHistory(item)}
       ${renderDetailAdvice(item)}
       <div class="detail-actions">
         <button class="secondary-btn" type="button" data-action="pin-security" data-symbol="${escapeAttr(item.symbol)}">${appState.pinnedSymbols.has(item.symbol) ? "取消置顶" : "置顶"}</button>
@@ -549,7 +565,11 @@ function renderNewsDetailSheet() {
       <div class="news-detail-body ${impactTone(item)}">
         <p>${escapeText(item.fullContent || item.summary)}</p>
         <dl>
+          <div><dt>地点/市场</dt><dd>${escapeText(item.location)}</dd></div>
+          <div><dt>主体</dt><dd>${escapeText(item.peopleOrOrg.join("、") || "未披露")}</dd></div>
+          <div><dt>事件</dt><dd>${escapeText(item.event || "未披露")}</dd></div>
           <div><dt>相关标的</dt><dd>${(item.relatedStocks || []).map((stock) => escapeText(stock)).join("、") || "市场整体"}</dd></div>
+          <div><dt>为什么重要</dt><dd>${escapeText(item.whyItMatters || "未配置真实影响判断。")}</dd></div>
           <div><dt>对持仓影响</dt><dd>${escapeText(item.holdingImpact || "暂无直接改变持仓计划。")}</dd></div>
           <div><dt>对观察池影响</dt><dd>${escapeText(item.watchImpact || "暂无直接改变观察池计划。")}</dd></div>
           <div><dt>观察条件</dt><dd>${escapeText(item.priceCondition || "观察价格是否突破关键位、成交量是否放大。")}</dd></div>
@@ -575,12 +595,18 @@ function renderDetailChart(item) {
     host.innerHTML = `<div class="chart-fallback">开放式基金按净值披露；净值曲线需要基金净值接口。</div>`;
     return;
   }
-  const data = period === "intraday" ? item.intraday : period === "week" ? item.weeklyKline : item.dailyKline;
+  const fallbackToDaily = period === "intraday" && (!item.intraday || !item.intraday.length) && item.dailyKline?.length;
+  const chartPeriod = fallbackToDaily ? "day" : period;
+  const data = chartPeriod === "intraday" ? item.intraday : chartPeriod === "week" ? item.weeklyKline : item.dailyKline;
   if (!data || !data.length) {
     host.innerHTML = `<div class="chart-fallback">${escapeText(chartStateText(item, period))}</div>`;
     return;
   }
-  host.innerHTML = "";
+  if (fallbackToDaily) {
+    host.innerHTML = `<div class="chart-fallback subtle">暂无该日分时，已显示历史日K。</div>`;
+  } else {
+    host.innerHTML = "";
+  }
   chartInstance = chartLib.createChart(host, {
     height: 220,
     layout: { background: { color: "rgba(255,255,255,.45)" }, textColor: "#393932" },
@@ -589,12 +615,12 @@ function renderDetailChart(item) {
     rightPriceScale: { borderVisible: false },
     timeScale: {
       borderVisible: false,
-      timeVisible: period === "intraday",
-      tickMarkFormatter: (time) => period === "intraday" ? formatMinuteFromTime(time) : formatDateAxisFromTime(time)
+      timeVisible: chartPeriod === "intraday",
+      tickMarkFormatter: (time) => chartPeriod === "intraday" ? formatMinuteFromTime(time) : formatDateAxisFromTime(time)
     }
   });
   const tooltip = document.querySelector(".chart-tooltip");
-  if (period === "intraday") {
+  if (chartPeriod === "intraday") {
     const series = chartInstance.addLineSeries({ color: "#d87563", lineWidth: 2 });
     series.setData(data.map((row) => ({ time: toChartTime(row.time), value: row.price, custom: row })));
     chartInstance.subscribeCrosshairMove((param) => showChartTooltip(param, series, tooltip, item, "intraday"));
@@ -656,25 +682,25 @@ async function refreshSecurity(item) {
     const status = remoteStatus.status || remoteStatus.session;
     if (status === "trading") {
       item.quote = await dataProvider.getQuote(item.symbol);
-      item.intraday = await dataProvider.getIntraday(item.symbol, item.quote.tradeDate);
+      item.intraday = await dataProvider.getIntraday(item.symbol, item.quote.tradeDate).catch(() => []);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
     } else if (status === "lunch_break") {
       item.quote = await dataProvider.getQuote(item.symbol).catch(() => item.quote);
       const tradeDate = item.quote?.tradeDate || await dataProvider.getLastTradingDay(item.symbol);
-      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate);
+      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate).catch(() => []);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
     } else if (status === "closed") {
       const tradeDate = remoteStatus.tradeDate || await dataProvider.getLastTradingDay(item.symbol);
-      item.summary = await dataProvider.getDailySummary(item.symbol, tradeDate);
-      item.quote = summaryToQuote(item.summary);
-      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
+      item.summary = await dataProvider.getDailySummary(item.symbol, tradeDate).catch(() => klineToSummary(item.dailyKline));
+      item.quote = summaryToQuote(item.summary);
+      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate).catch(() => []);
     } else if (status === "non_trading_day") {
       const tradeDate = await dataProvider.getLastTradingDay(item.symbol);
-      item.summary = await dataProvider.getDailySummary(item.symbol, tradeDate);
-      item.quote = summaryToQuote(item.summary, "historical");
-      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
+      item.summary = await dataProvider.getDailySummary(item.symbol, tradeDate).catch(() => klineToSummary(item.dailyKline));
+      item.quote = summaryToQuote(item.summary, "historical");
+      item.intraday = await dataProvider.getIntraday(item.symbol, tradeDate).catch(() => []);
     } else if (status === "suspended") {
       item.quote = await dataProvider.getLastValidQuote(item.symbol);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
@@ -682,6 +708,8 @@ async function refreshSecurity(item) {
       throw new Error("真实行情暂不可用");
     }
     item.weeklyKline = await dataProvider.getDailyKline(item.symbol, 80, "week").catch(() => item.weeklyKline || []);
+    item.historyMetrics = calculateHistoryMetrics(item.dailyKline);
+    item.usingCache = false;
     item.quoteStatus = status === "trading" ? "realtime" : status === "lunch_break" ? "lunch_break" : status === "suspended" ? "suspended" : "historical";
     item.quoteError = "";
     cacheSecurity(item);
@@ -891,6 +919,34 @@ function init() {
   startQuoteAutoRefresh();
 }
 
+function renderDetailHistory(item) {
+  if (item.type === "open_fund") {
+    return `<div class="history-panel"><strong>历史信息</strong><p>开放式基金历史净值接口暂未接入；不显示伪历史曲线。</p></div>`;
+  }
+  const metrics = item.historyMetrics || calculateHistoryMetrics(item.dailyKline || []);
+  const rows = [
+    ["最近交易日", metrics.lastTradeDate || "历史数据不足"],
+    ["昨日收盘", formatMetricPrice(metrics.yesterdayClose)],
+    ["近5日", formatMetricPercent(metrics.fiveDayChange)],
+    ["近20日", formatMetricPercent(metrics.twentyDayChange)],
+    ["近30日最高", formatMetricPrice(metrics.thirtyDayHigh)],
+    ["近30日最低", formatMetricPrice(metrics.thirtyDayLow)],
+    ["近30日", formatMetricPercent(metrics.thirtyDayChange)],
+    ["20日均量", formatMetricVolume(metrics.avgVolume20)]
+  ];
+  return `
+    <div class="history-panel">
+      <div class="panel-title-row">
+        <strong>昨日与历史行情</strong>
+        <span>${item.usingCache ? `缓存数据 ${escapeText(item.cacheSavedAt || "")}` : "真实历史K线计算"}</span>
+      </div>
+      <dl>
+        ${rows.map(([label, value]) => `<div><dt>${escapeText(label)}</dt><dd>${escapeText(value)}</dd></div>`).join("")}
+      </dl>
+    </div>
+  `;
+}
+
 function startQuoteAutoRefresh() {
   if (quoteRefreshTimer) clearInterval(quoteRefreshTimer);
   const interval = Math.max(5000, Math.min(Number(appState.refreshInterval || 10000), 15000));
@@ -956,17 +1012,23 @@ function normalizeNews(items) {
     id: item.id || `news-${index + 1}`,
     title: item.title || "",
     source: item.source || "未注明来源",
-    publishTime: item.publishTime || "",
+    publishTime: item.publishedAt || item.publishTime || "",
+    location: item.location || "未披露",
+    peopleOrOrg: Array.isArray(item.peopleOrOrg) ? item.peopleOrOrg : [],
     summary: item.summary || item.body || "",
     relatedStocks: item.relatedStocks || [],
-    impactType: item.impactType || item.type || "neutral",
+    sector: item.sector || "",
+    event: item.event || "",
+    impactType: item.impact || item.impactType || item.type || "neutral",
     impactScore: clampScore(item.impactScore ?? 5),
+    importance: Number(item.importance || item.impactScore || 5),
     url: item.url || "",
     fullContent: item.fullContent || item.summary || item.body || "",
     read: Boolean(item.read),
     relation: item.relation || inferNewsRelationFromStatic(item),
     holdingImpact: item.holdingImpact || "",
     watchImpact: item.watchImpact || "",
+    whyItMatters: item.whyItMatters || "",
     priceCondition: item.priceCondition || "",
     planChange: item.planChange || ""
   }));
@@ -998,23 +1060,27 @@ function normalizeRemoteMarketStatus(payload) {
 }
 
 function normalizeQuote(payload) {
+  const quote = payload.quote || payload;
   return {
     name: payload.name || "",
     code: payload.code || "",
     symbol: payload.symbol || payload.code || "",
-    price: numericOrNull(payload.price),
-    change: numericOrNull(payload.change),
-    changePercent: numericOrNull(payload.changePercent),
-    preClose: numericOrNull(payload.preClose),
-    open: numericOrNull(payload.open),
-    high: numericOrNull(payload.high),
-    low: numericOrNull(payload.low),
-    volume: numericOrNull(payload.volume),
-    amount: numericOrNull(payload.amount),
-    time: payload.time || "",
-    tradeDate: payload.tradeDate || dateFromTime(payload.time),
+    price: numericOrNull(quote.price ?? quote.close),
+    close: numericOrNull(quote.close ?? quote.price),
+    change: numericOrNull(quote.change),
+    changePercent: numericOrNull(quote.changePercent),
+    preClose: numericOrNull(quote.preClose),
+    open: numericOrNull(quote.open),
+    high: numericOrNull(quote.high),
+    low: numericOrNull(quote.low),
+    volume: numericOrNull(quote.volume),
+    amount: numericOrNull(quote.amount),
+    time: payload.lastUpdated || payload.time || "",
+    tradeDate: payload.dataDate || payload.tradeDate || dateFromTime(payload.time),
     mode: payload.mode || "realtime",
-    status: payload.status || payload.mode || "realtime"
+    status: payload.status || payload.mode || "realtime",
+    source: payload.source || "",
+    cached: Boolean(payload.cached)
   };
 }
 
@@ -1173,6 +1239,64 @@ function getDisplayRecord(item) {
   return null;
 }
 
+function klineToSummary(rows = []) {
+  const items = rows.filter((row) => row?.close != null);
+  const last = items[items.length - 1];
+  const prev = items[items.length - 2];
+  if (!last) throw new Error("真实历史K线不可用");
+  const preClose = prev?.close ?? null;
+  const changePercent = last.close != null && preClose ? ((last.close - preClose) / preClose) * 100 : last.changePercent;
+  return {
+    tradeDate: String(last.time).slice(0, 10),
+    close: last.close,
+    preClose,
+    open: last.open,
+    high: last.high,
+    low: last.low,
+    volume: last.volume,
+    amount: last.amount,
+    changePercent,
+    time: String(last.time).slice(0, 10),
+    mode: "historical",
+    status: "historical"
+  };
+}
+
+function calculateHistoryMetrics(rows = []) {
+  const items = (rows || []).filter((row) => row?.close != null).slice().sort((a, b) => String(a.time).localeCompare(String(b.time)));
+  const last = items[items.length - 1];
+  const previous = items[items.length - 2];
+  const closeChange = (fromIndex) => {
+    const base = items[items.length - 1 - fromIndex];
+    if (!last || !base?.close) return null;
+    return ((last.close - base.close) / base.close) * 100;
+  };
+  const last30 = items.slice(-30);
+  const last20 = items.slice(-20);
+  return {
+    lastTradeDate: last ? String(last.time).slice(0, 10) : "",
+    yesterdayClose: previous?.close ?? null,
+    fiveDayChange: items.length >= 6 ? closeChange(5) : null,
+    twentyDayChange: items.length >= 21 ? closeChange(20) : null,
+    thirtyDayHigh: last30.length ? Math.max(...last30.map((row) => row.high).filter((value) => value != null)) : null,
+    thirtyDayLow: last30.length ? Math.min(...last30.map((row) => row.low).filter((value) => value != null)) : null,
+    thirtyDayChange: items.length >= 31 ? closeChange(30) : null,
+    avgVolume20: last20.length >= 20 ? last20.reduce((sum, row) => sum + Number(row.volume || 0), 0) / last20.length : null
+  };
+}
+
+function formatMetricPrice(value) {
+  return value == null ? "历史数据不足" : formatPrice(value);
+}
+
+function formatMetricPercent(value) {
+  return value == null ? "历史数据不足" : formatPercent(value);
+}
+
+function formatMetricVolume(value) {
+  return value == null ? "历史数据不足" : formatVolume(value);
+}
+
 function getPrimaryPriceLabel(item) {
   const status = item.quoteStatus;
   if (status === "realtime") return "最新价";
@@ -1188,6 +1312,7 @@ function getSecurityStatusLabel(item) {
 }
 
 function getSecurityUpdateText(item) {
+  if (item.usingCache) return `缓存 ${item.cacheSavedAt || "时间未知"}`;
   return item.quote?.time || item.summary?.time || item.summary?.tradeDate || item.fundInfo?.navDate || "暂无真实更新时间";
 }
 
@@ -1212,10 +1337,10 @@ function chartStateText(item, period) {
   if (item.type === "open_fund") return "开放式基金按净值披露，不提供盘中分时。";
   const record = getDisplayRecord(item);
   const status = getSecurityStatusLabel(item);
-  if (period === "intraday" && !item.intraday.length) return `${status}；真实分时暂无，不绘制假线。`;
+  if (period === "intraday" && !item.intraday.length) return `${status}；今日无分时数据，已保留真实日K。`;
   if (period === "day" && !item.dailyKline.length) return `${status}；真实日K暂无，不绘制假K线。`;
   if (period === "week" && !item.weeklyKline.length) return `${status}；真实周K暂无，不绘制假K线。`;
-  return `数据日期：${getDataDateText(item)}；数据状态：${status}；更新时间：${record?.time || getSecurityUpdateText(item)}`;
+  return `数据日期：${getDataDateText(item)}；数据状态：${status}${item.usingCache ? " / 缓存行情" : ""}；更新时间：${record?.time || getSecurityUpdateText(item)}`;
 }
 
 function getLocalMarketStatus() {
@@ -1318,7 +1443,10 @@ function ensureDetailShape(item) {
     intraday: item.intraday || [],
     dailyKline: item.dailyKline || [],
     weeklyKline: item.weeklyKline || [],
+    historyMetrics: item.historyMetrics || calculateHistoryMetrics(item.dailyKline || []),
     fundInfo: item.fundInfo || null,
+    usingCache: Boolean(item.usingCache),
+    cacheSavedAt: item.cacheSavedAt || "",
     support: item.support || "",
     resistance: item.resistance || "",
     invalidCondition: item.invalidCondition || "没有真实行情不交易"
@@ -1334,7 +1462,9 @@ function cacheSecurity(item) {
     intraday: item.intraday,
     dailyKline: item.dailyKline,
     weeklyKline: item.weeklyKline,
+    historyMetrics: item.historyMetrics || calculateHistoryMetrics(item.dailyKline || []),
     fundInfo: item.fundInfo,
+    dataDate: getDataDateText(item),
     savedAt: getDateTimeText()
   };
   localStorage.setItem(`market-cache:${item.symbol}`, JSON.stringify(payload));
@@ -1349,7 +1479,10 @@ function restoreCachedSecurity(item) {
   item.intraday = item.intraday?.length ? item.intraday : cached.intraday || [];
   item.dailyKline = item.dailyKline?.length ? item.dailyKline : cached.dailyKline || [];
   item.weeklyKline = item.weeklyKline?.length ? item.weeklyKline : cached.weeklyKline || [];
+  item.historyMetrics = item.historyMetrics || cached.historyMetrics || calculateHistoryMetrics(item.dailyKline || []);
   item.fundInfo = item.fundInfo || cached.fundInfo || null;
+  item.usingCache = true;
+  item.cacheSavedAt = cached.savedAt || "";
   return hasAnyRealData(item);
 }
 

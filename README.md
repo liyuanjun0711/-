@@ -41,6 +41,8 @@ apiBase: ""
 - `/api/quote`
 - `/api/intraday`
 - `/api/kline`
+- `/api/history`
+- `/api/trading-days`
 - `/api/market-status`
 - `/api/last-trading-day`
 - `/api/daily-summary`
