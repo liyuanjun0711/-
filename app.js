@@ -133,6 +133,7 @@ const dataProvider = {
 };
 
 let chartInstance = null;
+let chartPointRows = new Map();
 let quoteRefreshTimer = null;
 let newsRefreshTimer = null;
 
@@ -476,6 +477,7 @@ function renderSecurityDetailSheet() {
         <button class="icon-btn" type="button" data-action="close-detail" aria-label="关闭">×</button>
       </div>
       ${renderDetailPrice(item)}
+      ${renderDataStatusPanel(item)}
       ${renderDetailChartArea(item)}
       ${renderDetailHistory(item)}
       ${renderDetailAdvice(item)}
@@ -510,6 +512,30 @@ function renderDetailPrice(item) {
         <span>成交量 ${formatVolume(record.volume)}</span>
         <span>成交额 ${formatAmount(record.amount)}</span>
       </div>
+    </div>
+  `;
+}
+
+function renderDataStatusPanel(item) {
+  const quoteOk = Boolean(item.quote || item.summary || item.fundInfo);
+  const historyCount = item.dailyKline?.length || 0;
+  const intradayCount = item.intraday?.length || 0;
+  const chartReady = item.type === "open_fund" ? Boolean(item.fundInfo) : historyCount > 0;
+  const source = item.quote?.source || item.summary?.source || item.fundInfo?.source || "暂无";
+  const error = item.quoteError || item.chartError || "";
+  return `
+    <div class="data-status-panel info-card">
+      <div class="panel-title-row">
+        <strong>数据状态</strong>
+        <span>${escapeText(getSecurityUpdateText(item))}</span>
+      </div>
+      <dl>
+        <div><dt>行情</dt><dd>${quoteOk ? `成功，来源 ${escapeText(source)}` : `失败：${escapeText(error || "暂无真实行情")}`}</dd></div>
+        <div><dt>历史K线</dt><dd>${historyCount ? `成功，${historyCount} 条` : `失败：${escapeText(item.historyError || "暂无真实历史K线数据")}`}</dd></div>
+        <div><dt>分时</dt><dd>${intradayCount ? `成功，${intradayCount} 条` : "暂无当日分时，已保留日K"}</dd></div>
+        <div><dt>图表</dt><dd>${chartReady ? "可渲染" : `失败：${escapeText(item.chartError || "没有可绘制K线")}`}</dd></div>
+        <div><dt>缓存</dt><dd>${item.usingCache ? `使用缓存 ${escapeText(item.cacheSavedAt || "")}` : "未使用缓存"}</dd></div>
+      </dl>
     </div>
   `;
 }
@@ -597,44 +623,86 @@ function renderNewsDetailSheet() {
 function renderDetailChart(item) {
   const host = document.querySelector(".detail-chart-host");
   if (!host || !chartLib) return;
-  chartInstance?.remove?.();
-  chartInstance = null;
-  const period = item.type === "open_fund" ? "fund" : appState.selectedChartPeriod;
-  if (item.type === "open_fund") {
-    host.innerHTML = `<div class="chart-fallback">开放式基金按净值披露；净值曲线需要基金净值接口。</div>`;
-    return;
-  }
-  const fallbackToDaily = period === "intraday" && (!item.intraday || !item.intraday.length) && item.dailyKline?.length;
-  const chartPeriod = fallbackToDaily ? "day" : period;
-  const data = chartPeriod === "intraday" ? item.intraday : chartPeriod === "week" ? item.weeklyKline : item.dailyKline;
-  if (!data || !data.length) {
-    host.innerHTML = `<div class="chart-fallback">${escapeText(chartStateText(item, period))}</div>`;
-    return;
-  }
-  host.innerHTML = "";
-  chartInstance = chartLib.createChart(host, {
-    height: 280,
-    layout: { background: { color: "rgba(255,255,255,.45)" }, textColor: "#393932" },
-    grid: { vertLines: { color: "rgba(30,30,20,.05)" }, horzLines: { color: "rgba(30,30,20,.05)" } },
-    crosshair: { mode: 1 },
-    rightPriceScale: { borderVisible: false },
-    timeScale: {
-      borderVisible: false,
-      timeVisible: chartPeriod === "intraday",
-      tickMarkFormatter: (time) => chartPeriod === "intraday" ? formatMinuteFromTime(time) : formatDateAxisFromTime(time)
+  try {
+    chartInstance?.remove?.();
+    chartInstance = null;
+    item.chartError = "";
+    const period = item.type === "open_fund" ? "fund" : appState.selectedChartPeriod;
+    if (item.type === "open_fund") {
+      host.innerHTML = `<div class="chart-fallback">开放式基金按净值披露；净值曲线需要基金净值接口。</div>`;
+      return;
     }
-  });
-  const tooltip = document.querySelector(".chart-tooltip");
-  if (chartPeriod === "intraday") {
-    const series = chartInstance.addLineSeries({ color: "#d87563", lineWidth: 2 });
-    series.setData(data.map((row) => ({ time: toChartTime(row.time), value: row.price, custom: row })));
-    chartInstance.subscribeCrosshairMove((param) => showChartTooltip(param, series, tooltip, item, "intraday"));
-  } else {
-    const series = chartInstance.addCandlestickSeries({ upColor: "#d87563", downColor: "#4f9a66", borderVisible: false, wickUpColor: "#d87563", wickDownColor: "#4f9a66" });
-    series.setData(data.map((row) => ({ time: toChartTime(row.time), open: row.open, high: row.high, low: row.low, close: row.close, custom: row })));
-    chartInstance.subscribeCrosshairMove((param) => showChartTooltip(param, series, tooltip, item, "kline"));
+    const fallbackToDaily = period === "intraday" && (!item.intraday || !item.intraday.length) && item.dailyKline?.length;
+    const chartPeriod = fallbackToDaily ? "day" : period;
+    const data = chartPeriod === "intraday" ? item.intraday : chartPeriod === "week" ? item.weeklyKline : item.dailyKline;
+    if (!data || !data.length) {
+      item.chartError = chartStateText(item, period);
+      host.innerHTML = `<div class="chart-fallback">${escapeText(item.chartError)}</div>`;
+      return;
+    }
+    host.innerHTML = "";
+    chartInstance = chartLib.createChart(host, {
+      height: 280,
+      layout: { background: { color: "rgba(255,255,255,.45)" }, textColor: "#393932" },
+      grid: { vertLines: { color: "rgba(30,30,20,.05)" }, horzLines: { color: "rgba(30,30,20,.05)" } },
+      crosshair: { mode: 1 },
+      rightPriceScale: { borderVisible: false },
+      timeScale: {
+        borderVisible: false,
+        timeVisible: chartPeriod === "intraday",
+        tickMarkFormatter: (time) => chartPeriod === "intraday" ? formatMinuteFromTime(time) : formatDateAxisFromTime(time)
+      }
+    });
+    const tooltip = document.querySelector(".chart-tooltip");
+    if (chartPeriod === "intraday") {
+      const series = addChartSeries(chartInstance, "line", { color: "#2E6B8F", lineWidth: 2 });
+      const points = data.map((row) => ({ time: toChartTime(row.time), value: Number(row.price) })).filter((row) => Number.isFinite(row.value));
+      chartPointRows = buildChartPointRows(points, data);
+      series.setData(points);
+      chartInstance.subscribeCrosshairMove((param) => showChartTooltip(param, series, tooltip, item, "intraday"));
+    } else {
+      const series = addChartSeries(chartInstance, "candlestick", { upColor: "#D92D20", downColor: "#039855", borderUpColor: "#D92D20", borderDownColor: "#039855", wickUpColor: "#D92D20", wickDownColor: "#039855" });
+      const points = data.map((row) => ({ time: toChartTime(row.time), open: Number(row.open), high: Number(row.high), low: Number(row.low), close: Number(row.close) }))
+        .filter((row) => [row.open, row.high, row.low, row.close].every(Number.isFinite));
+      chartPointRows = buildChartPointRows(points, data);
+      series.setData(points);
+      chartInstance.subscribeCrosshairMove((param) => showChartTooltip(param, series, tooltip, item, "kline"));
+    }
+    chartInstance.timeScale().fitContent();
+    requestAnimationFrame(() => chartInstance?.resize?.(host.clientWidth, 280));
+  } catch (error) {
+    console.error("chart render failed", error);
+    item.chartError = error.message || "图表渲染失败";
+    host.innerHTML = `<div class="chart-fallback">图表渲染失败：${escapeText(item.chartError)}</div>`;
   }
-  chartInstance.timeScale().fitContent();
+}
+
+function addChartSeries(chart, type, options) {
+  if (typeof chart.addSeries === "function") {
+    const seriesCtor = type === "candlestick" ? chartLib?.CandlestickSeries : chartLib?.LineSeries;
+    if (!seriesCtor) throw new Error(`lightweight-charts ${type} series is unavailable`);
+    return chart.addSeries(seriesCtor, options);
+  }
+  if (type === "candlestick" && typeof chart.addCandlestickSeries === "function") return chart.addCandlestickSeries(options);
+  if (type === "line" && typeof chart.addLineSeries === "function") return chart.addLineSeries(options);
+  throw new Error(`lightweight-charts cannot create ${type} series`);
+}
+
+function buildChartPointRows(points, sourceRows) {
+  const rows = new Map();
+  points.forEach((point, index) => {
+    const key = chartTimeKey(point.time);
+    const source = sourceRows.find((row) => chartTimeKey(toChartTime(row.time)) === key) || sourceRows[index];
+    rows.set(key, source);
+  });
+  return rows;
+}
+
+function chartTimeKey(time) {
+  if (typeof time === "string") return time;
+  if (typeof time === "number") return String(time);
+  if (time && typeof time === "object") return `${time.year}-${String(time.month).padStart(2, "0")}-${String(time.day).padStart(2, "0")}`;
+  return "";
 }
 
 function showChartTooltip(param, series, tooltip, item, type) {
@@ -643,7 +711,7 @@ function showChartTooltip(param, series, tooltip, item, type) {
     return;
   }
   const point = param.seriesData.get(series);
-  const row = point?.custom;
+  const row = chartPointRows.get(chartTimeKey(point?.time || param.time));
   if (!row) {
     tooltip.hidden = true;
     return;
@@ -667,6 +735,7 @@ async function refreshQuotes(options = {}) {
     appState.lastRealUpdated = normalizedResults.some((result) => result.ok) ? getDateTimeText() : appState.lastRealUpdated;
     if (!normalizedResults.some((result) => result.ok)) appState.quoteError = "真实行情暂不可用；如有缓存则使用最后一次真实数据。";
   } catch (error) {
+    console.error("refresh quotes failed", error);
     appState.quoteMode = hasAnyCachedData() ? "failed_with_cache" : "failed";
     appState.quoteError = error.message || "真实行情暂不可用";
   } finally {
@@ -723,6 +792,7 @@ async function refreshSecurity(item) {
     cacheSecurity(item);
     return { ok: true, status: item.quoteStatus };
   } catch (error) {
+    console.error(`refresh security failed: ${item.symbol}`, error);
     restoreCachedSecurity(item);
     item.prediction = buildRulePrediction(item);
     item.quoteStatus = hasAnyRealData(item) ? "interface_failed_cache" : "failed";
@@ -742,6 +812,7 @@ async function refreshNews() {
     recalculateAllPredictions();
     appState.lastUpdated = getDateTimeText();
   } catch (error) {
+    console.error("refresh news failed", error);
     const cached = loadJson("news-cache", null);
     if (cached?.items?.length) {
       appState.news = normalizeNews(cached.items);
@@ -781,6 +852,7 @@ async function handleSubmit(event) {
   try {
     appState.securitySearchResults = await dataProvider.search(keyword);
   } catch (error) {
+    console.error("search failed", error);
     appState.securitySearchResults = [];
     appState.searchError = error.message || "标的查询失败";
   }
@@ -1869,6 +1941,11 @@ function getDefaultChartPeriod(item) {
 function toChartTime(value) {
   if (typeof value === "number") return value;
   if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) return String(value);
+  const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  if (match) {
+    const [, year, month, day, hour, minute] = match.map(Number);
+    return Math.floor(Date.UTC(year, month - 1, day, hour, minute) / 1000);
+  }
   return Math.floor(new Date(String(value).replace(" ", "T")).getTime() / 1000);
 }
 

@@ -1522,10 +1522,45 @@ svg {
 }
 
 .detail-chart,
+.data-status-panel,
 .detail-actions {
   display: grid;
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+}
+
+.data-status-panel {
+  padding: var(--space-4);
+  border: 1px solid rgba(23, 23, 23, 0.08);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, .72);
+}
+
+.data-status-panel dl {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.data-status-panel dl div {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: start;
+}
+
+.data-status-panel dt {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.data-status-panel dd {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 760;
+  overflow-wrap: anywhere;
 }
 
 .chart-tabs {
