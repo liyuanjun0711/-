@@ -245,9 +245,10 @@ window.MARKET_BRIEFING_DATA = {
   newsItems: [],
   newsFlow: [],
   reasoning: [
-    { title: "为什么先卖", body: "贵金属仓位偏重，反弹减仓比下跌割肉更合适。" },
-    { title: "为什么不追高", body: "满仓状态下，追新方向必须先有卖出资金。" },
-    { title: "为什么真实行情优先", body: "价格、涨跌幅、成交量、K线只认代理接口返回；接口失败只做复盘。" }
+    { title: "行情信号", basis: "真实价格、涨跌幅、成交量和最近交易日K线。", inference: "价格在支撑上方且缩量时，先看持有；放量跌破支撑时先防守。", conclusion: "没有触发价就不交易。", invalidCondition: "接口失败且无缓存，所有价格判断暂停。" },
+    { title: "K线信号", basis: "日K、近5日和近20日涨跌幅。", inference: "短线转强但未突破压力位时，容易冲高回落。", conclusion: "突破前不追，突破后也要看成交量。", invalidCondition: "突破当天高开低走或放量下跌。" },
+    { title: "新闻信号", basis: "真实新闻来源、发布时间、相关标的和影响方向。", inference: "利好需要盘面确认，利空先降低预期。", conclusion: "新闻改变评分，不直接替代交易触发价。", invalidCondition: "新闻被澄清、证伪或价格反向运行。" },
+    { title: "仓位信号", basis: "账户接近满仓，贵金属和资源品敞口偏高。", inference: "新增方向必须先释放资金，否则会放大回撤。", conclusion: "先卖后买，禁止无现金来源追新方向。", invalidCondition: "银证转入或已卖出形成可用现金。" }
   ],
   invalidConditions: [
     "真实行情失败，所有价格触发计划暂停。",
@@ -256,9 +257,10 @@ window.MARKET_BRIEFING_DATA = {
     "军工未站稳0.696，买1手计划作废。"
   ],
   learningFramework: [
-    { title: "真实行情", body: "来自代理接口，显示价格、涨跌幅、K线和更新时间。" },
-    { title: "新闻事实", body: "显示来源和时间，站内先看摘要和影响判断。" },
-    { title: "主观评分", body: "只是今日预期判断，不替代真实行情和下单确认。" }
+    { title: "支撑位", basis: "价格多次回踩不破的位置。", inference: "跌破支撑说明承接变弱。", conclusion: "支撑上方观察，跌破先防守。", invalidCondition: "跌破后快速放量收回。" },
+    { title: "压力位", basis: "价格多次冲高回落的位置。", inference: "未突破压力前，追高胜率不高。", conclusion: "放量站上压力再考虑加仓。", invalidCondition: "突破后缩量回落到压力位下方。" },
+    { title: "放量突破", basis: "价格上破关键位且成交量明显放大。", inference: "资金愿意用更高价格买入。", conclusion: "可从观察升级为条件买入。", invalidCondition: "放量后高开低走或次日跌回关键位。" },
+    { title: "消息兑现", basis: "新闻利好出现后股价不涨反跌。", inference: "资金可能提前交易过预期。", conclusion: "利好不追，必须看盘面承接。", invalidCondition: "后续继续放量创新高。" }
   ],
   nextWatch: [
     { title: "164701 黄金LOF", body: "明天继续看1.765/1.774能否触发减仓。" },

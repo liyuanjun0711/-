@@ -1261,7 +1261,8 @@ svg {
 
 .chart-host {
   position: relative;
-  height: 190px;
+  height: 280px;
+  min-height: 280px;
   border: 1px solid rgba(255,255,255,.76);
   border-radius: var(--radius-md);
   background: rgba(255,255,255,.5);

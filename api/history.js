@@ -3,6 +3,7 @@ const eastmoney = require("../dataProviders/eastmoney");
 const sina = require("../dataProviders/sina");
 const tencent = require("../dataProviders/tencent");
 const { tryProviders, failPayload } = require("../dataProviders/fallback");
+const { cached, cacheKey, assertRateLimit } = require("../dataProviders/cache");
 
 function countFromRange(range) {
   const value = String(range || "30d").toLowerCase();
@@ -23,29 +24,34 @@ module.exports = async function handler(req, res) {
     const range = req.query?.range || "30d";
     const period = req.query?.period || "day";
     const count = countFromRange(range);
-    const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "kline", [period, count]);
-    const items = payload.items || payload;
-    const status = marketStatus();
-    const last = items[items.length - 1];
-    json(res, 200, {
-      ok: true,
-      source: providerName,
-      sourceType: "real",
-      cached: false,
-      mode: "historical",
-      marketStatus: status.marketStatus,
-      symbol: meta.symbol,
-      name: meta.name,
-      code: meta.code,
-      type: meta.type,
-      market: meta.market,
-      range,
-      period,
-      dataDate: last?.time || "",
-      lastUpdated: last?.time || "",
-      items
+    const key = cacheKey(["history", meta.symbol, range, period]);
+    const ttl = 3 * 60 * 60 * 1000;
+    assertRateLimit(key, 900, ttl);
+    const response = await cached(key, ttl, async () => {
+      const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "kline", [period, count]);
+      const items = payload.items || payload;
+      const status = marketStatus();
+      const last = items[items.length - 1];
+      return {
+        ok: true,
+        source: providerName,
+        sourceType: "real",
+        mode: "historical",
+        marketStatus: status.marketStatus,
+        symbol: meta.symbol,
+        name: meta.name,
+        code: meta.code,
+        type: meta.type,
+        market: meta.market,
+        range,
+        period,
+        dataDate: last?.time || "",
+        lastUpdated: last?.time || "",
+        items
+      };
     });
+    json(res, 200, response);
   } catch (error) {
-    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "real history unavailable", error));
+    json(res, error.statusCode || 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), error.message === "请求过于频繁，请稍后再试" ? error.message : "real history unavailable", error));
   }
 };

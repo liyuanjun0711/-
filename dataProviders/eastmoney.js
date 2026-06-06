@@ -1,4 +1,4 @@
-const { num, pct } = require("./common");
+const { num, pct, exchangeFromMarket } = require("./common");
 
 async function fetchJson(url) {
   const response = await fetch(url, { headers: { accept: "application/json,text/plain,*/*" } });
@@ -20,11 +20,15 @@ function mapSearchRow(row) {
   if (!/^\d{6}$/.test(code)) return null;
   const market = marketFromRow(row);
   return {
+    raw: code,
     name: row.Name || "",
     code,
     type: typeFromRow(row, code),
     market,
+    exchange: exchangeFromMarket(market),
     symbol: `${market}${code}`,
+    sinaSymbol: `${market.toLowerCase()}${code}`,
+    tencentSymbol: `${market.toLowerCase()}${code}`,
     sector: row.SecurityTypeName || row.Classify || "",
     source: "eastmoney",
     eastmoneySecid: row.QuoteID || `${market === "SH" ? "1" : "0"}.${code}`

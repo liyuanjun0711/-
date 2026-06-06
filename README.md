@@ -12,6 +12,7 @@
 - `api/*.js`：Vercel Serverless API Routes。
 - `dataProviders/*.js`：新浪、腾讯、东方财富、新闻源和统一 fallback 适配器。
 - `config/newsSources.json`：真实新闻源配置，当前接入东方财富搜索和 Google News RSS 备用源。
+- `vercel.json`：Vercel 免费部署配置，当前指定 `iad1`，因为线上测试中亚洲区域访问东方财富历史 K 线超时。
 - `.nojekyll`：GitHub Pages 兼容文件。
 
 ## 部署方式
@@ -21,6 +22,8 @@
 ```bash
 npx vercel --prod
 ```
+
+当前继续使用 Vercel 免费方案；线上测试发现亚洲区域访问东方财富历史 K 线容易超时，所以当前函数区域先放在 `iad1`，优先保证真实 K 线能返回。如果大陆访问仍然不稳定，可以迁移到腾讯云 EdgeOne Pages：前端文件可直接迁移，`api/*.js` 需要改成 EdgeOne Functions/Pages Functions 的请求处理格式，`dataProviders/*.js` 可以复用。
 
 如果继续使用 GitHub Pages 托管前端，需要先把本项目部署到 Vercel，然后在 `report-data.js` 中设置：
 
@@ -64,7 +67,7 @@ Vercel Hobby 会把 `api/**/*.js` 都算作 Serverless Function，所以 provide
 ## 数据源优先级
 
 - 股票搜索：东方财富搜索优先，本地持仓表兜底。
-- 实时行情：新浪 -> 腾讯 -> 东方财富。
+- 实时行情：东方财富 -> 新浪 -> 腾讯。
 - 分时数据：东方财富 -> 新浪 -> 腾讯。
 - K 线数据：东方财富 -> 新浪 -> 腾讯。
 - 新闻数据：东方财富财经搜索 -> Google News RSS。
@@ -74,3 +77,10 @@ Vercel Hobby 会把 `api/**/*.js` 都算作 Serverless Function，所以 provide
 ## 使用提醒
 
 页面中的预测评分和操作建议只用于个人复盘参考，不能替代券商 App 的真实成交价格、可用资金、可卖数量和交易确认。
+
+## 免费方案限制
+
+- Vercel 免费额度适合个人低频使用，不适合全市场扫描。
+- 服务端缓存是 Serverless 实例内存缓存，冷启动后可能失效；前端会再使用浏览器 localStorage 缓存最后一次真实数据。
+- 免费公开数据源可能延迟、限频或临时不可用；接口失败时只显示缓存或错误，不生成假数据。
+- 普通开放式基金暂不伪造盘中行情，只能接入真实净值接口后展示。

@@ -32,16 +32,32 @@ function toSymbolShape(item) {
   const market = item.market || inferMarket(item.code);
   const code = String(item.code);
   return {
+    raw: item.raw || code,
     name: item.name || "",
     code,
     market,
+    exchange: exchangeFromMarket(market),
     type: item.type || inferType(code),
     symbol: `${market}${code}`,
     sinaSymbol: `${market.toLowerCase()}${code}`,
     tencentSymbol: `${market.toLowerCase()}${code}`,
-    eastmoneySecid: `${market === "SH" ? "1" : "0"}.${code}`,
+    eastmoneySecid: eastmoneySecid(market, code),
     sector: item.sector || ""
   };
+}
+
+function eastmoneySecid(market, code) {
+  if (market === "SH") return `1.${code}`;
+  if (market === "SZ") return `0.${code}`;
+  if (market === "BJ") return `0.${code}`;
+  return `0.${code}`;
+}
+
+function exchangeFromMarket(market) {
+  if (market === "SH") return "SSE";
+  if (market === "SZ") return "SZSE";
+  if (market === "BJ") return "BSE";
+  return "OTC";
 }
 
 function inferMarket(code) {
@@ -125,6 +141,8 @@ module.exports = {
   normalizeSymbol,
   localSearch,
   marketStatus,
+  eastmoneySecid,
+  exchangeFromMarket,
   json,
   handleOptions,
   num,
