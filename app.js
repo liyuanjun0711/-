@@ -117,6 +117,7 @@ const dataProvider = {
 };
 
 let chartInstance = null;
+let quoteRefreshTimer = null;
 
 function buildSections() {
   return [
@@ -886,6 +887,17 @@ function initInteractions() {
 function init() {
   renderApp();
   initInteractions();
+  refreshQuotes({ initial: true });
+  startQuoteAutoRefresh();
+}
+
+function startQuoteAutoRefresh() {
+  if (quoteRefreshTimer) clearInterval(quoteRefreshTimer);
+  const interval = Math.max(5000, Math.min(Number(appState.refreshInterval || 10000), 15000));
+  quoteRefreshTimer = setInterval(() => {
+    const status = appState.marketStatus.status || appState.marketStatus.session;
+    if (status === "trading" && !appState.isRefreshingQuote) refreshQuotes({ auto: true });
+  }, interval);
 }
 
 function normalizeSecurities(items) {
