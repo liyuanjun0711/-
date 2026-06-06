@@ -2,7 +2,7 @@ window.MARKET_BRIEFING_DATA = {
   date: "2026-06-06",
   time: "08:30 北京时间",
   lastUpdated: null,
-  apiBase: "",
+  apiBase: "https://daily-briefing-blue.vercel.app",
   refreshInterval: 10000,
   oneLine: "没有真实行情接口时，不按页面价格交易；今天先降贵金属集中度，再考虑军工小仓切换。",
   tradeDecision: [
@@ -239,7 +239,7 @@ window.MARKET_BRIEFING_DATA = {
   ],
   riskOverview: [
     { title: "最大风险", priority: "高", conclusion: "贵金属集中度偏高。", trigger: "黄金、白银同时弱于预期。", action: "只在真实反弹触发价减，不下跌补。" },
-    { title: "行情风险", priority: "高", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示接口失败、行情接口未配置或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
+    { title: "行情风险", priority: "高", conclusion: "没有真实行情就不能按价格交易。", trigger: "页面显示接口失败或暂无真实数据。", action: "打开券商App核对，不用页面价格。" },
     { title: "满仓风险", priority: "中", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
   ],
   newsFlow: [
@@ -314,7 +314,7 @@ window.MARKET_BRIEFING_DATA = {
     { title: "为什么真实行情优先", body: "价格、涨跌幅、成交量、K线只认代理接口返回；接口失败只做复盘。" }
   ],
   invalidConditions: [
-    "行情接口未配置或真实行情失败，所有价格触发计划暂停。",
+    "真实行情失败，所有价格触发计划暂停。",
     "黄金未到1.765，减仓计划不执行。",
     "白银未到2.132，不卖也不补。",
     "军工未站稳0.696，买1手计划作废。"

@@ -1,47 +1,65 @@
-# 每日持仓简报网页
+# 每日持仓晨报工作台
 
-打开 `index.html` 即可查看本地简报页面。页面不依赖外部 CDN、国外脚本或在线字体。
+这是一个移动端优先的个人股票/基金行情与决策工作台。前端保持静态页面体验，真实行情通过 Vercel Serverless Functions 提供，不使用 Cloudflare。
 
-## 文件说明
+## 文件结构
 
-- `index.html`: 页面结构。
-- `styles.css`: 本地样式。
-- `app.js`: 本地渲染逻辑。
-- `report-data.js`: 每日简报数据。自动化每天更新这个文件即可刷新页面内容。
-- `vendor/lightweight-charts.standalone.production.js`: 本地行情图表库，避免页面运行时依赖外部 CDN。
-- `api-proxy/cloudflare-worker.js`: Cloudflare Worker 行情代理，可部署后给前端提供 `/api/search`、`/api/quote`、`/api/intraday`、`/api/kline`、`/api/news`。
-- `.nojekyll`: GitHub Pages 使用，避免静态文件被 Jekyll 处理。
+- `index.html`：页面结构。
+- `styles.css`：移动端金融工作台样式。
+- `app.js`：前端渲染、交互、行情刷新和图表逻辑。
+- `report-data.js`：持仓、观察池、策略和页面基础数据。
+- `vendor/lightweight-charts.standalone.production.js`：本地图表库。
+- `api/*.js`：Vercel Serverless API。
+- `lib/providers/*.js`：新浪、腾讯、东方财富行情源适配器。
+- `.nojekyll`：GitHub Pages 兼容文件。
 
-## 使用方式
+## 部署方式
 
-1. 本地双击 `index.html` 打开。
-2. 部署到 GitHub Pages 后，手机打开固定 Pages 链接。
-3. 每天自动化更新 `report-data.js` 并推送后，刷新浏览器即可看到最新简报。
-4. 未配置代理时，页面明确显示“暂无真实数据 / 行情获取失败”，不会生成假价格。
-5. 部署代理后，在 `report-data.js` 设置 `apiBase: "https://你的-worker域名"`，页面会请求自己的 API，再由代理请求真实行情源。
-6. 实际交易前仍以券商 App 实时价格、可用资金和可卖数量为准。
+推荐直接部署到 Vercel，这样前端和 `/api` 同源：
 
-## 行情代理接口
+```bash
+npx vercel --prod
+```
 
-前端只请求自己的代理接口，不直接请求第三方行情源。代理应提供：
+如果继续使用 GitHub Pages 托管前端，需要先把本项目部署到 Vercel，然后在 `report-data.js` 中设置：
+
+```js
+apiBase: "https://你的-vercel-项目域名"
+```
+
+如果前端也在 Vercel，保持：
+
+```js
+apiBase: ""
+```
+
+## 行情 API
+
+前端只请求自己的接口，不直接裸调第三方行情源：
 
 - `/api/search`
-- `/api/market-status`
-- `/api/last-trading-day`
 - `/api/quote`
 - `/api/intraday`
 - `/api/kline`
+- `/api/market-status`
+- `/api/last-trading-day`
 - `/api/daily-summary`
 - `/api/last-valid-quote`
 - `/api/fund`
 - `/api/news`
 
-Worker 内部按顺序尝试东方财富、 新浪财经、腾讯财经。所有价格、涨跌幅、昨收、开盘、最高、最低、成交量、成交额、分时和K线都必须来自真实接口。
+真实行情字段必须来自上游接口：最新价、昨收、开盘、最高、最低、涨跌额、涨跌幅、成交量、成交额、更新时间、分时、日K。
 
-如果代理或上游行情源不可用，接口会返回 `ok:false` 和错误信息；前端会显示“真实行情暂不可用”，如本机浏览器里有最后一次成功缓存，则显示“使用最后一次真实数据”，不会生成价格或K线。
+如果所有真实接口失败，API 返回 `ok:false`，前端显示“真实行情暂不可用”。如果本机浏览器有最后一次成功获取的真实数据，则显示“使用最后一次真实数据”。页面不会生成假价格、假涨跌幅或假K线。
 
-部署后把 `report-data.js` 里的 `apiBase` 改成 Worker 地址，例如：
+## 数据源优先级
 
-```js
-apiBase: "https://morning-post-market-api.your-subdomain.workers.dev"
-```
+- 实时行情：新浪 → 腾讯 → 东方财富。
+- 分时数据：东方财富 → 新浪 → 腾讯。
+- K线数据：东方财富 → 新浪 → 腾讯。
+
+普通开放式基金不显示伪实时分时或伪K线；未接入真实净值接口时显示失败状态。
+
+## 使用提醒
+
+页面中的预测评分和操作建议只用于个人复盘参考，不能替代券商 App 的实时成交价格、可用资金、可卖数量和真实交易确认。

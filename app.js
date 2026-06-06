@@ -28,8 +28,8 @@ const apiBase = getApiBase();
 const appState = {
   currentView: getInitialView(),
   marketStatus: getLocalMarketStatus(),
-  quoteMode: apiBase ? "failed" : "unconfigured",
-  quoteError: apiBase ? "" : "行情接口未配置",
+  quoteMode: "failed",
+  quoteError: "真实行情待刷新",
   lastUpdated: sourceData.lastUpdated || null,
   lastRealUpdated: null,
   refreshInterval: Number(sourceData.refreshInterval || 10000),
@@ -62,64 +62,54 @@ const dataProvider = {
   async search(keyword) {
     const value = keyword.trim();
     if (!value) return [];
-    if (!apiBase) return localSecuritySearch(value);
     const payload = await requestJson(`${apiBase}/api/search?keyword=${encodeURIComponent(value)}`);
     if (!payload.ok) throw new Error(payload.message || "搜索接口失败");
     return normalizeSearchItems(payload.items || []);
   },
   async getMarketStatus(symbol) {
-    if (!apiBase) return { ...appState.marketStatus, status: appState.marketStatus.session };
     const url = symbol ? `${apiBase}/api/market-status?symbol=${encodeURIComponent(symbol)}` : `${apiBase}/api/market-status`;
     const payload = await requestJson(url);
     if (!payload.ok) throw new Error(payload.message || "市场状态接口失败");
     return normalizeRemoteMarketStatus(payload);
   },
   async getLastTradingDay(symbol) {
-    if (!apiBase) throw new Error("行情接口未配置");
     const payload = await requestJson(`${apiBase}/api/last-trading-day?symbol=${encodeURIComponent(symbol)}`);
     if (!payload.ok) throw new Error(payload.message || "最近交易日接口失败");
     return payload.tradeDate;
   },
   async getQuote(symbol) {
-    if (!apiBase) throw new Error("行情接口未配置");
     const payload = await requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(symbol)}`);
     if (!payload.ok) throw new Error(payload.message || "真实行情暂不可用");
     return normalizeQuote(payload);
   },
   async getIntraday(symbol, tradeDate) {
-    if (!apiBase) throw new Error("行情接口未配置");
     const suffix = tradeDate ? `&tradeDate=${encodeURIComponent(tradeDate)}` : "";
     const payload = await requestJson(`${apiBase}/api/intraday?symbol=${encodeURIComponent(symbol)}${suffix}`);
     if (!payload.ok) throw new Error(payload.message || "真实分时获取失败");
     return normalizeIntraday(payload);
   },
   async getDailyKline(symbol, count = 120, period = "day") {
-    if (!apiBase) throw new Error("行情接口未配置");
     const payload = await requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=${encodeURIComponent(period)}&count=${encodeURIComponent(count)}`);
     if (!payload.ok) throw new Error(payload.message || "真实K线获取失败");
     return normalizeKline(payload);
   },
   async getDailySummary(symbol, tradeDate) {
-    if (!apiBase) throw new Error("行情接口未配置");
     const suffix = tradeDate ? `&tradeDate=${encodeURIComponent(tradeDate)}` : "";
     const payload = await requestJson(`${apiBase}/api/daily-summary?symbol=${encodeURIComponent(symbol)}${suffix}`);
     if (!payload.ok) throw new Error(payload.message || "日行情摘要获取失败");
     return normalizeDailySummary(payload);
   },
   async getLastValidQuote(symbol) {
-    if (!apiBase) throw new Error("行情接口未配置");
     const payload = await requestJson(`${apiBase}/api/last-valid-quote?symbol=${encodeURIComponent(symbol)}`);
     if (!payload.ok) throw new Error(payload.message || "最近有效行情获取失败");
     return normalizeQuote(payload);
   },
   async getFundInfo(symbol) {
-    if (!apiBase) throw new Error("基金净值接口未配置");
     const payload = await requestJson(`${apiBase}/api/fund?symbol=${encodeURIComponent(symbol)}`);
     if (!payload.ok) throw new Error(payload.message || "基金净值获取失败");
     return payload;
   },
   async getNews(keyword = "") {
-    if (!apiBase) return appState.news;
     const payload = await requestJson(`${apiBase}/api/news?keyword=${encodeURIComponent(keyword)}`);
     if (!payload.ok) throw new Error(payload.message || "新闻接口失败");
     return normalizeNews(payload.items || []);
@@ -641,7 +631,7 @@ async function refreshQuotes(options = {}) {
     const modes = results.map((result) => result.status).filter(Boolean);
     appState.quoteMode = chooseGlobalQuoteMode(modes);
     appState.lastRealUpdated = results.some((result) => result.ok) ? getDateTimeText() : appState.lastRealUpdated;
-    if (!results.some((result) => result.ok)) appState.quoteError = apiBase ? "真实行情暂不可用；如有缓存则使用最后一次真实数据。" : "行情接口未配置";
+    if (!results.some((result) => result.ok)) appState.quoteError = "真实行情暂不可用；如有缓存则使用最后一次真实数据。";
   } catch (error) {
     appState.quoteMode = hasAnyCachedData() ? "failed_with_cache" : "failed";
     appState.quoteError = error.message || "真实行情暂不可用";
@@ -913,8 +903,8 @@ function normalizeSecurities(items) {
     prediction: normalizePrediction(item),
     quote: null,
     summary: null,
-    quoteStatus: "unconfigured",
-    quoteError: apiBase ? "真实行情待刷新" : "行情接口未配置",
+    quoteStatus: "failed",
+    quoteError: "真实行情待刷新",
     marketStatus: null,
     intraday: [],
     dailyKline: [],
@@ -1156,7 +1146,7 @@ function renderPriceBox(item) {
     return `<strong>${nav == null ? "暂无真实净值" : formatPrice(nav)}</strong><span>${item.fundInfo?.navDate || "净值待取"}</span>`;
   }
   const record = getDisplayRecord(item);
-  if (!record) return `<strong>${apiBase ? "真实行情暂不可用" : "行情接口未配置"}</strong><span>${hasAnyRealData(item) ? "使用最后一次真实数据" : "暂无真实数据"}</span>`;
+  if (!record) return `<strong>真实行情暂不可用</strong><span>${hasAnyRealData(item) ? "使用最后一次真实数据" : "暂无真实数据"}</span>`;
   const label = ["closed", "non_trading_day", "historical", "suspended"].includes(item.quoteStatus) ? "收盘/最近" : "最新";
   return `<strong>${formatPrice(record.price ?? record.close)}</strong><span class="${changeClass(record.changePercent)}">${label} ${formatPercent(record.changePercent)}</span>`;
 }
@@ -1182,7 +1172,6 @@ function getPrimaryPriceLabel(item) {
 }
 
 function getSecurityStatusLabel(item) {
-  if (item.quoteStatus === "unconfigured") return "行情接口未配置";
   return getQuoteModeLabel(item.quoteStatus);
 }
 
@@ -1312,8 +1301,8 @@ function ensureDetailShape(item) {
     prediction: item.prediction || normalizePrediction({ predictionScore: 5, action: "观察", reason: "等待真实行情。" }),
     quote: item.quote || null,
     summary: item.summary || null,
-    quoteStatus: item.quoteStatus || (apiBase ? "failed" : "unconfigured"),
-    quoteError: item.quoteError || (apiBase ? "暂无真实数据" : "行情接口未配置"),
+    quoteStatus: item.quoteStatus || "failed",
+    quoteError: item.quoteError || "暂无真实数据",
     intraday: item.intraday || [],
     dailyKline: item.dailyKline || [],
     weeklyKline: item.weeklyKline || [],
@@ -1388,7 +1377,7 @@ function getViewLabel(view) {
 }
 
 function getApiBase() {
-  return String(sourceData.apiBase || "").replace(/\/$/, "");
+  return String(sourceData.apiBase ?? "").replace(/\/$/, "");
 }
 
 function getLastRealText() {
@@ -1415,13 +1404,12 @@ function getQuoteModeLabel(mode) {
     non_trading_day: "非交易日",
     failed: "接口失败",
     failed_with_cache: "接口失败，使用最后一次真实数据",
-    interface_failed_cache: "接口失败，使用最后一次真实数据",
-    unconfigured: "行情接口未配置"
+    interface_failed_cache: "接口失败，使用最后一次真实数据"
   }[mode] || "接口失败";
 }
 
 function getQuoteModeDescription() {
-  return apiBase ? "通过代理接口请求真实行情。" : "未配置后端代理；不生成假价格。";
+  return apiBase ? "通过 Vercel 代理接口请求真实行情。" : "通过同源 /api 请求 Vercel 真实行情。";
 }
 
 function getMarketStatusLabel(status) {
@@ -1432,8 +1420,7 @@ function getMarketStatusLabel(status) {
     non_trading_day: "非交易日",
     suspended: "停牌",
     error: "接口失败",
-    historical: "历史数据",
-    unconfigured: "行情接口未配置"
+    historical: "历史数据"
   }[status] || "接口失败";
 }
 
@@ -1442,7 +1429,6 @@ function chooseGlobalQuoteMode(modes) {
   if (modes.includes("lunch_break")) return "lunch_break";
   if (modes.includes("historical") || modes.includes("closed")) return "historical";
   if (modes.includes("interface_failed_cache")) return "failed_with_cache";
-  if (!apiBase) return "unconfigured";
   return "failed";
 }
 
