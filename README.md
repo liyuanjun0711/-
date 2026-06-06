@@ -9,7 +9,7 @@
 - `app.js`: 本地渲染逻辑。
 - `report-data.js`: 每日简报数据。自动化每天更新这个文件即可刷新页面内容。
 - `vendor/lightweight-charts.standalone.production.js`: 本地行情图表库，避免页面运行时依赖外部 CDN。
-- `api-proxy/cloudflare-worker.js`: 免费后端代理示例，可部署到 Cloudflare Worker 后给前端提供 `/api/search`、`/api/quote`、`/api/kline`、`/api/news`。
+- `api-proxy/cloudflare-worker.js`: Cloudflare Worker 行情代理，可部署后给前端提供 `/api/search`、`/api/quote`、`/api/intraday`、`/api/kline`、`/api/news`。
 - `.nojekyll`: GitHub Pages 使用，避免静态文件被 Jekyll 处理。
 
 ## 使用方式
@@ -36,4 +36,12 @@
 - `/api/fund`
 - `/api/news`
 
-如果代理或上游行情源不可用，接口应返回 `ok:false` 和错误信息；前端会显示接口失败并保留最后一次成功数据，不生成价格或K线。
+Worker 内部按顺序尝试东方财富、 新浪财经、腾讯财经。所有价格、涨跌幅、昨收、开盘、最高、最低、成交量、成交额、分时和K线都必须来自真实接口。
+
+如果代理或上游行情源不可用，接口会返回 `ok:false` 和错误信息；前端会显示“真实行情暂不可用”，如本机浏览器里有最后一次成功缓存，则显示“使用最后一次真实数据”，不会生成价格或K线。
+
+部署后把 `report-data.js` 里的 `apiBase` 改成 Worker 地址，例如：
+
+```js
+apiBase: "https://morning-post-market-api.your-subdomain.workers.dev"
+```

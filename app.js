@@ -52,7 +52,6 @@ const appState = {
   recentSecurities: loadJson("recentSecurities", []),
   recentNews: loadJson("recentNews", []),
   readNews: new Set(loadJson("readNews", [])),
-  autoTimer: null,
   initialized: false
 };
 
@@ -84,7 +83,7 @@ const dataProvider = {
   async getQuote(symbol) {
     if (!apiBase) throw new Error("行情接口未配置");
     const payload = await requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(symbol)}`);
-    if (!payload.ok) throw new Error(payload.message || "真实行情获取失败");
+    if (!payload.ok) throw new Error(payload.message || "真实行情暂不可用");
     return normalizeQuote(payload);
   },
   async getIntraday(symbol, tradeDate) {
@@ -482,7 +481,7 @@ function renderDetailPrice(item) {
     return `<div class="detail-price"><strong>${formatPrice(item.fundInfo.nav)}</strong><p>最新净值 / ${escapeText(item.fundInfo.navDate || "净值日期未知")}</p><span>开放式基金按净值披露，不提供盘中分时。</span></div>`;
   }
   const record = getDisplayRecord(item);
-  if (!record) return `<div class="detail-price failed"><strong>暂无真实数据</strong><p>${escapeText(item.quoteError || "真实行情获取失败")}</p><span>不会显示假价格；可配置代理接口后重试。</span></div>`;
+  if (!record) return `<div class="detail-price failed"><strong>暂无真实数据</strong><p>${escapeText(item.quoteError || "真实行情暂不可用")}</p><span>不会显示假价格；可配置代理接口后重试。</span></div>`;
   return `
     <div class="detail-price">
       <strong>${formatPrice(record.price ?? record.close)}</strong>
@@ -642,14 +641,13 @@ async function refreshQuotes(options = {}) {
     const modes = results.map((result) => result.status).filter(Boolean);
     appState.quoteMode = chooseGlobalQuoteMode(modes);
     appState.lastRealUpdated = results.some((result) => result.ok) ? getDateTimeText() : appState.lastRealUpdated;
-    if (!results.some((result) => result.ok)) appState.quoteError = apiBase ? "真实行情获取失败；已保留最后一次成功数据。" : "行情接口未配置";
+    if (!results.some((result) => result.ok)) appState.quoteError = apiBase ? "真实行情暂不可用；如有缓存则使用最后一次真实数据。" : "行情接口未配置";
   } catch (error) {
     appState.quoteMode = hasAnyCachedData() ? "failed_with_cache" : "failed";
-    appState.quoteError = error.message || "真实行情获取失败";
+    appState.quoteError = error.message || "真实行情暂不可用";
   } finally {
     appState.isRefreshingQuote = false;
     if (!options.silent) renderApp();
-    scheduleAutoRefresh();
   }
 }
 
@@ -690,7 +688,7 @@ async function refreshSecurity(item) {
       item.quote = await dataProvider.getLastValidQuote(item.symbol);
       item.dailyKline = await dataProvider.getDailyKline(item.symbol, 120, "day");
     } else {
-      throw new Error("真实行情获取失败");
+      throw new Error("真实行情暂不可用");
     }
     item.weeklyKline = await dataProvider.getDailyKline(item.symbol, 80, "week").catch(() => item.weeklyKline || []);
     item.quoteStatus = status === "trading" ? "realtime" : status === "lunch_break" ? "lunch_break" : status === "suspended" ? "suspended" : "historical";
@@ -700,7 +698,7 @@ async function refreshSecurity(item) {
   } catch (error) {
     restoreCachedSecurity(item);
     item.quoteStatus = hasAnyRealData(item) ? "interface_failed_cache" : "failed";
-    item.quoteError = error.message || "真实行情获取失败";
+    item.quoteError = hasAnyRealData(item) ? "真实行情暂不可用，使用最后一次真实数据" : (error.message || "真实行情暂不可用");
     return { ok: false, status: item.quoteStatus };
   }
 }
@@ -722,7 +720,6 @@ async function refreshNews() {
 async function refreshAnalysis() {
   if (appState.isRefreshingAnalysis) return;
   appState.isRefreshingAnalysis = true;
-  await new Promise((resolve) => setTimeout(resolve, 600));
   appState.lastUpdated = getDateTimeText();
   appState.isRefreshingAnalysis = false;
   renderApp();
@@ -899,7 +896,6 @@ function initInteractions() {
 function init() {
   renderApp();
   initInteractions();
-  scheduleAutoRefresh();
 }
 
 function normalizeSecurities(items) {
@@ -1160,7 +1156,7 @@ function renderPriceBox(item) {
     return `<strong>${nav == null ? "暂无真实净值" : formatPrice(nav)}</strong><span>${item.fundInfo?.navDate || "净值待取"}</span>`;
   }
   const record = getDisplayRecord(item);
-  if (!record) return `<strong>${apiBase ? "真实行情获取失败" : "行情接口未配置"}</strong><span>${hasAnyRealData(item) ? "保留上次成功数据" : "暂无真实数据"}</span>`;
+  if (!record) return `<strong>${apiBase ? "真实行情暂不可用" : "行情接口未配置"}</strong><span>${hasAnyRealData(item) ? "使用最后一次真实数据" : "暂无真实数据"}</span>`;
   const label = ["closed", "non_trading_day", "historical", "suspended"].includes(item.quoteStatus) ? "收盘/最近" : "最新";
   return `<strong>${formatPrice(record.price ?? record.close)}</strong><span class="${changeClass(record.changePercent)}">${label} ${formatPercent(record.changePercent)}</span>`;
 }
@@ -1255,12 +1251,6 @@ async function getDailyKline(symbol, count = 120) {
 
 async function getDailySummary(symbol, tradeDate) {
   return dataProvider.getDailySummary(symbol, tradeDate);
-}
-
-function scheduleAutoRefresh() {
-  clearTimeout(appState.autoTimer);
-  if ((appState.marketStatus.status || appState.marketStatus.session) !== "trading") return;
-  appState.autoTimer = setTimeout(() => refreshQuotes({ silent: true }), appState.refreshInterval);
 }
 
 function addSecurityToHolding(symbol) {
@@ -1407,7 +1397,7 @@ function getLastRealText() {
 
 function getNextRefreshText() {
   const status = appState.marketStatus.status || appState.marketStatus.session;
-  if (status === "trading") return `盘中每${Math.round(appState.refreshInterval / 1000)}秒刷新`;
+  if (status === "trading") return "盘中可手动刷新真实行情";
   if (status === "lunch_break") return "午间休市显示上午最后数据";
   if (status === "closed") return "收盘后显示当日收盘数据";
   if (status === "non_trading_day") return "非交易日显示最近交易日数据";
@@ -1424,8 +1414,8 @@ function getQuoteModeLabel(mode) {
     suspended: "停牌",
     non_trading_day: "非交易日",
     failed: "接口失败",
-    failed_with_cache: "接口失败，保留缓存",
-    interface_failed_cache: "接口失败，保留上次成功数据",
+    failed_with_cache: "接口失败，使用最后一次真实数据",
+    interface_failed_cache: "接口失败，使用最后一次真实数据",
     unconfigured: "行情接口未配置"
   }[mode] || "接口失败";
 }
