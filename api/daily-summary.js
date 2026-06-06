@@ -1,8 +1,8 @@
-const { normalizeSymbol, json, handleOptions, marketStatus } = require("../lib/providers/common");
-const eastmoney = require("../lib/providers/eastmoney");
-const sina = require("../lib/providers/sina");
-const tencent = require("../lib/providers/tencent");
-const { tryProviders, failPayload } = require("../lib/providers/fallback");
+const { normalizeSymbol, json, handleOptions, marketStatus } = require("../dataProviders/common");
+const eastmoney = require("../dataProviders/eastmoney");
+const sina = require("../dataProviders/sina");
+const tencent = require("../dataProviders/tencent");
+const { tryProviders, failPayload } = require("../dataProviders/fallback");
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
@@ -35,6 +35,6 @@ module.exports = async function handler(req, res) {
       amount: last.amount
     });
   } catch (error) {
-    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "日行情摘要获取失败", error));
+    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "daily summary unavailable", error));
   }
 };

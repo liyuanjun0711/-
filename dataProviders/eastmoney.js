@@ -6,6 +6,47 @@ async function fetchJson(url) {
   return response.json();
 }
 
+async function search(keyword) {
+  const value = String(keyword || "").trim();
+  if (!value) return [];
+  const url = `https://searchapi.eastmoney.com/api/suggest/get?input=${encodeURIComponent(value)}&type=14&token=&count=10`;
+  const payload = await fetchJson(url);
+  const rows = payload?.QuotationCodeTable?.Data || [];
+  return rows.map(mapSearchRow).filter(Boolean);
+}
+
+function mapSearchRow(row) {
+  const code = String(row.Code || row.UnifiedCode || "").trim();
+  if (!/^\d{6}$/.test(code)) return null;
+  const market = marketFromRow(row);
+  return {
+    name: row.Name || "",
+    code,
+    type: typeFromRow(row, code),
+    market,
+    symbol: `${market}${code}`,
+    sector: row.SecurityTypeName || row.Classify || "",
+    source: "eastmoney",
+    eastmoneySecid: row.QuoteID || `${market === "SH" ? "1" : "0"}.${code}`
+  };
+}
+
+function marketFromRow(row) {
+  const quoteId = String(row.QuoteID || "");
+  if (quoteId.startsWith("1.")) return "SH";
+  if (quoteId.startsWith("0.")) return "SZ";
+  if (quoteId.startsWith("2.")) return "BJ";
+  if (row.MktNum === "1" || row.JYS === "2") return "SH";
+  if (row.MktNum === "0" || row.JYS === "6") return "SZ";
+  return /^[6895]/.test(String(row.Code || "")) ? "SH" : "SZ";
+}
+
+function typeFromRow(row, code) {
+  const text = `${row.Classify || ""} ${row.SecurityTypeName || ""}`;
+  if (/基金|ETF|LOF|Fund/i.test(text)) return /^[15]/.test(code) ? "exchange_fund" : "open_fund";
+  return "stock";
+}
+
 function scale100(value) {
   const number = num(value);
   return number == null ? null : number / 100;
@@ -92,4 +133,4 @@ async function kline(meta, period = "day", count = 120) {
   }).filter((row) => row.time && row.open != null && row.high != null && row.low != null && row.close != null).slice(-count);
 }
 
-module.exports = { providerName: "eastmoney", quote, intraday, kline };
+module.exports = { providerName: "eastmoney", search, quote, intraday, kline };

@@ -1,5 +1,5 @@
 const SYMBOLS = [
-  { name: "东材科技", code: "601208", market: "SH", type: "stock", sector: "新材料" },
+  { name: "东材科技", code: "601208", market: "SH", type: "stock", sector: "电子材料" },
   { name: "天齐锂业", code: "002466", market: "SZ", type: "stock", sector: "锂矿" },
   { name: "中国联通", code: "600050", market: "SH", type: "stock", sector: "通信/6G" },
   { name: "中芯国际", code: "688981", market: "SH", type: "stock", sector: "半导体" },
@@ -19,7 +19,7 @@ function normalizeSymbol(input) {
   const code = upper.replace(/^(SH|SZ|BJ|OF)/, "");
   const byCode = SYMBOLS.find((item) => item.code === code);
   if (byCode) return toSymbolShape(byCode);
-  if (/^(SH|SZ)\d{6}$/.test(upper)) {
+  if (/^(SH|SZ|BJ|OF)\d{6}$/.test(upper)) {
     return toSymbolShape({ code: upper.slice(2), market: upper.slice(0, 2), type: inferType(upper.slice(2)) });
   }
   if (/^\d{6}$/.test(upper)) {
@@ -45,9 +45,10 @@ function toSymbolShape(item) {
 }
 
 function inferMarket(code) {
-  if (/^[6895]/.test(String(code))) return "SH";
-  if (/^[0123]/.test(String(code))) return "SZ";
-  if (/^[48]/.test(String(code))) return "BJ";
+  const value = String(code);
+  if (/^[6895]/.test(value)) return "SH";
+  if (/^[0123]/.test(value)) return "SZ";
+  if (/^[48]/.test(value)) return "BJ";
   return "OF";
 }
 

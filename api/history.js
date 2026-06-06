@@ -1,8 +1,8 @@
-const { normalizeSymbol, json, handleOptions, marketStatus } = require("../lib/providers/common");
-const eastmoney = require("../lib/providers/eastmoney");
-const sina = require("../lib/providers/sina");
-const tencent = require("../lib/providers/tencent");
-const { tryProviders, failPayload } = require("../lib/providers/fallback");
+const { normalizeSymbol, json, handleOptions, marketStatus } = require("../dataProviders/common");
+const eastmoney = require("../dataProviders/eastmoney");
+const sina = require("../dataProviders/sina");
+const tencent = require("../dataProviders/tencent");
+const { tryProviders, failPayload } = require("../dataProviders/fallback");
 
 function countFromRange(range) {
   const value = String(range || "30d").toLowerCase();
@@ -19,7 +19,7 @@ module.exports = async function handler(req, res) {
   let meta;
   try {
     meta = normalizeSymbol(req.query?.symbol || req.query?.code || "");
-    if (meta.type === "open_fund") throw new Error("普通开放式基金历史净值接口暂未接入");
+    if (meta.type === "open_fund") throw new Error("open fund history is not connected");
     const range = req.query?.range || "30d";
     const period = req.query?.period || "day";
     const count = countFromRange(range);
@@ -46,6 +46,6 @@ module.exports = async function handler(req, res) {
       items
     });
   } catch (error) {
-    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "真实历史行情不可用", error));
+    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "real history unavailable", error));
   }
 };

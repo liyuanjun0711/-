@@ -1,0 +1,27 @@
+{
+  "sources": [
+    {
+      "id": "eastmoney-search",
+      "name": "东方财富",
+      "type": "eastmoney-search",
+      "enabled": true,
+      "url": "https://search-api-web.eastmoney.com/search/jsonp",
+      "pageSize": 8
+    },
+    {
+      "id": "google-news-cn",
+      "name": "Google News",
+      "type": "google-news-rss",
+      "enabled": true,
+      "url": "https://news.google.com/rss/search?q={query}&hl=zh-CN&gl=CN&ceid=CN:zh-Hans"
+    }
+  ],
+  "defaultKeywords": [
+    "A股",
+    "黄金",
+    "白银",
+    "恒生科技",
+    "军工",
+    "稀有金属"
+  ]
+}

@@ -123,7 +123,9 @@ const dataProvider = {
     return payload;
   },
   async getNews(keyword = "") {
-    const payload = await requestJson(`${apiBase}/api/news?keyword=${encodeURIComponent(keyword)}`);
+    const symbols = [...appState.holdings, ...appState.watchlist].map((item) => item.symbol).filter(Boolean).join(",");
+    const keywords = buildNewsKeywords(keyword).join(",");
+    const payload = await requestJson(`${apiBase}/api/news?symbols=${encodeURIComponent(symbols)}&keywords=${encodeURIComponent(keywords)}`);
     if (!payload.ok) throw new Error(payload.message || "新闻接口失败");
     return normalizeNews(payload.items || []);
   }
@@ -392,7 +394,12 @@ function renderHoldingNews(container) {
 
 function renderTopNews(container) {
   const items = [...appState.news].sort((a, b) => b.importance - a.importance).slice(0, 3);
-  container.appendChild(renderNewsFeed(items, { emptyText: "暂无真实新闻数据；未配置来源时不生成假新闻。" }));
+  if (appState.searchError && !items.length) {
+    const error = createEl("div", "empty-card");
+    error.textContent = appState.searchError;
+    container.appendChild(error);
+  }
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无真实新闻数据；不会生成假新闻。可点刷新新闻重试。" }));
 }
 
 function renderMarketNews(container) {
@@ -725,6 +732,7 @@ async function refreshSecurity(item) {
 async function refreshNews() {
   if (appState.isRefreshingNews) return;
   appState.isRefreshingNews = true;
+  appState.searchError = "";
   try {
     appState.news = await dataProvider.getNews(appState.searchKeyword);
     appState.lastUpdated = getDateTimeText();
@@ -916,7 +924,24 @@ function init() {
   renderApp();
   initInteractions();
   refreshQuotes({ initial: true });
+  refreshNews();
   startQuoteAutoRefresh();
+}
+
+function buildNewsKeywords(keyword = "") {
+  const values = [
+    keyword,
+    ...appState.holdings.map((item) => item.name),
+    ...appState.watchlist.map((item) => item.name),
+    ...(sourceData.newsKeywords || []),
+    "A股",
+    "黄金",
+    "白银",
+    "恒生科技",
+    "军工",
+    "稀有金属"
+  ];
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))].slice(0, 12);
 }
 
 function renderDetailHistory(item) {
@@ -1016,7 +1041,7 @@ function normalizeNews(items) {
     location: item.location || "未披露",
     peopleOrOrg: Array.isArray(item.peopleOrOrg) ? item.peopleOrOrg : [],
     summary: item.summary || item.body || "",
-    relatedStocks: item.relatedStocks || [],
+    relatedStocks: item.relatedSymbols || item.relatedStocks || [],
     sector: item.sector || "",
     event: item.event || "",
     impactType: item.impact || item.impactType || item.type || "neutral",

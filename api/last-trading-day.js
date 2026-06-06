@@ -1,8 +1,8 @@
-const { normalizeSymbol, json, handleOptions } = require("../lib/providers/common");
-const eastmoney = require("../lib/providers/eastmoney");
-const sina = require("../lib/providers/sina");
-const tencent = require("../lib/providers/tencent");
-const { tryProviders, failPayload } = require("../lib/providers/fallback");
+﻿const { normalizeSymbol, json, handleOptions } = require("../dataProviders/common");
+const eastmoney = require("../dataProviders/eastmoney");
+const sina = require("../dataProviders/sina");
+const tencent = require("../dataProviders/tencent");
+const { tryProviders, failPayload } = require("../dataProviders/fallback");
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;

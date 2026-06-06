@@ -243,72 +243,7 @@ window.MARKET_BRIEFING_DATA = {
     { title: "满仓风险", priority: "中", conclusion: "追新方向会让仓位失控。", trigger: "没有卖出资金还想买军工或新热点。", action: "强制先卖后买。" }
   ],
   newsItems: [],
-  newsFlow: [
-    {
-      id: "holding-metals-risk",
-      title: "贵金属短线仍受美元和美债影响",
-      source: "晨报规则",
-      publishTime: "2026-06-06 08:30",
-      summary: "美元和美债若继续偏强，会压制黄金、白银弹性。",
-      relatedStocks: ["164701", "161226"],
-      impactType: "negative",
-      impactScore: 4,
-      url: "",
-      fullContent: "贵金属持仓今天不适合下跌补仓。只在真实价格反弹到触发价后减风险，未触发则保持观察。",
-      holdingImpact: "影响黄金LOF、国投白银LOF。",
-      watchImpact: "不影响观察池新增买入。",
-      priceCondition: "164701看1.765/1.774；161226看2.132。",
-      planChange: "不改变计划，仍然反弹减仓。"
-    },
-    {
-      id: "holding-defense-positive",
-      title: "军工相对强度可继续跟踪",
-      source: "晨报规则",
-      publishTime: "2026-06-06 08:30",
-      summary: "若军工尾盘仍强于大盘，512710有仓内切换价值。",
-      relatedStocks: ["512710", "159241"],
-      impactType: "positive",
-      impactScore: 7,
-      url: "",
-      fullContent: "军工方向不是无条件买。只有先卖出贵金属获得资金，并且512710尾盘站稳0.696，才考虑小仓切换。",
-      holdingImpact: "影响512710、159241。",
-      watchImpact: "观察军工和航空航天方向是否延续。",
-      priceCondition: "512710尾盘站稳0.696且强于大盘。",
-      planChange: "满足条件才新增1手。"
-    },
-    {
-      id: "watch-lithium-neutral",
-      title: "锂矿观察但不追",
-      source: "晨报规则",
-      publishTime: "2026-06-06 08:30",
-      summary: "天齐锂业有弹性，但账户已有稀有金属ETF，不能重复堆资源品。",
-      relatedStocks: ["002466", "159608"],
-      impactType: "neutral",
-      impactScore: 5,
-      url: "",
-      fullContent: "天齐锂业只适合观察，不适合在满仓状态下直接追。需要锂矿板块转强，同时稀有金属ETF突破关键位。",
-      holdingImpact: "影响159608观察，不改变持仓。",
-      watchImpact: "影响天齐锂业观察条件。",
-      priceCondition: "159608站上1.224，锂矿板块放量强于大盘。",
-      planChange: "不改变今日操作计划。"
-    },
-    {
-      id: "market-tech-neutral",
-      title: "港股科技看权重同步",
-      source: "晨报规则",
-      publishTime: "2026-06-06 08:30",
-      summary: "腾讯、阿里、美团不同步时，不把ETF反弹当加仓信号。",
-      relatedStocks: ["159740"],
-      impactType: "neutral",
-      impactScore: 5,
-      url: "",
-      fullContent: "恒生科技ETF是组合体感核心，但今天不加仓。只看0.600支撑和0.628压力。",
-      holdingImpact: "影响159740持有判断。",
-      watchImpact: "无。",
-      priceCondition: "159740守住0.600，突破0.628也不追。",
-      planChange: "不改变，持有不加。"
-    }
-  ],
+  newsFlow: [],
   reasoning: [
     { title: "为什么先卖", body: "贵金属仓位偏重，反弹减仓比下跌割肉更合适。" },
     { title: "为什么不追高", body: "满仓状态下，追新方向必须先有卖出资金。" },
@@ -339,3 +274,4 @@ window.MARKET_BRIEFING_DATA = {
     { name: "易方达蓝筹精选混合", code: "005827", symbol: "OF005827", market: "OF", type: "open_fund", sector: "开放式基金", support: "", resistance: "" }
   ]
 };
+

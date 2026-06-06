@@ -1,15 +1,15 @@
-const { normalizeSymbol, json, handleOptions, marketStatus } = require("../lib/providers/common");
-const eastmoney = require("../lib/providers/eastmoney");
-const sina = require("../lib/providers/sina");
-const tencent = require("../lib/providers/tencent");
-const { tryProviders, failPayload } = require("../lib/providers/fallback");
+const { normalizeSymbol, json, handleOptions, marketStatus } = require("../dataProviders/common");
+const eastmoney = require("../dataProviders/eastmoney");
+const sina = require("../dataProviders/sina");
+const tencent = require("../dataProviders/tencent");
+const { tryProviders, failPayload } = require("../dataProviders/fallback");
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
   let meta;
   try {
     meta = normalizeSymbol(req.query?.symbol || req.query?.code || "");
-    if (meta.type === "open_fund") throw new Error("普通开放式基金不显示伪实时分时");
+    if (meta.type === "open_fund") throw new Error("open fund intraday is not supported");
     const tradeDate = req.query?.date || req.query?.tradeDate || "";
     const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "intraday", [tradeDate]);
     const status = marketStatus();
@@ -23,6 +23,6 @@ module.exports = async function handler(req, res) {
       items: payload.items || payload
     });
   } catch (error) {
-    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "真实分时数据不可用", error));
+    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "real intraday unavailable", error));
   }
 };

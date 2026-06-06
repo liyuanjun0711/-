@@ -1,3 +1,3 @@
-const quote = require("./quote");
+﻿const quote = require("./quote");
 
 module.exports = quote;

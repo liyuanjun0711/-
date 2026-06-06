@@ -1,15 +1,15 @@
-const { normalizeSymbol, json, handleOptions } = require("../lib/providers/common");
-const sina = require("../lib/providers/sina");
-const tencent = require("../lib/providers/tencent");
-const eastmoney = require("../lib/providers/eastmoney");
-const { tryProviders, withQuoteMeta, quoteFromLastKline, failPayload } = require("../lib/providers/fallback");
+const { normalizeSymbol, json, handleOptions } = require("../dataProviders/common");
+const sina = require("../dataProviders/sina");
+const tencent = require("../dataProviders/tencent");
+const eastmoney = require("../dataProviders/eastmoney");
+const { tryProviders, withQuoteMeta, quoteFromLastKline, failPayload } = require("../dataProviders/fallback");
 
 module.exports = async function handler(req, res) {
   if (handleOptions(req, res)) return;
   let meta;
   try {
     meta = normalizeSymbol(req.query?.symbol || req.query?.code || "");
-    if (meta.type === "open_fund") throw new Error("普通开放式基金不支持盘中实时行情");
+    if (meta.type === "open_fund") throw new Error("open fund realtime quote is not supported");
     try {
       const { payload } = await tryProviders(meta, [sina, tencent, eastmoney], "quote");
       json(res, 200, withQuoteMeta(payload, meta));
@@ -18,6 +18,6 @@ module.exports = async function handler(req, res) {
       json(res, 200, quoteFromLastKline(meta, payload.items || payload, providerName));
     }
   } catch (error) {
-    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "真实行情获取失败", error));
+    json(res, 502, failPayload(meta?.symbol || String(req.query?.symbol || ""), "real quote unavailable", error));
   }
 };
