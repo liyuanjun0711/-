@@ -62,6 +62,7 @@ const appState = {
 
 appState.sections = buildSections();
 hydrateCachedMarketData();
+initializeDataStateFromSeed();
 
 const dataProvider = {
   async search(keyword) {
@@ -2080,6 +2081,13 @@ function hydrateCachedMarketData() {
   [...appState.holdings, ...appState.watchlist].forEach((item) => {
     if (restoreCachedSecurity(item)) item.quoteStatus = "historical";
   });
+}
+
+function initializeDataStateFromSeed() {
+  if (!hasAnyCachedData()) return;
+  appState.quoteMode = "historical";
+  appState.quoteError = "";
+  appState.lastRealUpdated = sourceData.lastUpdated || appState.lastRealUpdated || getDateTimeText();
 }
 
 function hasAnyRealData(item) {
