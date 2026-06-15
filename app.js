@@ -3,24 +3,24 @@ const chartLib = window.LightweightCharts;
 
 const sectionMap = {
   action: {
-    title: "今日",
-    subtitle: "只放今天最重要的动作、风险和影响计划的消息",
-    sections: ["today-decision", "must-handle", "do-not-do", "high-risk", "plan-news"]
+    title: "今日操作",
+    subtitle: "只放今天最重要的动作、风险和执行条件",
+    sections: ["trade-decision", "one-sentence", "execution-list", "trade-plan", "do-not-do"]
   },
   quote: {
-    title: "行情",
+    title: "持仓行情与走势",
     subtitle: "真实价格、历史数据、图表和主观评分分开看",
-    sections: ["global-search", "holding-quotes", "quote-watchlist", "risk-trigger", "prediction-overview"]
+    sections: ["quote-search", "holding-quotes", "prediction-overview", "risk-trigger", "quote-watchlist"]
   },
   news: {
-    title: "新闻",
+    title: "市场新闻与机会",
     subtitle: "先看影响持仓，再看观察池和市场消息",
-    sections: ["top-news", "holding-news", "market-news", "read-news"]
+    sections: ["holding-news", "market-risk", "hot-review", "sector-move", "watchlist"]
   },
   logic: {
-    title: "学习与复盘",
+    title: "今日交易逻辑",
     subtitle: "把行情、K线、成交量和新闻信号拆开复盘",
-    sections: ["reasoning", "invalid-conditions", "next-watch", "learning-framework"]
+    sections: ["reasoning", "invalid-conditions", "learning-framework", "cancel-plan", "next-watch"]
   }
 };
 
@@ -38,7 +38,7 @@ const appState = {
   news: loadCachedNewsItems(),
   newsCacheInfo: loadJson("news-cache", null),
   sections: [],
-  expandedSections: new Set(["today-decision", "global-search", "holding-quotes", "holding-news", "reasoning"]),
+  expandedSections: new Set(["trade-decision", "quote-search", "holding-quotes", "holding-news", "reasoning"]),
   isRefreshingQuote: false,
   isRefreshingNews: false,
   isRefreshingAnalysis: false,
@@ -53,6 +53,10 @@ const appState = {
   recentSecurities: loadJson("recentSecurities", []),
   recentNews: loadJson("recentNews", []),
   readNews: new Set(loadJson("readNews", [])),
+  previousPredictionSnapshot: loadJson("prediction-history", {}),
+  predictionHistory: loadJson("prediction-history", {}),
+  refreshTasks: [],
+  toast: null,
   initialized: false
 };
 
@@ -90,9 +94,7 @@ const dataProvider = {
     return normalizeIntraday(payload);
   },
   async getDailyKline(symbol, count = 120, period = "day") {
-    const endpoint = period === "day"
-      ? `${apiBase}/api/history?symbol=${encodeURIComponent(symbol)}&range=${encodeURIComponent(`${count}d`)}&period=day`
-      : `${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=${encodeURIComponent(period)}&count=${encodeURIComponent(count)}`;
+    const endpoint = `${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=${encodeURIComponent(period)}&count=${encodeURIComponent(count)}`;
     const payload = await requestJson(endpoint);
     if (!payload.ok) throw new Error(payload.message || "真实K线获取失败");
     return normalizeKline(payload);
@@ -139,24 +141,26 @@ let newsRefreshTimer = null;
 
 function buildSections() {
   return [
-    section("today-decision", "action", "Primary", "今日操作结论", "decision", true, renderTodayDecision),
-    section("must-handle", "action", "必须处理", "今日必须处理的持仓", "quote", false, renderMustHandle),
+    section("trade-decision", "action", "Primary", "今日操作结论", "decision", true, renderTodayDecision),
+    section("one-sentence", "action", "一句话", "今日一句话", "decision", false, renderOneSentence),
+    section("execution-list", "action", "执行", "执行清单", "quote", false, renderExecutionList),
+    section("trade-plan", "action", "计划", "交易计划", "decision", false, renderTradePlan),
     section("do-not-do", "action", "纪律", "今日禁止操作", "risk", false, renderDoNotDo),
-    section("high-risk", "action", "高风险", "高风险提醒", "risk", false, renderHighRisk),
-    section("plan-news", "action", "影响计划", "影响今日计划的新闻", "news", false, renderPlanNews),
-    section("global-search", "quote", "查询", "股票 / 基金 / 新闻统一搜索", "quote", true, renderGlobalSearch),
+    section("quote-search", "quote", "查询", "股票 / ETF / LOF / 基金统一查询", "quote", true, renderGlobalSearch),
     section("holding-quotes", "quote", "持仓", "持仓行情列表", "quote", true, renderHoldingQuotes),
-    section("quote-watchlist", "quote", "观察池", "观察池行情列表", "watch", false, renderQuoteWatchlist),
-    section("risk-trigger", "quote", "风险", "风险触发提醒", "risk", false, renderRiskTrigger),
     section("prediction-overview", "quote", "评分", "今日评分总览", "expectation", false, renderPredictionOverview),
-    section("top-news", "news", "重点", "今日重点新闻", "news", true, renderTopNews),
-    section("holding-news", "news", "持仓", "持仓相关新闻", "news", false, renderHoldingNews),
-    section("market-news", "news", "市场", "市场与行业新闻", "news", false, renderMarketNews),
-    section("read-news", "news", "已读", "已读新闻", "news", false, renderReadNews),
+    section("risk-trigger", "quote", "风险", "风险触发提醒", "risk", false, renderRiskTrigger),
+    section("quote-watchlist", "quote", "观察池", "观察池行情列表", "watch", false, renderQuoteWatchlist),
+    section("holding-news", "news", "持仓", "持仓相关新闻", "news", true, renderHoldingNews),
+    section("market-risk", "news", "风险", "全市场重大风险", "risk", false, renderMarketRisk),
+    section("hot-review", "news", "24小时", "过去24小时热点", "news", false, renderHotReview),
+    section("sector-move", "news", "板块", "板块机会与异动", "news", false, renderSectorMove),
+    section("watchlist", "news", "观察池", "观察池新闻与条件", "watch", false, renderWatchlistNews),
     section("reasoning", "logic", "依据", "今日判断依据", "logic", true, renderReasoning),
     section("invalid-conditions", "logic", "失效", "判断失效条件", "risk", false, renderInvalidConditions),
-    section("next-watch", "logic", "明日", "明日观察重点", "logic", false, renderNextWatch),
-    section("learning-framework", "logic", "概念", "关键概念解释", "logic", false, renderLearningFramework)
+    section("learning-framework", "logic", "框架", "关键判断框架", "logic", false, renderLearningFramework),
+    section("cancel-plan", "logic", "取消", "取消交易计划", "risk", false, renderCancelPlan),
+    section("next-watch", "logic", "明日", "明日观察重点", "logic", false, renderNextWatch)
   ];
 }
 
@@ -168,7 +172,11 @@ function renderApp() {
   const root = document.getElementById("moduleRoot");
   root.innerHTML = "";
   root.appendChild(renderSectionHeader(appState.currentView));
+  const refreshPanel = renderRefreshStatePanel();
+  if (refreshPanel) root.appendChild(refreshPanel);
   getCurrentSections().forEach((item, index) => root.appendChild(renderSection(item, index === 0)));
+  const toast = renderToast();
+  if (toast) root.appendChild(toast);
   renderSecurityDetailSheet();
   renderNewsDetailSheet();
   dedupeRenderedSections();
@@ -193,6 +201,47 @@ function renderSectionHeader(view) {
     </div>
   `;
   return header;
+}
+
+function renderRefreshStatePanel() {
+  if (!appState.refreshTasks.length) return null;
+  const panel = createEl("section", "refresh-state-panel reveal-card");
+  panel.innerHTML = `
+    <div class="refresh-pulse" aria-hidden="true"></div>
+    <div>
+      <strong>${escapeText(appState.refreshTasks[0].label)}</strong>
+      <span>${escapeText(appState.refreshTasks.map((task) => task.detail).filter(Boolean).join(" / ") || "请求真实数据源，失败时保留缓存，不生成假数据。")}</span>
+    </div>
+  `;
+  return panel;
+}
+
+function renderToast() {
+  if (!appState.toast) return null;
+  const toast = createEl("div", `toast ${appState.toast.type || "info"}`);
+  toast.textContent = appState.toast.message;
+  return toast;
+}
+
+function startRefreshTask(id, label, detail = "") {
+  appState.refreshTasks = appState.refreshTasks.filter((task) => task.id !== id);
+  appState.refreshTasks.push({ id, label, detail, startedAt: Date.now() });
+  appState.toast = null;
+}
+
+function finishRefreshTask(id) {
+  appState.refreshTasks = appState.refreshTasks.filter((task) => task.id !== id);
+}
+
+function showToast(message, type = "info") {
+  appState.toast = { message, type, time: Date.now() };
+  window.clearTimeout(showToast.timer);
+  showToast.timer = window.setTimeout(() => {
+    if (appState.toast?.message === message) {
+      appState.toast = null;
+      renderApp();
+    }
+  }, 3200);
 }
 
 function renderSection(item, isPrimary) {
@@ -228,6 +277,42 @@ function renderTodayDecision(container) {
     wrap.appendChild(card);
   });
   container.appendChild(wrap);
+}
+
+function renderThesisTracker(container) {
+  const items = sortPinned(appState.holdings).slice(0, 6).map((item) => {
+    const previous = getPreviousPrediction(item);
+    const current = item.prediction || normalizePrediction(item);
+    const record = getDisplayRecord(item);
+    const delta = previous?.predictionScore ? current.predictionScore - previous.predictionScore : 0;
+    const status = !previous ? "新基准" : Math.abs(delta) < 0.5 ? "继续跟踪" : delta > 0 ? "逻辑增强" : "逻辑减弱";
+    const evidence = record?.changePercent != null
+      ? `真实涨跌幅${formatPercent(record.changePercent)}，最新价/收盘价${formatPrice(record.price ?? record.close)}。`
+      : "真实行情不足，只保留上次观点，不做新判断。";
+    return {
+      title: `${item.name} ${item.code}`,
+      basis: previous ? `前次：${formatScore(previous.predictionScore)}分 / ${previous.action || previous.predictionLabel || "未记录动作"}` : "首次纳入观点追踪。",
+      inference: `${status}：${current.scoreChangeReason || current.reason}`,
+      conclusion: `${evidence}${current.action ? ` 动作：${current.action}` : ""}`,
+      invalidCondition: current.invalidCondition || item.invalidCondition || "跌破支撑、放量转弱或相关新闻证伪。"
+    };
+  });
+  container.appendChild(renderShortCards(items));
+}
+
+function renderOneSentence(container) {
+  const card = createEl("article", "info-card mini-card");
+  card.innerHTML = `<strong>${escapeText(sourceData.oneLine || "等真实行情确认，不做临场加仓。")}</strong><p>仅供个人复盘参考，不构成投资建议；页面不生成、不补全任何假行情。</p>`;
+  container.appendChild(card);
+}
+
+function renderExecutionList(container) {
+  container.appendChild(renderBulletList(sourceData.executionOrder || [], "execution-list"));
+}
+
+function renderTradePlan(container) {
+  const items = sourceData.tradePlan?.length ? sourceData.tradePlan : (sourceData.tradeDecision || []);
+  container.appendChild(renderShortCards(items));
 }
 
 function renderMustHandle(container) {
@@ -278,8 +363,8 @@ function renderQuoteStatusPanel() {
     <div class="quote-status-actions">
       <span>${getMarketStatusLabel(appState.marketStatus.status || appState.marketStatus.session)}</span>
       <small>${getNextRefreshText()}</small>
-      <button class="secondary-btn compact" type="button" data-action="refresh-quotes">刷新行情</button>
-      <button class="secondary-btn compact" type="button" data-action="refresh-news">刷新新闻</button>
+          <button class="secondary-btn compact ${appState.isRefreshingQuote ? "is-refreshing" : ""}" type="button" data-action="refresh-quotes" ${appState.isRefreshingQuote ? "disabled" : ""}>${appState.isRefreshingQuote ? "正在更新行情" : "刷新行情"}</button>
+          <button class="secondary-btn compact ${appState.isRefreshingNews ? "is-refreshing" : ""}" type="button" data-action="refresh-news" ${appState.isRefreshingNews ? "disabled" : ""}>${appState.isRefreshingNews ? "正在获取新闻" : "刷新新闻"}</button>
     </div>
   `;
   return panel;
@@ -350,7 +435,8 @@ function renderSecurityList(items, options = {}) {
         <span>${item.quoteError && !hasAnyRealData(item) ? escapeText(item.quoteError) : getDataDateText(item)}</span>
       </div>
       <div class="score-strip">
-        <strong>今日评分：${formatScore(item.prediction.predictionScore)} / 10</strong>
+        <strong>规则评分：${formatScore(item.prediction.predictionScore)} / 10</strong>
+        <small>${renderScoreChangeText(item.prediction)}</small>
         <span>${escapeText(item.prediction.predictionLabel)}｜${escapeText(item.prediction.reason)}</span>
         <em>${escapeText(item.prediction.action)}；仅供个人复盘参考</em>
       </div>
@@ -380,6 +466,7 @@ function renderPredictionOverview(container) {
         <div><dt>触发</dt><dd>${escapeText(item.resistance || item.prediction.trigger || "等真实价格确认")}</dd></div>
         <div><dt>失效</dt><dd>${escapeText(item.prediction.invalidCondition)}</dd></div>
       </dl>
+      ${renderScoreBreakdown(item.prediction)}
     `;
     wrap.appendChild(card);
   });
@@ -407,6 +494,26 @@ function renderTopNews(container) {
 
 function renderMarketNews(container) {
   container.appendChild(renderNewsFeed(getNewsByRelation("market").concat(getNewsByRelation("watch")), { emptyText: "暂无真实市场与行业新闻。" }));
+}
+
+function renderMarketRisk(container) {
+  const items = appState.news.filter((item) => inferNewsRelation(item) === "market" && ["negative", "risk"].includes(item.impactType));
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无新增重大风险新闻；继续按触发价和仓位纪律执行。" }));
+}
+
+function renderHotReview(container) {
+  const items = appState.news.filter((item) => inferNewsRelation(item) === "market").sort((a, b) => b.importance - a.importance).slice(0, 5);
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无过去24小时真实热点新闻。" }));
+}
+
+function renderSectorMove(container) {
+  const items = appState.news.filter((item) => ["holding", "watch", "market"].includes(inferNewsRelation(item))).slice(0, 6);
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无可核对的板块异动新闻。" }));
+}
+
+function renderWatchlistNews(container) {
+  const items = getNewsByRelation("watch");
+  container.appendChild(renderNewsFeed(items, { emptyText: "暂无观察池相关新闻；观察池仍按买入条件执行。" }));
 }
 
 function renderReadNews(container) {
@@ -442,7 +549,7 @@ function renderNewsFeed(items, options = {}) {
 }
 
 function renderReasoning(container) {
-  container.appendChild(renderShortCards(sourceData.reasoning || []));
+  container.appendChild(renderShortCards([...buildMarketLogicCards(), ...(sourceData.reasoning || [])].slice(0, 8)));
 }
 
 function renderInvalidConditions(container) {
@@ -455,6 +562,39 @@ function renderNextWatch(container) {
 
 function renderLearningFramework(container) {
   container.appendChild(renderShortCards(sourceData.learningFramework || []));
+}
+
+function renderCancelPlan(container) {
+  container.appendChild(renderBulletList(sourceData.cancelPlan || sourceData.invalidConditions || [], "invalid-list"));
+}
+
+function buildMarketLogicCards() {
+  return sortPinned(appState.holdings).slice(0, 4).map((item) => {
+    const record = getDisplayRecord(item);
+    const metrics = item.historyMetrics || calculateHistoryMetrics(item.dailyKline || []);
+    const price = numericOrNull(record?.price ?? record?.close);
+    const support = parseLevel(item.support, "min");
+    const resistance = parseLevel(item.resistance, "max");
+    const volumeRatio = record?.volume && metrics.avgVolume20 ? record.volume / metrics.avgVolume20 : null;
+    const basis = [
+      record?.changePercent != null ? `真实涨跌幅${formatPercent(record.changePercent)}` : "真实涨跌幅不足",
+      price != null ? `价格${formatPrice(price)}` : "价格不足",
+      metrics.fiveDayChange != null ? `5日${formatPercent(metrics.fiveDayChange)}` : "5日数据不足",
+      volumeRatio ? `量能${volumeRatio.toFixed(1)}倍` : "量能对比不足"
+    ].join("；");
+    const inference = price != null && resistance != null && price > resistance
+      ? `突破压力位${formatPrice(resistance)}后，交易逻辑从“等确认”转为“观察回踩是否承接”。`
+      : price != null && support != null && price < support
+        ? `跌破支撑位${formatPrice(support)}后，原先的持有逻辑被削弱，先看止跌而不是加仓。`
+        : `价格仍在支撑与压力之间，说明市场还没给出方向确认，操作要靠触发条件而不是情绪。`;
+    return {
+      title: `${item.name} ${item.code}：为什么这样操作`,
+      basis,
+      inference,
+      conclusion: item.prediction?.action || item.action || "暂不操作",
+      invalidCondition: item.prediction?.invalidCondition || item.invalidCondition || "跌破支撑、放量转弱或相关新闻证伪。"
+    };
+  });
 }
 
 function renderSecurityDetailSheet() {
@@ -564,6 +704,7 @@ function renderDetailAdvice(item) {
   return `
     <div class="advice-panel" style="--score-bg:${getScoreColor(p.predictionScore)}">
       <strong>今日评分：${formatScore(p.predictionScore)} / 10 · ${escapeText(p.predictionLabel)}</strong>
+      <p class="score-change">${escapeText(renderScoreChangeText(p))}</p>
       <dl>
         <div><dt>方向</dt><dd>${escapeText(p.expectedDirection)}</dd></div>
         <div><dt>建议</dt><dd>${escapeText(p.action)}</dd></div>
@@ -571,7 +712,32 @@ function renderDetailAdvice(item) {
         <div><dt>失效</dt><dd>${escapeText(p.invalidCondition)}</dd></div>
         <div><dt>风险</dt><dd>${escapeText(p.riskLevel)}</dd></div>
       </dl>
+      ${renderScoreBreakdown(p)}
       <small>行情数据为真实数据；评分和建议为本地规则生成，仅供个人复盘参考，不构成投资建议。</small>
+    </div>
+  `;
+}
+
+function renderScoreChangeText(prediction) {
+  if (!prediction?.previousScore) return prediction?.scoreChangeReason || "首次记录，作为后续观点追踪基准。";
+  const delta = Number(prediction.scoreDelta || 0);
+  return `前次 ${formatScore(prediction.previousScore)} → 本次 ${formatScore(prediction.predictionScore)}（${formatSigned(delta)}）：${prediction.scoreChangeReason || "变化来自本地规则模型。"}`;
+}
+
+function renderScoreBreakdown(prediction) {
+  const rows = Array.isArray(prediction?.scoreBreakdown) ? prediction.scoreBreakdown : [];
+  if (!rows.length) return "";
+  return `
+    <div class="score-breakdown">
+      ${rows.map((row) => `
+        <div class="score-factor">
+          <div>
+            <strong>${escapeText(row.name)}</strong>
+            <span>${escapeText(row.why)}</span>
+          </div>
+          <em class="${Number(row.delta || 0) > 0 ? "up" : Number(row.delta || 0) < 0 ? "down" : "flat"}">${formatScore(row.score)} / 10 · ${formatSigned(row.delta || 0)}</em>
+        </div>
+      `).join("")}
     </div>
   `;
 }
@@ -724,6 +890,8 @@ async function refreshQuotes(options = {}) {
   if (appState.isRefreshingQuote) return;
   appState.isRefreshingQuote = true;
   appState.quoteError = "";
+  startRefreshTask("quotes", "正在更新行情", "获取真实价格、历史K线和分时");
+  if (!options.silent) renderApp();
   updateStatusText();
   try {
     appState.marketStatus = await dataProvider.getMarketStatus();
@@ -732,14 +900,17 @@ async function refreshQuotes(options = {}) {
     const modes = normalizedResults.map((result) => result.status).filter(Boolean);
     appState.quoteMode = chooseGlobalQuoteMode(modes);
     recalculateAllPredictions();
+    showToast("行情已更新，评分已按连续性规则重算。", "success");
     appState.lastRealUpdated = normalizedResults.some((result) => result.ok) ? getDateTimeText() : appState.lastRealUpdated;
     if (!normalizedResults.some((result) => result.ok)) appState.quoteError = "真实行情暂不可用；如有缓存则使用最后一次真实数据。";
   } catch (error) {
     console.error("refresh quotes failed", error);
+    showToast("行情刷新失败：已显示错误或缓存，不生成假数据。", "warning");
     appState.quoteMode = hasAnyCachedData() ? "failed_with_cache" : "failed";
     appState.quoteError = error.message || "真实行情暂不可用";
   } finally {
     appState.isRefreshingQuote = false;
+    finishRefreshTask("quotes");
     if (!options.silent) renderApp();
   }
 }
@@ -805,14 +976,18 @@ async function refreshNews() {
   if (appState.isRefreshingNews) return;
   appState.isRefreshingNews = true;
   appState.searchError = "";
+  startRefreshTask("news", "正在获取新闻", "刷新持仓、观察池和市场相关消息");
+  renderApp();
   try {
     appState.news = await dataProvider.getNews(appState.searchKeyword);
     appState.newsCacheInfo = { items: appState.news, savedAt: getDateTimeText(), cached: false };
     saveJson("news-cache", appState.newsCacheInfo);
     recalculateAllPredictions();
+    showToast("新闻已更新，相关评分已重新计算。", "success");
     appState.lastUpdated = getDateTimeText();
   } catch (error) {
     console.error("refresh news failed", error);
+    showToast("新闻刷新失败：已显示缓存或错误原因。", "warning");
     const cached = loadJson("news-cache", null);
     if (cached?.items?.length) {
       appState.news = normalizeNews(cached.items);
@@ -824,6 +999,7 @@ async function refreshNews() {
     }
   } finally {
     appState.isRefreshingNews = false;
+    finishRefreshTask("news");
     renderApp();
   }
 }
@@ -831,8 +1007,13 @@ async function refreshNews() {
 async function refreshAnalysis() {
   if (appState.isRefreshingAnalysis) return;
   appState.isRefreshingAnalysis = true;
+  startRefreshTask("analysis", "正在生成分析", "拆解技术面、资金面、消息面和观点变化");
+  renderApp();
   appState.lastUpdated = getDateTimeText();
+  recalculateAllPredictions();
+  showToast("分析已更新：评分拆解和观点追踪已刷新。", "success");
   appState.isRefreshingAnalysis = false;
+  finishRefreshTask("analysis");
   renderApp();
 }
 
@@ -898,7 +1079,21 @@ function handleInteraction(event) {
       return;
     case "refresh-one": {
       const item = findSecurity(target.dataset.symbol);
-      if (item) refreshSecurity(item).finally(renderApp);
+      if (item) {
+        startRefreshTask(`one-${item.symbol}`, "正在刷新单只标的", `${item.name} ${item.code}`);
+        renderApp();
+        refreshSecurity(item).then(() => {
+          item.prediction = buildRulePrediction(item);
+          persistPredictionHistory();
+          showToast(`${item.name} 已更新。`, "success");
+        }).catch((error) => {
+          console.error(`refresh one failed: ${item.symbol}`, error);
+          showToast(`${item.name} 刷新失败，已保留缓存或错误状态。`, "warning");
+        }).finally(() => {
+          finishRefreshTask(`one-${item.symbol}`);
+          renderApp();
+        });
+      }
       return;
     }
     case "pin-security":
@@ -989,6 +1184,16 @@ function updateStatusText() {
   setText("reportTime", getLastRealText());
   setText("analysisStatus", appState.isRefreshingAnalysis ? "正在刷新分析" : "评分为主观预期");
   setText("liveQuoteStatus", `${getQuoteModeLabel(appState.quoteMode)} / ${getMarketStatusLabel(appState.marketStatus.status || appState.marketStatus.session)}`);
+  syncRefreshButton("refreshQuotes", appState.isRefreshingQuote, "正在更新行情", "刷新行情");
+  syncRefreshButton("refreshAnalysis", appState.isRefreshingAnalysis, "正在生成分析", "刷新分析");
+}
+
+function syncRefreshButton(id, loading, loadingText, idleText) {
+  const button = document.getElementById(id);
+  if (!button) return;
+  button.disabled = Boolean(loading);
+  button.classList.toggle("is-refreshing", Boolean(loading));
+  button.textContent = loading ? loadingText : idleText;
 }
 
 function revealCards() {
@@ -1015,7 +1220,8 @@ function initInteractions() {
       newsRefreshTimer = null;
       return;
     }
-    refreshQuotes({ auto: true, silent: true }).finally(renderApp);
+    if (getLocalMarketStatus().status === "trading") refreshQuotes({ auto: true, silent: true }).finally(renderApp);
+    else renderApp();
     startQuoteAutoRefresh();
     startNewsAutoRefresh();
   });
@@ -1024,7 +1230,7 @@ function initInteractions() {
 function init() {
   renderApp();
   initInteractions();
-  refreshQuotes({ initial: true });
+  if (getLocalMarketStatus().status === "trading") refreshQuotes({ initial: true });
   refreshNews();
   startQuoteAutoRefresh();
   startNewsAutoRefresh();
@@ -1091,32 +1297,50 @@ function startNewsAutoRefresh() {
 }
 
 function normalizeSecurities(items) {
-  return items.map((item) => ({
-    name: item.name || "",
-    code: String(item.code || ""),
-    symbol: item.symbol || toSymbol(item),
-    market: item.market || inferMarket(item.code),
-    exchange: item.exchange || exchangeFromMarket(item.market || inferMarket(item.code)),
-    type: item.type || inferType(item.code),
-    sinaSymbol: item.sinaSymbol || `${(item.market || inferMarket(item.code)).toLowerCase()}${item.code}`,
-    tencentSymbol: item.tencentSymbol || `${(item.market || inferMarket(item.code)).toLowerCase()}${item.code}`,
-    eastmoneySecid: item.eastmoneySecid || `${(item.market || inferMarket(item.code)) === "SH" ? "1" : "0"}.${item.code}`,
-    sector: item.sector || "",
-    support: item.support || "",
-    resistance: item.resistance || "",
-    action: item.action || "",
-    invalidCondition: item.invalidCondition || "",
-    prediction: normalizePrediction(item),
-    quote: null,
-    summary: null,
-    quoteStatus: "failed",
-    quoteError: "真实行情待刷新",
-    marketStatus: null,
-    intraday: [],
-    dailyKline: [],
-    weeklyKline: [],
-    fundInfo: null
-  }));
+  return items.map((item) => {
+    const seededSummary = item.summary || (item.lastClose != null ? {
+      close: item.lastClose,
+      preClose: item.lastPreClose ?? null,
+      open: item.lastOpen ?? null,
+      high: item.lastHigh ?? null,
+      low: item.lastLow ?? null,
+      volume: item.lastVolume ?? null,
+      amount: item.lastAmount ?? null,
+      changePercent: item.lastChangePercent ?? null,
+      tradeDate: item.lastTradeDate || "",
+      time: item.lastTradeDate || "",
+      mode: "historical",
+      status: "historical",
+      source: item.lastSource || "static-proxy-kline"
+    } : null);
+    const seededQuote = item.quote || (seededSummary ? summaryToQuote(seededSummary, "historical") : null);
+    return {
+      name: item.name || "",
+      code: String(item.code || ""),
+      symbol: item.symbol || toSymbol(item),
+      market: item.market || inferMarket(item.code),
+      exchange: item.exchange || exchangeFromMarket(item.market || inferMarket(item.code)),
+      type: item.type || inferType(item.code),
+      sinaSymbol: item.sinaSymbol || `${(item.market || inferMarket(item.code)).toLowerCase()}${item.code}`,
+      tencentSymbol: item.tencentSymbol || `${(item.market || inferMarket(item.code)).toLowerCase()}${item.code}`,
+      eastmoneySecid: item.eastmoneySecid || `${(item.market || inferMarket(item.code)) === "SH" ? "1" : "0"}.${item.code}`,
+      sector: item.sector || "",
+      support: item.support || "",
+      resistance: item.resistance || "",
+      action: item.action || "",
+      invalidCondition: item.invalidCondition || "",
+      prediction: normalizePrediction(item),
+      quote: seededQuote,
+      summary: seededSummary,
+      quoteStatus: seededQuote ? "historical" : "failed",
+      quoteError: seededQuote ? "" : "真实行情待刷新",
+      marketStatus: null,
+      intraday: Array.isArray(item.intraday) ? item.intraday : [],
+      dailyKline: Array.isArray(item.dailyKline) ? item.dailyKline : [],
+      weeklyKline: Array.isArray(item.weeklyKline) ? item.weeklyKline : [],
+      fundInfo: item.fundInfo || null
+    };
+  });
 }
 
 function normalizeWatchlist(items) {
@@ -1448,6 +1672,7 @@ function recalculateAllPredictions() {
   [...appState.holdings, ...appState.watchlist, ...appState.securitySearchResults].forEach((item) => {
     if (item) item.prediction = buildRulePrediction(item);
   });
+  persistPredictionHistory();
 }
 
 function buildRulePrediction(item) {
@@ -1488,7 +1713,8 @@ function buildRulePrediction(item) {
   score += newsSignal.scoreDelta;
   if (newsSignal.reason) reasons.push(newsSignal.reason);
 
-  const finalScore = clampScore(score);
+  const stabilized = stabilizePredictionScore(item, score, record, newsSignal);
+  const finalScore = stabilized.score;
   const label = scoreToLabel(finalScore);
   const isHolding = appState.holdings.some((row) => row.symbol === item.symbol);
   const action = chooseRuleAction(finalScore, isHolding, price, support, resistance);
@@ -1497,6 +1723,11 @@ function buildRulePrediction(item) {
 
   return {
     predictionScore: finalScore,
+    rawScore: clampScore(score),
+    previousScore: stabilized.previousScore,
+    scoreDelta: stabilized.scoreDelta,
+    scoreChangeReason: stabilized.reason,
+    scoreBreakdown: buildScoreBreakdown(item, record, metrics, newsSignal, score, finalScore, stabilized.previousScore),
     predictionLabel: label,
     expectedDirection: scoreToDirection(finalScore),
     reason: reasons.slice(0, 2).join("；") || base.reason || "真实行情未给出明确方向，暂不主动操作。",
@@ -1517,6 +1748,96 @@ function getSecurityNewsSignal(item) {
   if (score > 0.7) return { scoreDelta: 0.6, reason: "相关新闻偏利好" };
   if (score < -0.7) return { scoreDelta: -0.6, reason: "相关新闻偏利空" };
   return { scoreDelta: 0, reason: "相关新闻整体中性" };
+}
+
+function stabilizePredictionScore(item, rawScore, record, newsSignal) {
+  const raw = clampScore(rawScore);
+  const previous = getPreviousPrediction(item);
+  if (!previous?.predictionScore) return { score: raw, previousScore: null, scoreDelta: 0, reason: "首次计算，无历史分数可比较。" };
+  const previousScore = clampScore(previous.predictionScore);
+  const rawDelta = raw - previousScore;
+  const majorMove = Math.abs(Number(record?.changePercent || 0)) >= 5;
+  const price = numericOrNull(record?.price ?? record?.close);
+  const support = parseLevel(item.support, "min");
+  const resistance = parseLevel(item.resistance, "max");
+  const levelBreak = (price != null && resistance != null && price > resistance) || (price != null && support != null && price < support);
+  const majorNews = Math.abs(Number(newsSignal?.scoreDelta || 0)) >= 0.6;
+  const maxMove = majorMove || levelBreak || majorNews ? 2 : 1;
+  const limitedDelta = Math.max(-maxMove, Math.min(maxMove, rawDelta));
+  const score = clampScore(previousScore + limitedDelta);
+  return {
+    score,
+    previousScore,
+    scoreDelta: score - previousScore,
+    reason: Math.abs(rawDelta) > maxMove
+      ? `原始变化${formatSigned(rawDelta)}分，因未出现足够级别的新证据，稳定器限制为${formatSigned(limitedDelta)}分。`
+      : `变化${formatSigned(limitedDelta)}分，来自真实行情、K线和新闻信号。`
+  };
+}
+
+function buildScoreBreakdown(item, record, metrics, newsSignal, rawScore, finalScore, previousScore) {
+  const price = numericOrNull(record?.price ?? record?.close);
+  const support = parseLevel(item.support, "min");
+  const resistance = parseLevel(item.resistance, "max");
+  const change = Number(record?.changePercent || 0);
+  const volumeRatio = record?.volume && metrics.avgVolume20 ? record.volume / metrics.avgVolume20 : null;
+  return [
+    {
+      name: "技术面",
+      score: price != null && resistance != null && price > resistance ? 7 : price != null && support != null && price < support ? 3 : 5,
+      delta: price != null && resistance != null && price > resistance ? 1 : price != null && support != null && price < support ? -1 : 0,
+      why: price == null ? "缺少可核对价格，技术位不加分。" : price > (resistance ?? Infinity) ? `价格高于压力位${formatPrice(resistance)}，说明买盘愿意接受更高成本。` : price < (support ?? -Infinity) ? `价格跌破支撑位${formatPrice(support)}，原有承接逻辑需要下修。` : `价格仍在支撑${formatPrice(support)}与压力${formatPrice(resistance)}之间，方向未确认。`
+    },
+    {
+      name: "趋势/资金面",
+      score: change >= 2 || (volumeRatio && volumeRatio > 1.5 && change > 0) ? 7 : change <= -2 || (volumeRatio && volumeRatio > 1.5 && change < 0) ? 3 : 5,
+      delta: change >= 2 ? 1 : change <= -2 ? -1 : 0,
+      why: volumeRatio ? `涨跌幅${formatPercent(change)}，成交量约为20日均量${volumeRatio.toFixed(1)}倍，量价关系决定短线强弱。` : `涨跌幅${formatPercent(change)}，成交量对比不足，先按价格强弱处理。`
+    },
+    {
+      name: "消息面",
+      score: clampScore(5 + Number(newsSignal?.scoreDelta || 0) * 2),
+      delta: Number(newsSignal?.scoreDelta || 0),
+      why: newsSignal?.reason || "暂无足以改变交易计划的持仓相关新闻。"
+    },
+    {
+      name: "风险纪律",
+      score: /高|减|卖|不买|不追/.test(`${item.riskLevel || ""}${item.action || ""}${item.invalidCondition || ""}`) ? 4 : 5,
+      delta: /高|减|卖|不买|不追/.test(`${item.riskLevel || ""}${item.action || ""}${item.invalidCondition || ""}`) ? -0.5 : 0,
+      why: "满仓账户先控制回撤和资金来源，评分不能替代仓位纪律。"
+    },
+    {
+      name: "连续性调整",
+      score: finalScore,
+      delta: previousScore ? finalScore - previousScore : 0,
+      why: previousScore ? `前次${formatScore(previousScore)}分，本次${formatScore(finalScore)}分；除非有突破、跌破或重大消息，否则限制单日大幅跳变。` : "首次记录，作为后续观点演化的基准。"
+    }
+  ];
+}
+
+function getPreviousPrediction(item) {
+  return appState.previousPredictionSnapshot?.[item.symbol] || null;
+}
+
+function persistPredictionHistory() {
+  const next = { ...(appState.predictionHistory || {}) };
+  [...appState.holdings, ...appState.watchlist, ...appState.securitySearchResults].forEach((item) => {
+    if (!item?.symbol || !item.prediction) return;
+    next[item.symbol] = {
+      predictionScore: item.prediction.predictionScore,
+      predictionLabel: item.prediction.predictionLabel,
+      action: item.prediction.action,
+      reason: item.prediction.reason,
+      updatedAt: getDateTimeText()
+    };
+  });
+  appState.predictionHistory = next;
+  saveJson("prediction-history", next);
+}
+
+function formatSigned(value) {
+  const number = Number(value || 0);
+  return `${number >= 0 ? "+" : ""}${number.toFixed(Math.abs(number) >= 1 ? 1 : 2)}`;
 }
 
 function chooseRuleAction(score, isHolding, price, support, resistance) {
@@ -1587,7 +1908,7 @@ function chartStateText(item, period) {
   if (item.type === "open_fund") return "开放式基金按净值披露，不提供盘中分时。";
   const record = getDisplayRecord(item);
   const status = getSecurityStatusLabel(item);
-  if (period === "intraday" && !item.intraday.length) return `${status}；今日无分时数据，已保留真实日K。`;
+  if (period === "intraday" && !item.intraday.length) return item.dailyKline.length ? `${status}；今日无分时数据，已保留真实日K。` : `${status}；真实分时暂无；不绘制假线。`;
   if (period === "day" && !item.dailyKline.length) return `${status}；真实日K暂无，不绘制假K线。`;
   if (period === "week" && !item.weeklyKline.length) return `${status}；真实周K暂无，不绘制假K线。`;
   return `数据日期：${getDataDateText(item)}；数据状态：${status}${item.usingCache ? " / 缓存行情" : ""}；更新时间：${record?.time || getSecurityUpdateText(item)}`;
@@ -1782,7 +2103,7 @@ function sectionClass(item) {
 
 function getInitialView() {
   const hash = location.hash.replace("#", "");
-  if (hash === "trend" || hash === "quote") return "quote";
+  if (hash === "quote") return "quote";
   return sectionMap[hash] ? hash : "action";
 }
 
@@ -1878,7 +2199,7 @@ function decisionTone(type) {
 }
 
 function getScoreColor(score) {
-  const colors = { 1: "#83bd95", 2: "#a8d2ae", 3: "#cfe9cf", 4: "#e8f5e8", 5: "#fffdf8", 6: "#ffece7", 7: "#ffd6cc", 8: "#f5b9ab", 9: "#e79684", 10: "#d87563" };
+  const colors = { 1: "#D1FADF", 2: "#DDF8E8", 3: "#ECFDF3", 4: "#F4FBF7", 5: "#F7F7F7", 6: "#FFF1F0", 7: "#FEE4E2", 8: "#FDA29B", 9: "#F97066", 10: "#D92D20" };
   return colors[Math.round(clampScore(score))] || colors[5];
 }
 
