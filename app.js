@@ -266,6 +266,8 @@
   function renderErrorNotice() {
     const message = state.snapshotError || state.newsError;
     if (!message) return "";
+    const quoteAssets = allQuoteAssets();
+    if (state.snapshotError && quoteAssets.length && quoteAssets.every(hasQuote)) return "";
     return `
       <section class="notice">
         <div>
