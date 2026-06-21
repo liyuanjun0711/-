@@ -75,6 +75,11 @@
   function bindEvents() {
     document.addEventListener("click", handleClick);
     document.addEventListener("submit", handleSubmit);
+    document.addEventListener("gesturestart", preventZoomGesture, { passive: false });
+    document.addEventListener("gesturechange", preventZoomGesture, { passive: false });
+    document.addEventListener("gestureend", preventZoomGesture, { passive: false });
+    document.addEventListener("touchmove", preventMultiTouchZoom, { passive: false });
+    window.addEventListener("wheel", preventCtrlWheelZoom, { passive: false });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && state.selectedSymbol) closeDetail();
     });
@@ -90,6 +95,18 @@
       state.view = initialView();
       render();
     });
+  }
+
+  function preventZoomGesture(event) {
+    event.preventDefault();
+  }
+
+  function preventMultiTouchZoom(event) {
+    if (event.touches && event.touches.length > 1) event.preventDefault();
+  }
+
+  function preventCtrlWheelZoom(event) {
+    if (event.ctrlKey) event.preventDefault();
   }
 
   function handleClick(event) {
@@ -858,7 +875,7 @@
     const asset = findAsset(symbol);
     if (!asset) return;
     state.selectedSymbol = symbol;
-    state.detailPeriod = "intraday";
+    state.detailPeriod = "day";
     state.detailError = "";
     document.body.style.overflow = "hidden";
     renderDetail();
@@ -893,10 +910,10 @@
       const quotePromise = requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(asset.symbol)}&bucket=${detailBucket}`, 7000, { cache: "default" });
       const dayPromise = asset.type === "open_fund"
         ? Promise.reject(new Error("开放式基金暂不提供K线"))
-        : requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(asset.symbol)}&period=day&count=120`, 10000);
+        : requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(asset.symbol)}&period=day&count=120`, 6000);
       const intradayPromise = asset.type === "open_fund"
         ? Promise.reject(new Error("开放式基金暂不提供分时"))
-        : requestJson(`${apiBase}/api/intraday?symbol=${encodeURIComponent(asset.symbol)}`, 10000);
+        : requestJson(`${apiBase}/api/intraday?symbol=${encodeURIComponent(asset.symbol)}`, 3500);
       const [quoteResult, dayResult, intradayResult] = await Promise.allSettled([quotePromise, dayPromise, intradayPromise]);
       if (requestId !== state.detailRequestId) return;
 
@@ -940,7 +957,7 @@
     const isWatch = asset.group === "watch";
     const score = scoreAsset(asset);
     const chartRows = state.detailPeriod === "day" ? asset.detail?.daily || [] : asset.detail?.intraday || [];
-    const chartMessage = state.detailLoading
+    const chartMessage = state.detailLoading && !chartRows.length
       ? "正在加载图表数据…"
       : state.detailError && !chartRows.length
         ? state.detailError
