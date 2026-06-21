@@ -56,6 +56,12 @@ function scale100(value) {
   return number == null ? null : number / 100;
 }
 
+function scaleQuoteValue(value, meta) {
+  const number = num(value);
+  if (number == null) return null;
+  return meta.type === "exchange_fund" ? number / 1000 : number / 100;
+}
+
 function eastmoneyTime(value) {
   const number = Number(value);
   if (!Number.isFinite(number) || number <= 0) return "";
@@ -75,8 +81,8 @@ async function quote(meta) {
   const payload = await fetchJson(`https://push2.eastmoney.com/api/qt/stock/get?secid=${meta.eastmoneySecid}&fields=f43,f44,f45,f46,f47,f48,f57,f58,f60,f86,f169,f170`);
   const data = payload.data;
   if (!data || data.f43 == null || data.f43 === "-") throw new Error("eastmoney quote empty");
-  const price = scale100(data.f43);
-  const preClose = scale100(data.f60);
+  const price = scaleQuoteValue(data.f43, meta);
+  const preClose = scaleQuoteValue(data.f60, meta);
   return {
     source: "eastmoney",
     name: data.f58 || meta.name,
@@ -87,10 +93,10 @@ async function quote(meta) {
     time: eastmoneyTime(data.f86),
     price,
     preClose,
-    open: scale100(data.f46),
-    high: scale100(data.f44),
-    low: scale100(data.f45),
-    change: scale100(data.f169) ?? (price != null && preClose != null ? price - preClose : null),
+    open: scaleQuoteValue(data.f46, meta),
+    high: scaleQuoteValue(data.f44, meta),
+    low: scaleQuoteValue(data.f45, meta),
+    change: scaleQuoteValue(data.f169, meta) ?? (price != null && preClose != null ? price - preClose : null),
     changePercent: scale100(data.f170) ?? pct(price, preClose),
     volume: num(data.f47) != null ? num(data.f47) * 100 : null,
     amount: num(data.f48)

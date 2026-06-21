@@ -4,6 +4,12 @@
   const sourceData = window.MARKET_BRIEFING_DATA || {};
   const chartLib = window.LightweightCharts;
   const apiBase = String(sourceData.apiBase || "").replace(/\/$/, "");
+  const sectionMap = {
+    action: { title: "今日操作", sections: ["trade-decision", "one-sentence", "execution-list", "trade-plan", "do-not-do"] },
+    quote: { title: "持仓行情与走势", sections: ["quote-search", "holding-quotes", "prediction-overview", "risk-trigger", "quote-watchlist"] },
+    news: { title: "市场新闻与机会", sections: ["holding-news", "market-risk", "hot-review", "sector-move", "watchlist"] },
+    logic: { title: "今日交易逻辑", sections: ["reasoning", "invalid-conditions", "learning-framework", "cancel-plan", "next-watch"] }
+  };
 
   const CACHE_KEYS = {
     snapshot: "portfolio-dashboard:snapshot:v3",
@@ -100,6 +106,10 @@
       refreshSnapshot({ manual: true });
       return;
     }
+    if (action === "go-view") {
+      setView(target.dataset.targetView);
+      return;
+    }
     if (action === "open-detail") {
       openDetail(target.dataset.symbol);
       return;
@@ -155,11 +165,11 @@
   }
 
   function setView(view) {
-    if (!["overview", "market", "news", "notes"].includes(view)) return;
+    if (!sectionMap[view]) return;
     state.view = view;
     history.replaceState(null, "", `#${view}`);
     render();
-    document.querySelector(".tabbar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document.querySelector(".segment")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function render() {
@@ -169,11 +179,11 @@
     if (!root) return;
 
     const errorNotice = renderErrorNotice();
-    const viewHtml = state.view === "market"
+    const viewHtml = state.view === "quote"
       ? renderMarketView()
       : state.view === "news"
         ? renderNewsView()
-        : state.view === "notes"
+        : state.view === "logic"
           ? renderNotesView()
           : renderOverviewView();
 
@@ -226,7 +236,7 @@
   }
 
   function renderTabs() {
-    document.querySelectorAll(".tabbar [data-view]").forEach((button) => {
+    document.querySelectorAll(".segment [data-view]").forEach((button) => {
       button.classList.toggle("active", button.dataset.view === state.view);
     });
   }
@@ -289,7 +299,7 @@
       <section class="overview-grid">
         <div class="main-column">
           <section class="card">
-            ${cardHeader("持仓快照", "先看价格、涨跌和数据时间；详细图表按需加载。", `<button class="text-button" type="button" data-view="market">查看全部</button>`)}
+            ${cardHeader("持仓快照", "先看价格、涨跌和数据时间；详细图表按需加载。", `<button class="text-button" type="button" data-action="go-view" data-target-view="quote">查看全部</button>`)}
             ${renderAssetList(holdings)}
           </section>
         </div>
@@ -950,7 +960,8 @@
   function renderDetailChart(asset) {
     const host = document.getElementById("detailChartHost");
     if (!host || !chartLib) return;
-    const rows = state.detailPeriod === "day" ? asset.detail?.daily || [] : asset.detail?.intraday || [];
+    const isDay = state.detailPeriod === "day";
+    const rows = isDay ? asset.detail?.daily || [] : asset.detail?.intraday || [];
     if (!rows.length) return;
 
     destroyDetailChart();
@@ -962,11 +973,17 @@
         layout: { background: { color: "#ffffff" }, textColor: "#667085" },
         grid: { vertLines: { color: "#f0f2f5" }, horzLines: { color: "#f0f2f5" } },
         rightPriceScale: { borderVisible: false },
-        timeScale: { borderVisible: false, timeVisible: state.detailPeriod === "intraday", secondsVisible: false },
+        timeScale: {
+          borderVisible: false,
+          timeVisible: !isDay,
+          secondsVisible: false,
+          tickMarkFormatter: (time) => isDay ? chartDateTick(time) : chartIntradayTick(time)
+        },
         crosshair: { mode: 1 }
       });
+      const dataByTime = new Map();
 
-      if (state.detailPeriod === "day") {
+      if (isDay) {
         const series = addSeries(detailChart, "candlestick", {
           upColor: "#d92d20",
           downColor: "#07883f",
@@ -975,17 +992,37 @@
           wickUpColor: "#d92d20",
           wickDownColor: "#07883f"
         });
-        series.setData(rows.map((row) => ({
-          time: String(row.time).slice(0, 10),
-          open: Number(row.open),
-          high: Number(row.high),
-          low: Number(row.low),
-          close: Number(row.close)
-        })).filter((row) => [row.open, row.high, row.low, row.close].every(Number.isFinite)));
+        const values = rows.map((row) => {
+          const item = {
+            time: String(row.time).slice(0, 10),
+            open: Number(row.open),
+            high: Number(row.high),
+            low: Number(row.low),
+            close: Number(row.close),
+            volume: numberOrNull(row.volume),
+            changePercent: numberOrNull(row.changePercent)
+          };
+          return item;
+        }).filter((row) => [row.open, row.high, row.low, row.close].every(Number.isFinite));
+        values.forEach((row) => dataByTime.set(String(row.time), row));
+        series.setData(values);
       } else {
         const series = addSeries(detailChart, "line", { color: "#2563eb", lineWidth: 2 });
-        series.setData(rows.map((row) => ({ time: intradayChartTime(row.time), value: Number(row.price) })).filter((row) => Number.isFinite(row.time) && Number.isFinite(row.value)));
+        const values = rows.map((row) => {
+          const item = {
+            time: intradayChartTime(row.time),
+            rawTime: row.time,
+            value: Number(row.price),
+            volume: numberOrNull(row.volume),
+            changePercent: numberOrNull(row.changePercent)
+          };
+          return item;
+        }).filter((row) => Number.isFinite(row.time) && Number.isFinite(row.value));
+        values.forEach((row) => dataByTime.set(String(row.time), row));
+        series.setData(values);
       }
+      const tooltip = createChartTooltip(host, asset, dataByTime, isDay);
+      detailChart.subscribeCrosshairMove((param) => updateChartTooltip(tooltip, param, asset, dataByTime, isDay));
       detailChart.timeScale().fitContent();
       detailResizeHandler = () => detailChart?.resize?.(host.clientWidth, window.innerWidth <= 640 ? 260 : 300);
       window.addEventListener("resize", detailResizeHandler);
@@ -1018,6 +1055,54 @@
     const hasZone = /Z$|[+-]\d{2}:?\d{2}$/.test(normalized);
     const timestamp = Date.parse(hasZone ? normalized : `${normalized}+08:00`);
     return Number.isFinite(timestamp) ? Math.floor(timestamp / 1000) : NaN;
+  }
+
+  function chartIntradayTick(time) {
+    const timestamp = Number(time);
+    if (!Number.isFinite(timestamp)) return "";
+    return new Intl.DateTimeFormat("zh-CN", { timeZone: "Asia/Shanghai", hour: "2-digit", minute: "2-digit", hour12: false }).format(new Date(timestamp * 1000));
+  }
+
+  function chartDateTick(time) {
+    const text = typeof time === "string" ? time : `${time?.year || ""}-${String(time?.month || "").padStart(2, "0")}-${String(time?.day || "").padStart(2, "0")}`;
+    const match = text.match(/^\d{4}-(\d{2})-(\d{2})/);
+    return match ? `${match[1]}-${match[2]}` : text;
+  }
+
+  function createChartTooltip(host) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "chart-tooltip";
+    tooltip.hidden = true;
+    host.appendChild(tooltip);
+    return tooltip;
+  }
+
+  function updateChartTooltip(tooltip, param, asset, dataByTime, isDay) {
+    if (!tooltip || !param?.point || param.point.x < 0 || param.point.y < 0) {
+      if (tooltip) tooltip.hidden = true;
+      return;
+    }
+    const row = dataByTime.get(String(param.time));
+    if (!row) {
+      tooltip.hidden = true;
+      return;
+    }
+    const timeText = isDay ? String(row.time) : formatDateTime(row.rawTime);
+    tooltip.innerHTML = isDay
+      ? `<strong>${escapeHtml(asset.name)} ${escapeHtml(asset.code)}</strong><span>${escapeHtml(timeText)}</span><span>开 ${formatPrice(row.open)} 高 ${formatPrice(row.high)} 低 ${formatPrice(row.low)} 收 ${formatPrice(row.close)}</span><span>量 ${formatVolume(row.volume)} 涨跌 ${Number.isFinite(row.changePercent) ? formatPercent(row.changePercent) : "--"}</span>`
+      : `<strong>${escapeHtml(asset.name)} ${escapeHtml(asset.code)}</strong><span>${escapeHtml(timeText)}</span><span>价 ${formatPrice(row.value)} 量 ${formatVolume(row.volume)}</span>`;
+    tooltip.hidden = false;
+    const left = Math.min(Math.max(param.point.x + 12, 8), Math.max(8, tooltip.parentElement.clientWidth - tooltip.offsetWidth - 8));
+    const top = Math.min(Math.max(param.point.y + 12, 8), Math.max(8, tooltip.parentElement.clientHeight - tooltip.offsetHeight - 8));
+    tooltip.style.transform = `translate(${left}px, ${top}px)`;
+  }
+
+  function formatVolume(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "--";
+    if (number >= 100000000) return `${(number / 100000000).toFixed(2)}亿`;
+    if (number >= 10000) return `${(number / 10000).toFixed(1)}万`;
+    return String(Math.round(number));
   }
 
   function applyQuotePayload(asset, payload, origin) {
@@ -1377,9 +1462,9 @@
 
   function initialView() {
     const raw = location.hash.replace("#", "");
-    const mapping = { action: "overview", quote: "market", logic: "notes" };
+    const mapping = { overview: "action", market: "quote", notes: "logic" };
     const value = mapping[raw] || raw;
-    return ["overview", "market", "news", "notes"].includes(value) ? value : "overview";
+    return sectionMap[value] ? value : "action";
   }
 
   function inferMarket(code) {
