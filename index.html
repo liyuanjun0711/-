@@ -3,60 +3,63 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f1e9">
-  <title>每日持仓晨报</title>
+  <meta name="theme-color" content="#f4f6f8">
+  <meta name="description" content="个人持仓行情、风险提醒与市场信息仪表盘">
+  <title>持仓仪表盘</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="ambient ambient-a"></div>
-  <div class="ambient ambient-b"></div>
-
-  <div class="phone-shell">
-    <header class="app-hero" id="topSection">
-      <div class="hero-toolbar" aria-label="页面工具">
-        <button class="icon-btn" type="button" data-action="top" aria-label="返回顶部">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
-        </button>
-        <div class="toolbar-actions">
-          <button class="icon-btn" type="button" data-action="set-view" data-target-view="news" aria-label="查看新闻">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3"/><circle cx="10.8" cy="10.8" r="6.8"/></svg>
-          </button>
-          <button class="icon-btn" type="button" data-action="refresh-quotes" aria-label="刷新行情">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5"/><path d="M4 17v-5h5"/><path d="M6.5 9a7 7 0 0 1 11.4-2.2L20 9"/><path d="M17.5 15a7 7 0 0 1-11.4 2.2L4 15"/></svg>
-          </button>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">LY</div>
+        <div>
+          <p class="eyebrow">PORTFOLIO WORKSPACE</p>
+          <h1>持仓仪表盘</h1>
         </div>
       </div>
-
-      <div class="hero-copy">
-        <p class="eyebrow">Trading Dashboard</p>
-        <h1>每日持仓晨报</h1>
-        <p class="subline">先看今日动作，再查真实行情</p>
-      </div>
-
-      <div class="hero-status-card">
-        <div class="status-text">
-          <span id="reportDate">--</span>
-          <strong id="liveQuoteStatus">行情未刷新</strong>
-          <small id="reportTime">--</small>
-          <small id="analysisStatus">分析未刷新</small>
-        </div>
-        <div class="hero-actions">
-          <button class="primary-btn" id="refreshQuotes" type="button" data-action="refresh-quotes">刷新行情</button>
-          <button class="secondary-btn" id="refreshAnalysis" type="button" data-action="refresh-analysis">刷新分析</button>
-        </div>
-      </div>
+      <button class="refresh-button" id="refreshAll" type="button" data-action="refresh-all">
+        <span class="refresh-icon" aria-hidden="true">↻</span>
+        <span class="refresh-label">刷新数据</span>
+      </button>
     </header>
 
-    <nav class="segment" aria-label="页面导航">
-      <span class="segment-indicator" aria-hidden="true"></span>
-      <button type="button" data-view="action" class="active">今日</button>
-      <button type="button" data-view="quote">行情</button>
-      <button type="button" data-view="news">新闻</button>
-      <button type="button" data-view="logic">逻辑</button>
+    <section class="data-bar" aria-label="数据状态">
+      <div class="data-state">
+        <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+        <div>
+          <strong id="dataStatus">正在读取本地缓存</strong>
+          <small id="dataTimestamp">尚未完成数据校验</small>
+        </div>
+      </div>
+      <div class="data-meta">
+        <span id="marketStatus">市场状态待确认</span>
+        <span id="baselineStatus">策略基线待读取</span>
+      </div>
+    </section>
+
+    <nav class="tabbar" aria-label="页面导航">
+      <button type="button" data-view="overview" class="active">总览</button>
+      <button type="button" data-view="market">行情</button>
+      <button type="button" data-view="news">消息</button>
+      <button type="button" data-view="notes">复盘</button>
     </nav>
 
-    <main class="layout" id="moduleRoot" aria-live="polite"></main>
+    <main id="appRoot" class="app-main" aria-live="polite">
+      <section class="loading-card">
+        <div class="skeleton skeleton-title"></div>
+        <div class="skeleton skeleton-line"></div>
+        <div class="skeleton skeleton-line short"></div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      行情用于个人观察与复盘。实际交易以前台券商价格、可用资金和成交确认为准。
+    </footer>
   </div>
+
+  <div id="detailRoot"></div>
+  <div id="toastRoot" aria-live="assertive"></div>
 
   <script src="./vendor/lightweight-charts.standalone.production.js"></script>
   <script src="./report-data.js"></script>
