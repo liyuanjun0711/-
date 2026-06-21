@@ -3,59 +3,73 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#f4f6f8">
-  <meta name="description" content="个人持仓行情、风险提醒与市场信息仪表盘">
-  <title>持仓仪表盘</title>
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="description" content="统一快照、可解释评分与风险跟踪的个人持仓仪表盘">
+  <title>持仓工作台</title>
   <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-block">
-        <div class="brand-mark" aria-hidden="true">LY</div>
-        <div>
-          <p class="eyebrow">PORTFOLIO WORKSPACE</p>
-          <h1>持仓仪表盘</h1>
+  <div class="workspace-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-kicker">PORTFOLIO</span>
+        <strong>持仓工作台</strong>
+        <small>统一行情快照与可解释评分</small>
+      </div>
+
+      <nav class="tabbar" aria-label="页面导航">
+        <button type="button" data-view="overview" class="active"><span>总览</span><small>Portfolio</small></button>
+        <button type="button" data-view="market"><span>行情</span><small>Market</small></button>
+        <button type="button" data-view="news"><span>消息</span><small>News</small></button>
+        <button type="button" data-view="notes"><span>方法</span><small>Method</small></button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <span>评分不是买卖建议</span>
+        <small>同一快照 + 同一模型 = 同一评分</small>
+      </div>
+    </aside>
+
+    <div class="workspace-main">
+      <header class="commandbar">
+        <div class="page-heading">
+          <p class="eyebrow">PERSONAL MARKET MONITOR</p>
+          <h1>持仓与风险</h1>
         </div>
-      </div>
-      <button class="refresh-button" id="refreshAll" type="button" data-action="refresh-all">
-        <span class="refresh-icon" aria-hidden="true">↻</span>
-        <span class="refresh-label">刷新数据</span>
-      </button>
-    </header>
+        <button class="refresh-button" id="refreshAll" type="button" data-action="refresh-all">
+          <span class="refresh-icon" aria-hidden="true">↻</span>
+          <span class="refresh-label">刷新统一快照</span>
+        </button>
+      </header>
 
-    <section class="data-bar" aria-label="数据状态">
-      <div class="data-state">
-        <span class="status-dot" id="statusDot" aria-hidden="true"></span>
-        <div>
-          <strong id="dataStatus">正在读取本地缓存</strong>
-          <small id="dataTimestamp">尚未完成数据校验</small>
+      <section class="provenance-bar" aria-label="数据来源与版本">
+        <div class="data-state">
+          <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+          <div>
+            <strong id="dataStatus">正在读取可信缓存</strong>
+            <small id="dataTimestamp">尚未完成统一快照校验</small>
+          </div>
         </div>
-      </div>
-      <div class="data-meta">
-        <span id="marketStatus">市场状态待确认</span>
-        <span id="baselineStatus">策略基线待读取</span>
-      </div>
-    </section>
-
-    <nav class="segment" aria-label="页面导航">
-      <button type="button" data-view="action" class="active">操作</button>
-      <button type="button" data-view="quote">行情</button>
-      <button type="button" data-view="news">消息</button>
-      <button type="button" data-view="logic">逻辑</button>
-    </nav>
-
-    <main id="appRoot" class="app-main" aria-live="polite">
-      <section class="loading-card">
-        <div class="skeleton skeleton-title"></div>
-        <div class="skeleton skeleton-line"></div>
-        <div class="skeleton skeleton-line short"></div>
+        <div class="provenance-meta">
+          <span id="marketStatus">市场状态待确认</span>
+          <span id="snapshotStatus">快照编号待生成</span>
+          <span id="scoreStatus">评分模型待加载</span>
+          <span id="baselineStatus">组合配置待读取</span>
+        </div>
       </section>
-    </main>
 
-    <footer class="app-footer">
-      行情用于个人观察与复盘。实际交易以前台券商价格、可用资金和成交确认为准。
-    </footer>
+      <main id="appRoot" class="app-main" aria-live="polite">
+        <section class="loading-card">
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-line"></div>
+          <div class="skeleton skeleton-line short"></div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        页面只展示公共行情源返回的数据、明确标注的缓存和人工策略基线。实际交易以前台券商价格与成交确认为准。
+      </footer>
+    </div>
   </div>
 
   <div id="detailRoot"></div>

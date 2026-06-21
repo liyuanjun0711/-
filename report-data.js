@@ -1,5 +1,6 @@
 window.MARKET_BRIEFING_DATA = {
   date: "2026-06-22",
+  portfolioVersion: "portfolio-2026-06-21-v1",
   time: "端午节后开市前版本，基于2026-06-18收盘日K和2026-06-21周末新闻",
   lastUpdated: "2026-06-21 16:20 北京时间",
   apiBase: "https://daily-briefing-blue.vercel.app",
@@ -245,6 +246,31 @@ window.MARKET_BRIEFING_DATA = {
       predictionLabel: "防守失速",
       expectedDirection: "弱震荡",
       reason: "6月18日跌3.28%，短线从防守仓变成观察仓。",
+      riskLevel: "中"
+    },
+    {
+      name: "金智科技",
+      code: "002090",
+      symbol: "SZ002090",
+      market: "SZ",
+      type: "stock",
+      sector: "电力自动化/虚拟电厂",
+      status: "正式持仓，人工基线待更新",
+      support: "8.20 / 8.00",
+      resistance: "8.80 / 9.20",
+      lastTradeDate: "2026-06-21 人工基线待券商持仓确认",
+      lastOpen: null,
+      lastClose: null,
+      lastHigh: null,
+      lastLow: null,
+      lastChangePercent: null,
+      lastSource: "manual holding baseline pending confirmation",
+      action: "只按真实行情和量能观察，不因本地缓存加仓。",
+      invalidCondition: "跌破8.00且板块转弱，观察分降低；真实行情失败时不按页面价格交易。",
+      predictionScore: 5,
+      predictionLabel: "中性观察",
+      expectedDirection: "震荡",
+      reason: "已按用户要求纳入正式持仓；成本、数量和交易日期未确认，暂不猜测。",
       riskLevel: "中"
     }
   ],

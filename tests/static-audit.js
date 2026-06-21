@@ -1,0 +1,25 @@
+const fs = require('fs');
+const path = require('path');
+const assert = require('assert');
+const root = path.join(__dirname, '..');
+const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
+const api = fs.readFileSync(path.join(root, 'api', 'quote.js'), 'utf8');
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const css = fs.readFileSync(path.join(root, 'styles.css'), 'utf8');
+
+assert(app.includes('market-observation-v4.0.0'));
+assert(app.includes('snapshotId'));
+assert(app.includes('portfolioVersion'));
+assert(app.includes('scoreAsset'));
+assert(!app.includes('&_=${Date.now()}'), 'cache-busting Date.now query must be removed');
+assert(!app.includes('portfolio-dashboard:custom-holdings:v3'), 'old local holdings key must not be read');
+assert(api.includes('s-maxage='));
+assert(api.includes('createSnapshotId'));
+assert(api.includes('.sort()'));
+assert(api.includes('schemaVersion: SCHEMA_VERSION'));
+assert(html.includes('snapshotStatus'));
+assert(html.includes('scoreStatus'));
+assert(css.includes('.workspace-shell'));
+assert(css.includes('@media (max-width: 760px)'));
+assert(css.includes('prefers-reduced-motion'));
+console.log('static audit ok');
