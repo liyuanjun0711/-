@@ -1114,7 +1114,7 @@
 
     if (asset.baseline?.close > 0) {
       const ratio = price / asset.baseline.close;
-      if (ratio > 20 || ratio < 0.05) {
+      if (ratio > 3 || ratio < 0.33) {
         asset.quoteError = "价格量级异常，已拒绝覆盖缓存";
         return { ok: false, message: asset.quoteError };
       }
