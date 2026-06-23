@@ -4,6 +4,23 @@
   const sourceData = window.MARKET_BRIEFING_DATA || {};
   const chartLib = window.LightweightCharts;
   const apiBase = String(sourceData.apiBase || "").replace(/\/$/, "");
+  const dataProvider = Object.freeze({
+    search(keyword) {
+      return requestJson(`${apiBase}/api/search?keyword=${encodeURIComponent(keyword)}`, 8000);
+    },
+    getQuote(symbol, bucket) {
+      return requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(symbol)}&bucket=${bucket}`, 7000, { cache: "default" });
+    },
+    getIntraday(symbol) {
+      return requestJson(`${apiBase}/api/intraday?symbol=${encodeURIComponent(symbol)}`, 3500);
+    },
+    getDailyKline(symbol) {
+      return requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(symbol)}&period=day&count=120`, 6000);
+    },
+    getFundInfo(symbol) {
+      return requestJson(`${apiBase}/api/fund?symbol=${encodeURIComponent(symbol)}`, 6000);
+    }
+  });
 
   const SCORE_VERSION = "market-observation-v4.0.0";
   const SCORE_RULES = Object.freeze({
@@ -20,6 +37,12 @@
     news: "portfolio-dashboard:news:v4",
     details: "portfolio-dashboard:details:v4"
   };
+  const sectionMap = Object.freeze({
+    action: { title: "今日操作", sections: ["trade-decision", "one-sentence", "execution-list", "trade-plan", "do-not-do"] },
+    quote: { title: "持仓行情与走势", sections: ["quote-search", "holding-quotes", "prediction-overview", "risk-trigger", "quote-watchlist"] },
+    news: { title: "市场新闻与机会", sections: ["holding-news", "market-risk", "hot-review", "sector-move", "watchlist"] },
+    logic: { title: "今日交易逻辑", sections: ["reasoning", "invalid-conditions", "learning-framework", "cancel-plan", "next-watch"] }
+  });
 
   const state = {
     view: initialView(),
@@ -110,7 +133,7 @@
   }
 
   function handleClick(event) {
-    const viewButton = event.target.closest("[data-view]");
+    const viewButton = event.target.closest(".segment [data-view]");
     if (viewButton) {
       event.preventDefault();
       setView(viewButton.dataset.view);
@@ -184,7 +207,7 @@
   }
 
   function setView(view) {
-    if (!["overview", "market", "news", "notes"].includes(view)) return;
+    if (!sectionMap[view]) return;
     state.view = view;
     history.replaceState(null, "", `#${view}`);
     render();
@@ -198,13 +221,7 @@
     if (!root) return;
 
     const errorNotice = renderErrorNotice();
-    const viewHtml = state.view === "market"
-      ? renderMarketView()
-      : state.view === "news"
-        ? renderNewsView()
-        : state.view === "notes"
-          ? renderNotesView()
-          : renderOverviewView();
+    const viewHtml = renderSectionedView();
 
     root.innerHTML = `<div class="view-stack">${errorNotice}${viewHtml}</div>`;
     renderDetail();
@@ -261,6 +278,148 @@
     document.querySelectorAll(".tabbar [data-view]").forEach((button) => {
       button.classList.toggle("active", button.dataset.view === state.view);
     });
+  }
+
+  function renderSectionedView() {
+    if (state.view === "quote") return renderQuoteView();
+    if (state.view === "news") return renderNewsWorkbenchView();
+    if (state.view === "logic") return renderLogicView();
+    return renderActionView();
+  }
+
+  function sectionBlock(id, title, subtitle, body) {
+    return `
+      <section class="card work-section" id="${escapeAttr(id)}">
+        ${cardHeader(title, subtitle)}
+        ${body}
+      </section>
+    `;
+  }
+
+  function renderActionView() {
+    return `
+      <section class="focus-card" id="trade-decision">
+        <div class="focus-top">
+          <span class="focus-label">${escapeHtml(sectionMap.action.title)}</span>
+          <span class="mode-tag">仅供个人复盘参考</span>
+        </div>
+        <h2>${escapeHtml(sourceData.oneLine || "今日先等真实行情确认。")}</h2>
+        <div class="decision-grid">
+          ${(sourceData.tradeDecision || []).map(renderDecisionCard).join("")}
+        </div>
+      </section>
+      ${sectionBlock("one-sentence", "一句话", "第一屏只保留最重要的动作。", `<div class="brief-line">${escapeHtml(sourceData.oneLine || "")}</div>`)}
+      ${sectionBlock("execution-list", "执行清单", "按顺序执行，未触发就不做。", renderDisciplineList(sourceData.executionOrder || []))}
+      ${sectionBlock("trade-plan", "调仓计划", "每条计划区分依据、判断和失效条件。", renderPlanList(sourceData.tradePlan || []))}
+      ${sectionBlock("do-not-do", "不要做", "防止把主观预期当成交易信号。", renderDisciplineList(sourceData.noTradeList || []))}
+    `;
+  }
+
+  function renderQuoteView() {
+    return `
+      ${sectionBlock("quote-search", "股票 / ETF / LOF / 基金统一查询", "搜索只用于临时查看，不改写统一持仓。", `
+        <form class="search-form" data-role="asset-search">
+          <input name="keyword" value="${escapeAttr(state.searchKeyword)}" placeholder="例如 002090、金智科技" autocomplete="off" aria-label="搜索标的">
+          <button type="submit" ${state.searching ? "disabled" : ""}>${state.searching ? "搜索中" : "搜索"}</button>
+        </form>
+        ${renderSearchResults()}
+      `)}
+      ${sectionBlock("holding-quotes", "持仓真实行情列表", "价格来自自有代理或明确标注的真实缓存。", renderAssetList(state.holdings))}
+      ${sectionBlock("prediction-overview", "今日评分与预期总览", "主观预测与真实行情分开显示。", renderPredictionOverview(state.holdings))}
+      ${sectionBlock("risk-trigger", "风险触发提醒", "只列需要盘中盯住的失效条件。", renderRiskList(rankedRiskItems(state.holdings).slice(0, 8)))}
+      ${sectionBlock("quote-watchlist", "观察池", "不满足触发条件时明确不买。", renderAssetList(state.watchlist, { emptyTitle: "观察池为空", emptyText: "当前没有统一观察池标的。" }))}
+    `;
+  }
+
+  function renderNewsWorkbenchView() {
+    const holdingNews = filteredNews().filter((item) => intersects(item.relatedStocks || [], state.holdings.map((asset) => asset.code)));
+    const marketNews = filteredNews().filter((item) => ["risk", "market"].includes(item.relation));
+    const sectorNews = filteredNews().filter((item) => item.relation === "positive" || item.relation === "watch");
+    return `
+      ${sectionBlock("holding-news", "持仓相关新闻", "只展示可核对来源，不编造新闻。", renderNewsGrid(holdingNews.length ? holdingNews : filteredNews().slice(0, 4)))}
+      ${sectionBlock("market-risk", "全市场重大利好 / 风险", "先看持仓外部环境。", renderNewsGrid(marketNews.slice(0, 4)))}
+      ${sectionBlock("hot-review", "过去24小时热点", "区分已确认事实和基于事实的判断。", renderNewsGrid(filteredNews().filter((item) => /24小时|热点/.test(item.title || item.sector || "")).slice(0, 3)))}
+      ${sectionBlock("sector-move", "板块轮动", "红色为利好，绿色为风险。", renderNewsGrid(sectorNews.slice(0, 4)))}
+      ${sectionBlock("watchlist", "观察池机会", "每个观察标的都有触发条件和不买理由。", renderWatchlistPlans())}
+    `;
+  }
+
+  function renderLogicView() {
+    return `
+      ${sectionBlock("reasoning", "推理依据", "行情、仓位、新闻和K线分开看。", renderPlanList(sourceData.reasoning || []))}
+      ${sectionBlock("invalid-conditions", "失效条件", "任一条件触发就取消对应计划。", renderDisciplineList(sourceData.invalidConditions || []))}
+      ${sectionBlock("learning-framework", "交易框架", "只保留当天会影响动作的规则。", renderPlanList(sourceData.learningFramework || []))}
+      ${sectionBlock("cancel-plan", "取消计划", "失败态和急跌场景优先取消。", renderDisciplineList(sourceData.cancelPlan || []))}
+      ${sectionBlock("next-watch", "下一步观察", "按时间顺序复盘。", renderDisciplineList(sourceData.nextWatch || []))}
+    `;
+  }
+
+  function renderDecisionCard(item) {
+    return `
+      <article class="decision-card">
+        <span class="signal-tag ${relationTone(item.type)}">${escapeHtml(item.type || "动作")}</span>
+        <h3>${escapeHtml(item.title || "")}</h3>
+        <p>${escapeHtml(item.conclusion || "")}</p>
+        <dl>
+          <div><dt>动作</dt><dd>${escapeHtml(item.action || "")}</dd></div>
+          <div><dt>触发</dt><dd>${escapeHtml(item.trigger || "")}</dd></div>
+          <div><dt>原因</dt><dd>${escapeHtml(item.reason || "")}</dd></div>
+        </dl>
+      </article>
+    `;
+  }
+
+  function renderPlanList(items) {
+    const rows = (items || []).filter(Boolean);
+    if (!rows.length) return renderEmpty("暂无计划", "当前数据没有维护对应内容。");
+    return `<div class="plan-list">${rows.map((item) => `
+      <article class="compact-item">
+        <div class="compact-item-head"><strong>${escapeHtml(item.title || "计划")}</strong><span class="risk-tag medium">${escapeHtml(item.invalidCondition ? "有失效条件" : "观察")}</span></div>
+        ${item.basis ? `<p>${escapeHtml(item.basis)}</p>` : ""}
+        ${item.inference ? `<p>${escapeHtml(item.inference)}</p>` : ""}
+        ${item.conclusion ? `<p><strong>结论：</strong>${escapeHtml(item.conclusion)}</p>` : ""}
+        ${item.invalidCondition ? `<p><strong>失效：</strong>${escapeHtml(item.invalidCondition)}</p>` : ""}
+      </article>
+    `).join("")}</div>`;
+  }
+
+  function renderPredictionOverview(assets) {
+    return `<div class="prediction-grid">${assets.map((asset) => `
+      <article class="prediction-card">
+        <strong>${escapeHtml(asset.name || asset.code)}</strong>
+        <span>${escapeHtml(String(asset.predictionScore || "--"))}/10 · ${escapeHtml(asset.predictionLabel || "未评分")}</span>
+        <p>${escapeHtml(asset.expectedDirection || "待观察")}：${escapeHtml(asset.reason || asset.action || "")}</p>
+      </article>
+    `).join("")}</div>`;
+  }
+
+  function renderNewsGrid(items) {
+    const rows = (items || []).filter(Boolean);
+    return rows.length ? `<div class="news-grid">${rows.map(renderNewsCard).join("")}</div>` : renderEmpty("暂无可确认消息", "新闻接口失败或无匹配内容时不自动编造。");
+  }
+
+  function renderWatchlistPlans() {
+    return `<div class="plan-list">${state.watchlist.map((asset) => `
+      <article class="compact-item">
+        <div class="compact-item-head"><strong>${escapeHtml(asset.name)} ${escapeHtml(asset.code)}</strong><span class="risk-tag ${escapeAttr((asset.riskLevel || "").toLowerCase() === "高" ? "high" : "medium")}">${escapeHtml(asset.status || "观察")}</span></div>
+        <p><strong>板块：</strong>${escapeHtml(asset.sector || "")}　<strong>关注：</strong>${escapeHtml(asset.reason || "")}</p>
+        <p><strong>触发买入：</strong>${escapeHtml(asset.buyTrigger || "不买")}</p>
+        <p><strong>不买原因：</strong>${escapeHtml(asset.avoidReason || "未触发")}</p>
+        <p><strong>风险点：</strong>${escapeHtml(asset.risk || asset.invalidCondition || "")}</p>
+      </article>
+    `).join("")}</div>`;
+  }
+
+  function intersects(left, right) {
+    const set = new Set(right.map(String));
+    return left.map(String).some((item) => set.has(item));
+  }
+
+  function relationTone(value) {
+    const text = String(value || "");
+    if (/卖|防守|风险|止损/.test(text)) return "danger";
+    if (/买|利好|强/.test(text)) return "positive";
+    return "warning";
   }
 
   function renderErrorNotice() {
@@ -332,7 +491,7 @@
       <section class="overview-grid">
         <div class="main-column">
           <section class="card">
-            ${cardHeader("持仓快照", "价格、涨跌、评分和可信度均绑定到同一快照。", `<button class="text-button" type="button" data-view="market">查看全部</button>`)}
+            ${cardHeader("持仓快照", "价格、涨跌、评分和可信度均绑定到同一快照。", `<button class="text-button" type="button" data-action="refresh-snapshot">刷新行情</button>`)}
             ${renderAssetList(holdings)}
           </section>
         </div>
@@ -719,8 +878,14 @@
   async function fetchMarketStatus() {
     try {
       const payload = await requestJson(`${apiBase}/api/market-status`, 5000);
+      const fallback = localMarketStatus();
+      const status = payload.status || payload.marketStatus || payload.session || fallback.status;
       return {
-        status: payload.status || payload.marketStatus || payload.session || localMarketStatus().status,
+        ...fallback,
+        status,
+        isTradingDay: payload.isTradingDay ?? fallback.isTradingDay,
+        session: payload.session || fallback.session,
+        label: payload.label || marketStatusLabel(status),
         tradeDate: payload.tradeDate || payload.dataDate || ""
       };
     } catch {
@@ -742,7 +907,7 @@
     } catch (batchError) {
       const rows = await mapPool(assets, 4, async (asset) => {
         try {
-          const payload = await requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(asset.symbol)}&bucket=${bucket}`, 7000, { cache: "default" });
+          const payload = await dataProvider.getQuote(asset.symbol, bucket);
           return { ok: true, payload };
         } catch (error) {
           return { ok: false, payload: { ok: false, symbol: asset.symbol, message: error?.message || "行情获取失败" } };
@@ -788,7 +953,7 @@
     state.searching = true;
     render();
     try {
-      const payload = await requestJson(`${apiBase}/api/search?keyword=${encodeURIComponent(keyword)}`, 8000);
+      const payload = await dataProvider.search(keyword);
       state.searchResults = normalizeAssets(payload.items || [], "search");
       if (!state.searchResults.length) {
         state.searchResults = normalizeAssets((sourceData.searchUniverse || []).filter((item) => `${item.name}${item.code}`.toLowerCase().includes(keyword.toLowerCase())), "search");
@@ -909,23 +1074,24 @@
 
     try {
       const detailBucket = Math.floor(Date.now() / (state.marketStatus.status === "trading" ? 30000 : 300000));
-      const quotePromise = requestJson(`${apiBase}/api/quote?symbol=${encodeURIComponent(asset.symbol)}&bucket=${detailBucket}`, 7000, { cache: "default" });
+      const quotePromise = dataProvider.getQuote(asset.symbol, detailBucket);
       const dayPromise = asset.type === "open_fund"
-        ? Promise.reject(new Error("开放式基金暂不提供K线"))
-        : requestJson(`${apiBase}/api/kline?symbol=${encodeURIComponent(asset.symbol)}&period=day&count=120`, 6000);
+        ? dataProvider.getFundInfo(asset.symbol)
+        : dataProvider.getDailyKline(asset.symbol);
       const intradayPromise = asset.type === "open_fund"
         ? Promise.reject(new Error("开放式基金暂不提供分时"))
-        : requestJson(`${apiBase}/api/intraday?symbol=${encodeURIComponent(asset.symbol)}`, 3500);
+        : dataProvider.getIntraday(asset.symbol);
       const [quoteResult, dayResult, intradayResult] = await Promise.allSettled([quotePromise, dayPromise, intradayPromise]);
       if (requestId !== state.detailRequestId) return;
 
       if (quoteResult.status === "fulfilled") applyQuotePayload(asset, quoteResult.value, "live");
       asset.detail = {
         savedAt: new Date().toISOString(),
-        daily: dayResult.status === "fulfilled" ? normalizeKline(dayResult.value.items || dayResult.value) : asset.detail?.daily || [],
+        daily: asset.type === "open_fund" ? [] : dayResult.status === "fulfilled" ? normalizeKline(dayResult.value.items || dayResult.value) : asset.detail?.daily || [],
         intraday: intradayResult.status === "fulfilled" ? normalizeIntraday(intradayResult.value.items || intradayResult.value) : asset.detail?.intraday || []
       };
       saveDetails();
+      if (asset.type === "open_fund") throw new Error("开放式基金按净值披露，不提供盘中K线");
       if (!asset.detail.daily.length && !asset.detail.intraday.length) throw new Error("图表数据暂不可用");
       if (force) showToast(`${asset.name || asset.code} 已更新。`, "success");
     } catch (error) {
@@ -958,13 +1124,16 @@
     const quote = asset.quote;
     const isWatch = asset.group === "watch";
     const score = scoreAsset(asset);
-    const chartRows = state.detailPeriod === "day" ? asset.detail?.daily || [] : asset.detail?.intraday || [];
+    const isOpenFund = asset.type === "open_fund";
+    const chartRows = isOpenFund ? [] : state.detailPeriod === "day" ? asset.detail?.daily || [] : asset.detail?.intraday || [];
     const chartMessage = state.detailLoading && !chartRows.length
       ? "正在加载图表数据…"
-      : state.detailError && !chartRows.length
+      : isOpenFund
+        ? "开放式基金按净值披露，不提供盘中K线"
+        : state.detailError && !chartRows.length
         ? state.detailError
         : !chartRows.length
-          ? "暂无可验证的图表数据"
+          ? state.detailPeriod === "day" ? "真实日K暂无；不绘制假K线。" : "真实分时暂无；不绘制假线。"
           : "";
 
     root.innerHTML = `
@@ -1066,7 +1235,12 @@
         layout: { background: { color: "#ffffff" }, textColor: "#667085" },
         grid: { vertLines: { color: "#f0f2f5" }, horzLines: { color: "#f0f2f5" } },
         rightPriceScale: { borderVisible: false },
-        timeScale: { borderVisible: false, timeVisible: state.detailPeriod === "intraday", secondsVisible: false },
+        timeScale: {
+          borderVisible: false,
+          timeVisible: state.detailPeriod === "intraday",
+          secondsVisible: false,
+          tickMarkFormatter: (time) => state.detailPeriod === "intraday" ? formatIntradayTick(time) : formatDailyTick(time)
+        },
         crosshair: { mode: 1 }
       });
 
@@ -1079,16 +1253,22 @@
           wickUpColor: "#d92d20",
           wickDownColor: "#07883f"
         });
-        series.setData(rows.map((row) => ({
+        const candleRows = rows.map((row) => ({
           time: String(row.time).slice(0, 10),
           open: Number(row.open),
           high: Number(row.high),
           low: Number(row.low),
-          close: Number(row.close)
-        })).filter((row) => [row.open, row.high, row.low, row.close].every(Number.isFinite)));
+          close: Number(row.close),
+          volume: Number(row.volume),
+          changePercent: Number(row.changePercent)
+        })).filter((row) => [row.open, row.high, row.low, row.close].every(Number.isFinite));
+        series.setData(candleRows);
+        bindChartTooltip(host, asset, series, candleRows, "day");
       } else {
         const series = addSeries(detailChart, "line", { color: "#2563eb", lineWidth: 2 });
-        series.setData(rows.map((row) => ({ time: intradayChartTime(row.time), value: Number(row.price) })).filter((row) => Number.isFinite(row.time) && Number.isFinite(row.value)));
+        const lineRows = rows.map((row) => ({ time: intradayChartTime(row.time), value: Number(row.price), rawTime: row.time, volume: row.volume })).filter((row) => Number.isFinite(row.time) && Number.isFinite(row.value));
+        series.setData(lineRows);
+        bindChartTooltip(host, asset, series, lineRows, "intraday");
       }
       detailChart.timeScale().fitContent();
       detailResizeHandler = () => detailChart?.resize?.(host.clientWidth, window.innerWidth <= 640 ? 260 : 300);
@@ -1122,6 +1302,54 @@
     const hasZone = /Z$|[+-]\d{2}:?\d{2}$/.test(normalized);
     const timestamp = Date.parse(hasZone ? normalized : `${normalized}+08:00`);
     return Number.isFinite(timestamp) ? Math.floor(timestamp / 1000) : NaN;
+  }
+
+  function formatIntradayTick(time) {
+    const timestamp = typeof time === "number" ? time * 1000 : parseTime(time);
+    if (!timestamp) return "";
+    const text = new Intl.DateTimeFormat("zh-CN", {
+      timeZone: "Asia/Shanghai",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    }).format(new Date(timestamp));
+    return ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"].includes(text) ? text : text;
+  }
+
+  function formatDailyTick(time) {
+    const text = typeof time === "string" ? time : `${time?.year || ""}-${String(time?.month || "").padStart(2, "0")}-${String(time?.day || "").padStart(2, "0")}`;
+    const match = text.match(/\d{4}-(\d{2})-(\d{2})/);
+    return match ? `${match[1]}-${match[2]}` : String(time || "");
+  }
+
+  function bindChartTooltip(host, asset, series, rows, period) {
+    const tooltip = document.createElement("div");
+    tooltip.className = "chart-tooltip";
+    tooltip.style.display = "none";
+    host.appendChild(tooltip);
+    detailChart.subscribeCrosshairMove((param) => {
+      const point = param.point;
+      const row = param.seriesData?.get(series);
+      if (!point || !row) {
+        tooltip.style.display = "none";
+        return;
+      }
+      tooltip.style.display = "block";
+      tooltip.style.left = `${Math.min(point.x + 12, host.clientWidth - 190)}px`;
+      tooltip.style.top = `${Math.max(point.y + 12, 8)}px`;
+      const source = rows.find((item) => String(item.time) === String(row.time)) || {};
+      tooltip.innerHTML = period === "day"
+        ? `<strong>${escapeHtml(asset.name)} ${escapeHtml(asset.code)}</strong><span>${escapeHtml(formatDailyTick(row.time))}</span><span>开 ${formatPrice(row.open)} 高 ${formatPrice(row.high)} 低 ${formatPrice(row.low)} 收 ${formatPrice(row.close)}</span><span>成交量 ${escapeHtml(formatVolume(source.volume))} · 涨跌幅 ${escapeHtml(formatPercent(source.changePercent))}</span>`
+        : `<strong>${escapeHtml(asset.name)} ${escapeHtml(asset.code)}</strong><span>${escapeHtml(formatIntradayTick(row.time))}</span><span>价格 ${formatPrice(row.value)}</span><span>成交量 ${escapeHtml(formatVolume(source.volume))}</span>`;
+    });
+  }
+
+  function formatVolume(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "--";
+    if (number >= 100000000) return `${(number / 100000000).toFixed(2)}亿`;
+    if (number >= 10000) return `${(number / 10000).toFixed(2)}万`;
+    return String(Math.round(number));
   }
 
   function applyQuotePayload(asset, payload, origin) {
@@ -1624,10 +1852,12 @@
     const hour = Number(parts.find((part) => part.type === "hour")?.value || 0);
     const minute = Number(parts.find((part) => part.type === "minute")?.value || 0);
     const total = hour * 60 + minute;
-    if (day === 0 || day === 6) return { status: "non_trading_day" };
-    if ((total >= 570 && total <= 690) || (total >= 780 && total <= 900)) return { status: "trading" };
-    if (total > 690 && total < 780) return { status: "lunch_break" };
-    return { status: "closed" };
+    const isTradingDay = day !== 0 && day !== 6;
+    if (!isTradingDay) return { status: "non_trading_day", isTradingDay, session: "closed", label: "非交易日" };
+    if (total >= 570 && total <= 690) return { status: "trading", isTradingDay, session: "morning", label: "A股交易中" };
+    if (total > 690 && total < 780) return { status: "lunch_break", isTradingDay, session: "lunch_break", label: "A股午间休市" };
+    if (total >= 780 && total <= 900) return { status: "trading", isTradingDay, session: "afternoon", label: "A股交易中" };
+    return { status: "closed", isTradingDay, session: "closed", label: "A股已收盘" };
   }
 
   function marketStatusLabel(status) {
@@ -1643,9 +1873,9 @@
 
   function initialView() {
     const raw = location.hash.replace("#", "");
-    const mapping = { action: "overview", quote: "market", logic: "notes" };
+    const mapping = { overview: "action", market: "quote", notes: "logic" };
     const value = mapping[raw] || raw;
-    return ["overview", "market", "news", "notes"].includes(value) ? value : "overview";
+    return sectionMap[value] ? value : "action";
   }
 
   function inferMarket(code) {

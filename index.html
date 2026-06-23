@@ -11,23 +11,12 @@
 <body>
   <div class="workspace-shell">
     <aside class="sidebar">
-      <div class="brand">
-        <span class="brand-kicker">PORTFOLIO</span>
-        <strong>持仓工作台</strong>
-        <small>行情、K线、风险</small>
-      </div>
-
-      <nav class="tabbar" aria-label="页面导航">
-        <button type="button" data-view="overview" class="active"><span>总览</span><small>Portfolio</small></button>
-        <button type="button" data-view="market"><span>行情</span><small>Market</small></button>
-        <button type="button" data-view="news"><span>消息</span><small>News</small></button>
-        <button type="button" data-view="notes"><span>方法</span><small>Rules</small></button>
+      <nav class="segment tabbar" aria-label="页面导航">
+        <button type="button" data-view="action" class="active"><span>操作</span><small>Action</small></button>
+        <button type="button" data-view="quote"><span>行情</span><small>Quote</small></button>
+        <button type="button" data-view="news"><span>新闻</span><small>News</small></button>
+        <button type="button" data-view="logic"><span>逻辑</span><small>Logic</small></button>
       </nav>
-
-      <div class="sidebar-foot">
-        <span>复盘用，不自动交易</span>
-        <small>真实行情和规则评分分开显示</small>
-      </div>
     </aside>
 
     <div class="workspace-main">
@@ -65,8 +54,6 @@
           <div class="skeleton skeleton-line short"></div>
         </section>
       </main>
-
-      <footer class="app-footer">行情来自公开数据源；评分为本地规则，仅供复盘。</footer>
     </div>
   </div>
 
