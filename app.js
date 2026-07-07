@@ -1091,12 +1091,10 @@
         intraday: intradayResult.status === "fulfilled" ? normalizeIntraday(intradayResult.value.items || intradayResult.value) : asset.detail?.intraday || []
       };
       saveDetails();
-      if (asset.type === "open_fund") throw new Error("开放式基金按净值披露，不提供盘中K线");
-      if (!asset.detail.daily.length && !asset.detail.intraday.length) throw new Error("图表数据暂不可用");
       if (force) showToast(`${asset.name || asset.code} 已更新。`, "success");
     } catch (error) {
-      console.error("detail refresh failed", error);
-      state.detailError = error?.message || "详情数据暂不可用";
+      console.warn("detail refresh failed", error);
+      state.detailError = asset.type === "open_fund" ? "开放式基金按净值披露，不提供盘中K线" : "";
       if (force) showToast("单只标的刷新失败，已保留缓存。", "warning");
     } finally {
       if (requestId === state.detailRequestId) {
