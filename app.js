@@ -133,7 +133,7 @@
   }
 
   function handleClick(event) {
-    const viewButton = event.target.closest(".segment [data-view]");
+    const viewButton = event.target.closest("[data-view]");
     if (viewButton) {
       event.preventDefault();
       setView(viewButton.dataset.view);
@@ -297,7 +297,9 @@
   }
 
   function renderActionView() {
+    const staleNotice = renderBriefingFreshnessNotice();
     return `
+      ${staleNotice}
       <section class="focus-card" id="trade-decision">
         <div class="focus-top">
           <span class="focus-label">${escapeHtml(sectionMap.action.title)}</span>
@@ -312,6 +314,24 @@
       ${sectionBlock("execution-list", "执行清单", "按顺序执行，未触发就不做。", renderDisciplineList(sourceData.executionOrder || []))}
       ${sectionBlock("trade-plan", "调仓计划", "每条计划区分依据、判断和失效条件。", renderPlanList(sourceData.tradePlan || []))}
       ${sectionBlock("do-not-do", "不要做", "防止把主观预期当成交易信号。", renderDisciplineList(sourceData.noTradeList || []))}
+    `;
+  }
+
+  function renderBriefingFreshnessNotice() {
+    const quoteDate = latestQuoteDataDate();
+    const reportDate = String(sourceData.date || "").slice(0, 10);
+    if (!quoteDate || !reportDate || reportDate >= quoteDate) return "";
+    return `
+      <section class="card info-card freshness-card">
+        <div class="card-header">
+          <div>
+            <span class="eyebrow">数据状态</span>
+            <h3>今日分析不是实时内容</h3>
+            <p>当前真实行情已经更新到 ${escapeHtml(quoteDate)}，但这页文字分析仍是 ${escapeHtml(reportDate)} 的静态简报。请先看“行情”页的实时价格和K线，交易动作以券商App最终价格为准。</p>
+          </div>
+          <button class="text-button" type="button" data-view="quote">看实时行情</button>
+        </div>
+      </section>
     `;
   }
 
@@ -1824,6 +1844,15 @@
     return assets.map((asset) => asset.quoteMeta?.lastUpdated || asset.quoteMeta?.dataDate || "").filter(Boolean).sort().at(-1) || "";
   }
 
+  function latestQuoteDataDate() {
+    return allQuoteAssets()
+      .map((asset) => asset.quoteMeta?.dataDate || asset.quoteMeta?.lastUpdated || "")
+      .map((value) => String(value).slice(0, 10))
+      .filter(Boolean)
+      .sort()
+      .at(-1) || "";
+  }
+
   function quoteSourceText(asset) {
     if (!asset.quote) return asset.quoteError || "尚无真实行情";
     return `${modeLabel(asset.quoteMeta?.mode)} · ${asset.quoteMeta?.source || "未知来源"} · ${formatDateTime(asset.quoteMeta?.lastUpdated || asset.quoteMeta?.dataDate)}`;
@@ -1873,7 +1902,25 @@
     const raw = location.hash.replace("#", "");
     const mapping = { overview: "action", market: "quote", notes: "logic" };
     const value = mapping[raw] || raw;
-    return sectionMap[value] ? value : "action";
+    if (sectionMap[value]) return value;
+    return isStaticBriefingLikelyStale() ? "quote" : "action";
+  }
+
+  function isStaticBriefingLikelyStale() {
+    const reportDate = String(sourceData.date || "").slice(0, 10);
+    const today = todayInShanghai();
+    return Boolean(reportDate && today && reportDate < today);
+  }
+
+  function todayInShanghai() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Shanghai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date());
+    const map = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
   }
 
   function inferMarket(code) {
