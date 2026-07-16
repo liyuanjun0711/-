@@ -1082,7 +1082,7 @@
   async function loadDetail(asset, force = false) {
     if (!asset || state.detailLoading) return;
     const detailAge = Date.now() - parseTime(asset.detail?.savedAt);
-    if (!force && asset.detail && detailAge < 15 * 60 * 1000 && (asset.detail.daily?.length || asset.detail.intraday?.length)) {
+    if (!force && asset.detail && detailAge < 15 * 60 * 1000 && (asset.detail.daily?.length || asset.detail.intraday?.length) && !isDetailChartStale(asset)) {
       renderDetail();
       return;
     }
@@ -1105,9 +1105,20 @@
       if (requestId !== state.detailRequestId) return;
 
       if (quoteResult.status === "fulfilled") applyQuotePayload(asset, quoteResult.value, "live");
+      const staleDailyBeforeUpdate = isDetailChartStale(asset);
+      const dailyRows = asset.type === "open_fund"
+        ? []
+        : dayResult.status === "fulfilled"
+          ? mergeQuoteIntoDailyKline(asset, normalizeKline(dayResult.value.items || dayResult.value))
+          : staleDailyBeforeUpdate
+            ? []
+            : asset.detail?.daily || [];
+      if (dayResult.status === "rejected" && staleDailyBeforeUpdate) {
+        state.detailError = `真实K线未更新：${dayResult.reason?.message || "接口暂不可用"}。当前价格以行情卡片为准。`;
+      }
       asset.detail = {
         savedAt: new Date().toISOString(),
-        daily: asset.type === "open_fund" ? [] : dayResult.status === "fulfilled" ? normalizeKline(dayResult.value.items || dayResult.value) : asset.detail?.daily || [],
+        daily: dailyRows,
         intraday: intradayResult.status === "fulfilled" ? normalizeIntraday(intradayResult.value.items || intradayResult.value) : asset.detail?.intraday || []
       };
       saveDetails();
@@ -1122,6 +1133,50 @@
         render();
       }
     }
+  }
+
+  function isDetailChartStale(asset) {
+    const quoteDate = quoteDataDate(asset);
+    const detailDate = latestDailyKlineDate(asset);
+    return Boolean(quoteDate && detailDate && detailDate < quoteDate);
+  }
+
+  function quoteDataDate(asset) {
+    return String(asset?.quoteMeta?.dataDate || asset?.quoteMeta?.lastUpdated || "").slice(0, 10);
+  }
+
+  function latestDailyKlineDate(asset) {
+    return (asset?.detail?.daily || [])
+      .map((row) => String(row.time || "").slice(0, 10))
+      .filter(Boolean)
+      .sort()
+      .at(-1) || "";
+  }
+
+  function mergeQuoteIntoDailyKline(asset, rows) {
+    const quote = asset?.quote;
+    const date = quoteDataDate(asset);
+    if (!quote || !date) return rows;
+    const close = Number(quote.close ?? quote.price);
+    const open = Number(quote.open);
+    const high = Number(quote.high);
+    const low = Number(quote.low);
+    if (![open, high, low, close].every(Number.isFinite)) return rows;
+    const next = Array.isArray(rows) ? [...rows] : [];
+    const quoteRow = {
+      time: date,
+      open,
+      high,
+      low,
+      close,
+      volume: Number.isFinite(Number(quote.volume)) ? Number(quote.volume) : null,
+      amount: Number.isFinite(Number(quote.amount)) ? Number(quote.amount) : null,
+      changePercent: Number.isFinite(Number(quote.changePercent)) ? Number(quote.changePercent) : null
+    };
+    const index = next.findIndex((row) => String(row.time || "").slice(0, 10) === date);
+    if (index >= 0) next[index] = { ...next[index], ...quoteRow };
+    else next.push(quoteRow);
+    return next.sort((a, b) => String(a.time).localeCompare(String(b.time)));
   }
 
   function renderDetail() {

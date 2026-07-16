@@ -15,6 +15,33 @@ async function tryProviders(meta, providers, method, args = []) {
   throw failure;
 }
 
+async function tryProvidersFast(meta, providers, method, args = [], timeoutMs = 4500) {
+  const tasks = providers.map((provider) => {
+    const name = provider.providerName || provider.name || "provider";
+    return withTimeout(Promise.resolve().then(() => provider[method](meta, ...args)), timeoutMs, `${name} ${method} timeout`)
+      .then((payload) => ({ payload, providerName: name }))
+      .catch((error) => {
+        throw new Error(`${name}: ${error.message}`);
+      });
+  });
+  try {
+    return await Promise.any(tasks);
+  } catch (error) {
+    const errors = (error.errors || []).map((item) => item.message || String(item));
+    const failure = new Error(errors.join("; ") || "all providers failed");
+    failure.errors = errors;
+    throw failure;
+  }
+}
+
+function withTimeout(promise, timeoutMs, message) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 function withQuoteMeta(row, meta) {
   const status = marketStatus();
   const quote = {
@@ -126,4 +153,4 @@ function failPayload(symbol, message, error) {
   };
 }
 
-module.exports = { tryProviders, withQuoteMeta, quoteFromLastKline, failPayload };
+module.exports = { tryProviders, tryProvidersFast, withQuoteMeta, quoteFromLastKline, failPayload };

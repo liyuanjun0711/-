@@ -2,7 +2,7 @@ const { normalizeSymbol, json, handleOptions, marketStatus } = require("../dataP
 const eastmoney = require("../dataProviders/eastmoney");
 const sina = require("../dataProviders/sina");
 const tencent = require("../dataProviders/tencent");
-const { tryProviders, failPayload } = require("../dataProviders/fallback");
+const { tryProvidersFast, failPayload } = require("../dataProviders/fallback");
 const { cached, cacheKey, assertRateLimit } = require("../dataProviders/cache");
 
 module.exports = async function handler(req, res) {
@@ -17,7 +17,7 @@ module.exports = async function handler(req, res) {
     const ttl = period === "day" ? 3 * 60 * 60 * 1000 : 6 * 60 * 60 * 1000;
     assertRateLimit(key, 900, ttl);
     const response = await cached(key, ttl, async () => {
-      const { payload, providerName } = await tryProviders(meta, [eastmoney, sina, tencent], "kline", [period, count]);
+      const { payload, providerName } = await tryProvidersFast(meta, [sina, tencent, eastmoney], "kline", [period, count], 4500);
       const status = marketStatus();
       const items = payload.items || payload;
       const last = items[items.length - 1];
