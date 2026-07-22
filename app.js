@@ -144,6 +144,10 @@
     if (!target) return;
     const action = target.dataset.action;
 
+    if (action === "switch-view") {
+      setView(target.dataset.targetView);
+      return;
+    }
     if (action === "refresh-all") {
       refreshAll();
       return;
@@ -329,7 +333,7 @@
             <h3>今日分析不是实时内容</h3>
             <p>当前真实行情已经更新到 ${escapeHtml(quoteDate)}，但这页文字分析仍是 ${escapeHtml(reportDate)} 的静态简报。请先看“行情”页的实时价格和K线，交易动作以券商App最终价格为准。</p>
           </div>
-          <button class="text-button" type="button" data-view="quote">看实时行情</button>
+          <button class="text-button" type="button" data-action="switch-view" data-target-view="quote">看实时行情</button>
         </div>
       </section>
     `;
