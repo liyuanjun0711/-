@@ -362,7 +362,7 @@
     return `
       ${sectionBlock("holding-news", "持仓相关新闻", "只展示可核对来源，不编造新闻。", renderNewsGrid(holdingNews.length ? holdingNews : filteredNews().slice(0, 4)))}
       ${sectionBlock("market-risk", "全市场重大利好 / 风险", "先看持仓外部环境。", renderNewsGrid(marketNews.slice(0, 4)))}
-      ${sectionBlock("hot-review", "过去24小时热点", "区分已确认事实和基于事实的判断。", renderNewsGrid(filteredNews().filter((item) => /24小时|热点/.test(item.title || item.sector || "")).slice(0, 3)))}
+      ${sectionBlock("hot-review", "过去24小时热点", "区分已确认事实和基于事实的判断。", renderNewsGrid(filteredNews().filter((item) => /24小时|热点/.test(`${item.title || ""} ${item.sector || ""}`)).slice(0, 3)))}
       ${sectionBlock("sector-move", "板块轮动", "红色为利好，绿色为风险。", renderNewsGrid(sectorNews.slice(0, 4)))}
       ${sectionBlock("watchlist", "观察池机会", "每个观察标的都有触发条件和不买理由。", renderWatchlistPlans())}
     `;
@@ -574,7 +574,7 @@
   function renderNewsView() {
     const visibleNews = filteredNews();
     const liveLabel = state.newsOrigin === "live"
-      ? `新闻已更新：${formatDateTime(state.newsSavedAt)}`
+      ? `新闻已更新：${formatDateTime(state.newsSavedAt)}；同时保留已核验晨报资料`
       : state.newsOrigin === "cache"
         ? `当前显示新闻缓存：${formatDateTime(state.newsSavedAt)}`
         : "当前仅显示策略基线资料，不视为最新消息";
@@ -876,7 +876,7 @@
       const payload = await requestJson(`${apiBase}/api/news?symbols=${encodeURIComponent(symbols)}&keywords=${encodeURIComponent(keywords)}`, 10000);
       const items = normalizeNews(payload.items || [], "live");
       if (!items.length) throw new Error("新闻源没有返回可验证内容");
-      state.news = items;
+      state.news = mergeNews(items, normalizeNews(sourceData.newsItems || [], "seed"));
       state.newsOrigin = "live";
       state.newsSavedAt = new Date().toISOString();
       writeJson(CACHE_KEYS.news, { savedAt: state.newsSavedAt, items });
@@ -887,7 +887,7 @@
       if (state.newsOrigin === "seed") {
         const cached = readJson(CACHE_KEYS.news, null);
         if (cached?.items?.length) {
-          state.news = normalizeNews(cached.items, "cache");
+          state.news = mergeNews(normalizeNews(cached.items, "cache"), normalizeNews(sourceData.newsItems || [], "seed"));
           state.newsOrigin = "cache";
           state.newsSavedAt = cached.savedAt || "";
         }
@@ -1241,8 +1241,10 @@
                 <div class="asset-source">${escapeHtml(quoteSourceText(asset))}</div>
               </div>
               <div class="chart-tabs">
-                <button type="button" data-action="detail-period" data-period="intraday" class="${state.detailPeriod === "intraday" ? "active" : ""}">分时</button>
-                <button type="button" data-action="detail-period" data-period="day" class="${state.detailPeriod === "day" ? "active" : ""}">日K</button>
+                ${isOpenFund
+                  ? '<button type="button" class="active" disabled aria-disabled="true">净值曲线</button>'
+                  : `<button type="button" data-action="detail-period" data-period="intraday" class="${state.detailPeriod === "intraday" ? "active" : ""}">分时</button>
+                     <button type="button" data-action="detail-period" data-period="day" class="${state.detailPeriod === "day" ? "active" : ""}">日K</button>`}
               </div>
             </div>
             <div class="chart-host" id="detailChartHost">${chartMessage ? `<div class="chart-message">${escapeHtml(chartMessage)}</div>` : ""}</div>
@@ -1526,6 +1528,16 @@
       url: item.url || "",
       origin
     })).filter((item) => item.title);
+  }
+
+  function mergeNews(...groups) {
+    const seen = new Set();
+    return groups.flat().filter((item) => {
+      const key = String(item.url || item.title || "").trim();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
 
   function normalizeKline(items) {
@@ -1813,7 +1825,7 @@
   function hydrateNews() {
     const cached = readJson(CACHE_KEYS.news, null);
     if (!cached?.items?.length) return;
-    state.news = normalizeNews(cached.items, "cache");
+    state.news = mergeNews(normalizeNews(cached.items, "cache"), normalizeNews(sourceData.newsItems || [], "seed"));
     state.newsOrigin = "cache";
     state.newsSavedAt = cached.savedAt || "";
   }
@@ -2054,6 +2066,8 @@
 
   function formatNewsTime(value) {
     if (!value) return "时间未披露";
+    const text = String(value).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text.slice(5);
     const timestamp = parseTime(value);
     if (!timestamp) return String(value);
     return formatDateTime(timestamp);
