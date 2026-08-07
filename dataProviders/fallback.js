@@ -5,6 +5,7 @@ async function tryProviders(meta, providers, method, args = []) {
   for (const provider of providers) {
     try {
       const payload = await provider[method](meta, ...args);
+      validateProviderPayload(payload, method);
       return { payload, providerName: provider.providerName || provider.name || "provider", errors };
     } catch (error) {
       errors.push(`${provider.name || "provider"}: ${error.message}`);
@@ -19,7 +20,10 @@ async function tryProvidersFast(meta, providers, method, args = [], timeoutMs = 
   const tasks = providers.map((provider) => {
     const name = provider.providerName || provider.name || "provider";
     return withTimeout(Promise.resolve().then(() => provider[method](meta, ...args)), timeoutMs, `${name} ${method} timeout`)
-      .then((payload) => ({ payload, providerName: name }))
+      .then((payload) => {
+        validateProviderPayload(payload, method);
+        return { payload, providerName: name };
+      })
       .catch((error) => {
         throw new Error(`${name}: ${error.message}`);
       });
@@ -31,6 +35,28 @@ async function tryProvidersFast(meta, providers, method, args = [], timeoutMs = 
     const failure = new Error(errors.join("; ") || "all providers failed");
     failure.errors = errors;
     throw failure;
+  }
+}
+
+function validateProviderPayload(payload, method) {
+  if (method === "quote") {
+    const price = Number(payload?.price);
+    const preClose = Number(payload?.preClose);
+    const ohl = [payload?.open, payload?.high, payload?.low]
+      .filter((value) => value != null)
+      .map(Number);
+    if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(preClose) || preClose <= 0 || ohl.some((value) => !Number.isFinite(value) || value <= 0)) {
+      throw new Error("quote contains zero or invalid price fields");
+    }
+  }
+
+  if (method === "kline") {
+    const rows = Array.isArray(payload) ? payload : payload?.items;
+    const last = rows?.[rows.length - 1];
+    const values = [last?.open, last?.high, last?.low, last?.close].map(Number);
+    if (!last || values.some((value) => !Number.isFinite(value) || value <= 0)) {
+      throw new Error("kline contains zero or invalid OHLC fields");
+    }
   }
 }
 
@@ -153,4 +179,4 @@ function failPayload(symbol, message, error) {
   };
 }
 
-module.exports = { tryProviders, tryProvidersFast, withQuoteMeta, quoteFromLastKline, failPayload };
+module.exports = { tryProviders, tryProvidersFast, withQuoteMeta, quoteFromLastKline, failPayload, validateProviderPayload };
