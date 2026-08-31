@@ -38,6 +38,19 @@ const documentStub = {
 const storage = new Map();
 // Old V3 local-only portfolio state must be ignored by V4.
 storage.set("portfolio-dashboard:custom-holdings:v3", JSON.stringify([{ name: "不应出现", code: "600000", symbol: "SH600000" }]));
+storage.set("portfolio-dashboard:snapshot:v4", JSON.stringify({
+  savedAt: "2026-06-19T08:00:00.000Z",
+  portfolioVersion: "portfolio-test-v1",
+  items: [{
+    ok: true,
+    symbol: "SZ159740",
+    source: "stale-fixture",
+    mode: "historical",
+    dataDate: "2026-06-19",
+    lastUpdated: "2026-06-19",
+    quote: { price: 0.5, close: 0.5, preClose: 0.49, open: 0.49, high: 0.51, low: 0.48, changePercent: 2.04 }
+  }]
+}));
 const localStorageStub = {
   getItem: (key) => storage.get(key) || null,
   setItem: (key, value) => storage.set(key, value),
@@ -113,6 +126,18 @@ const windowStub = {
       riskLevel: "中",
       lastClose: 1.681,
       lastTradeDate: "2026-06-15"
+    }, {
+      name: "恒生科技ETF大成",
+      code: "159740",
+      symbol: "SZ159740",
+      market: "SZ",
+      type: "exchange_fund",
+      sector: "港股科技",
+      support: "0.58",
+      resistance: "0.62",
+      riskLevel: "中",
+      lastClose: 0.6,
+      lastTradeDate: "2026-06-20"
     }],
     watchlist: [],
     invalidConditions: ["没有真实行情不交易"],
@@ -128,7 +153,7 @@ const windowStub = {
   removeEventListener() {}
 };
 
-const locationStub = { hash: "", href: "https://example.com/" };
+const locationStub = { hash: "#quote", href: "https://example.com/#quote" };
 const historyStub = { replaceState() {} };
 const context = {
   window: windowStub,
@@ -171,6 +196,13 @@ setTimeout(() => {
   assert.strictEqual(debug.getState().snapshotId, "s4_test_snapshot");
   assert(nodes.get("appRoot").innerHTML.length > 500, "app should render meaningful content");
   assert(!nodes.get("appRoot").innerHTML.includes("不应出现"), "old device-local holdings must be ignored");
+  const staleGuard = debug.getAssetDiagnostics("SZ159740");
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(staleGuard)), {
+    hasQuote: false,
+    baselineDate: "2026-06-20",
+    quoteDate: "",
+    quoteSource: ""
+  }, "stale quote cache must not override a newer report baseline");
 
   const scoreInput = {
     quote: fixedQuote.quote,

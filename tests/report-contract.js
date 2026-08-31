@@ -33,34 +33,34 @@ assert(app.includes("timeVisible") && app.includes("tickMarkFormatter"), "chart 
 assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("真实日K暂无；不绘制假K线。"), "chart failure labels missing");
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 
-assert.strictEqual(data.date, "2026-08-07");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-08-07-premarket-v1");
+assert.strictEqual(data.date, "2026-09-01");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-09-01-premarket-v1");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
 assert.strictEqual(data.newsItems.length, 7);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
-assert(data.holdings.every((item) => item.lastTradeDate === "2026-08-06" && Number(item.lastClose) > 0), "holding quote baseline invalid");
-assert(data.watchlist.every((item) => item.lastTradeDate === "2026-08-06" && Number(item.lastClose) > 0), "watchlist baseline invalid");
+assert(data.holdings.every((item) => item.lastTradeDate === "2026-08-31" && Number(item.lastClose) > 0), "holding quote baseline invalid");
+assert(data.watchlist.every((item) => item.lastTradeDate === "2026-08-31" && Number(item.lastClose) > 0), "watchlist baseline invalid");
 
 for (const privatePhrase of ["总资产", "持仓金额", "持仓市值", "现金余额", "盈亏金额", "银证转账金额", "账号标识", "银行卡", "账户规模"]) {
   assert(!reportText.includes(privatePhrase), `privacy-sensitive wording found: ${privatePhrase}`);
 }
 
 const expected = {
-  "159740": [0.609, 0.601, 0.610, 0.600, -2.28],
-  "164701": [1.699, 1.660, 1.699, 1.654, 2.03],
-  "512710": [0.618, 0.620, 0.623, 0.612, -0.16],
-  "161226": [2.085, 2.035, 2.108, 2.000, -0.34],
-  "159608": [1.119, 1.105, 1.121, 1.092, 0.91],
-  "159241": [1.028, 1.035, 1.039, 1.017, 0.29],
-  "562350": [1.123, 1.117, 1.123, 1.105, -0.53],
-  "002090": [9.52, 9.43, 9.56, 9.26, -1.15],
-  "601208": [39.33, 41.76, 43.10, 39.33, 6.18],
-  "600050": [4.38, 4.38, 4.43, 4.35, -0.23],
-  "002466": [47.49, 47.18, 47.90, 46.50, -1.24],
-  "688981": [122, 124.15, 126.99, 121.88, -1.04],
-  "161725": [0.564, 0.560, 0.565, 0.557, -0.71],
-  "005827": [null, 1.5268, null, null, -0.27]
+  "159740": [0.569, 0.574, 0.576, 0.564, 0.17],
+  "164701": [1.728, 1.722, 1.732, 1.708, -3.26],
+  "512710": [0.619, 0.627, 0.629, 0.617, 0.80],
+  "161226": [1.940, 1.984, 1.993, 1.940, -3.36],
+  "159608": [1.097, 1.111, 1.112, 1.085, -0.63],
+  "159241": [1.029, 1.044, 1.047, 1.025, 1.06],
+  "562350": [1.092, 1.089, 1.092, 1.081, -0.55],
+  "002090": [9.40, 9.46, 9.50, 9.33, 0.53],
+  "601208": [50.10, 52.19, 52.89, 50.09, 1.77],
+  "600050": [4.28, 4.30, 4.30, 4.23, 0.47],
+  "002466": [50.20, 49.90, 50.73, 48.81, -0.40],
+  "688981": [123.00, 128.70, 129.89, 122.75, 2.24],
+  "161725": [0.548, 0.544, 0.552, 0.543, -0.91],
+  "005827": [null, 1.5191, null, null, 0.13]
 };
 for (const item of [...data.holdings, ...data.watchlist]) {
   const actual = [item.lastOpen, item.lastClose, item.lastHigh, item.lastLow, item.lastChangePercent];

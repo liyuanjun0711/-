@@ -1438,6 +1438,13 @@
     const preClose = numberOrNull(row.preClose);
     if (!Number.isFinite(price) || price <= 0) return { ok: false, message: "价格字段异常" };
 
+    const quoteDate = extractIsoDate(payload.dataDate || payload.lastUpdated || payload.time);
+    const baselineDate = extractIsoDate(asset.baseline?.date);
+    if (quoteDate && baselineDate && quoteDate < baselineDate) {
+      asset.quoteError = "行情日期早于报告基线，已拒绝覆盖";
+      return { ok: false, message: asset.quoteError };
+    }
+
     if (asset.baseline?.close > 0) {
       const ratio = price / asset.baseline.close;
       if (ratio > 20 || ratio < 0.05) {
@@ -1783,6 +1790,7 @@
   function hydrateSnapshot() {
     const cached = readJson(CACHE_KEYS.snapshot, null);
     if (!cached?.items || !Array.isArray(cached.items)) return;
+    if (cached.portfolioVersion && cached.portfolioVersion !== state.portfolioVersion) return;
     let applied = 0;
     cached.items.forEach((row) => {
       const asset = findAsset(row.symbol);
@@ -1834,8 +1842,26 @@
     const cached = readJson(CACHE_KEYS.details, {});
     if (!cached || typeof cached !== "object") return;
     allAssets().forEach((asset) => {
-      if (cached[asset.symbol]) asset.detail = cached[asset.symbol];
+      const detail = cached[asset.symbol];
+      if (!detail) return;
+      const baselineDate = extractIsoDate(asset.baseline?.date);
+      const detailDate = latestDetailDataDate(detail);
+      if (asset.type !== "open_fund" && baselineDate && (!detailDate || detailDate < baselineDate)) return;
+      asset.detail = detail;
     });
+  }
+
+  function latestDetailDataDate(detail) {
+    return [...(detail?.daily || []), ...(detail?.intraday || [])]
+      .map((row) => extractIsoDate(row?.time || row?.date))
+      .filter(Boolean)
+      .sort()
+      .at(-1) || "";
+  }
+
+  function extractIsoDate(value) {
+    const match = String(value || "").match(/\d{4}-\d{2}-\d{2}/);
+    return match ? match[0] : "";
   }
 
   function saveDetails() {
@@ -2148,6 +2174,15 @@
     scoreVersion: SCORE_VERSION,
     scoreAsset,
     createClientSnapshotId,
+    getAssetDiagnostics: (symbol) => {
+      const asset = findAsset(symbol);
+      return asset ? {
+        hasQuote: hasQuote(asset),
+        baselineDate: asset.baseline?.date || "",
+        quoteDate: quoteDataDate(asset),
+        quoteSource: asset.quoteMeta?.source || ""
+      } : null;
+    },
     getState: () => ({
       snapshotId: state.snapshotId,
       portfolioVersion: state.portfolioVersion,
