@@ -850,7 +850,7 @@
       startAutoRefresh();
       if (options.manual && !state.refreshingAll) showToast(`已更新 ${updated} 只标的${failures.length ? `，${failures.length}只保留缓存` : ""}。`, "success");
     } catch (error) {
-      console.error("snapshot refresh failed", error);
+      console.info("snapshot refresh unavailable", error?.message || error);
       state.snapshotError = error?.message || "真实行情暂不可用";
       state.snapshotOrigin = allQuoteAssets().some(hasQuote) ? "cache" : "seed";
       if (options.manual && !state.refreshingAll) showToast("行情更新失败，已保留最近一次成功数据。", "warning");
@@ -882,7 +882,7 @@
       writeJson(CACHE_KEYS.news, { savedAt: state.newsSavedAt, items });
       if (options.manual && !state.refreshingAll) showToast("新闻已更新。", "success");
     } catch (error) {
-      console.error("news refresh failed", error);
+      console.info("news refresh unavailable", error?.message || error);
       state.newsError = error?.message || "新闻接口暂不可用";
       if (state.newsOrigin === "seed") {
         const cached = readJson(CACHE_KEYS.news, null);
