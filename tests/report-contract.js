@@ -33,34 +33,34 @@ assert(app.includes("timeVisible") && app.includes("tickMarkFormatter"), "chart 
 assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("真实日K暂无；不绘制假K线。"), "chart failure labels missing");
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 
-assert.strictEqual(data.date, "2026-09-09");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-09-09-premarket-v1");
+assert.strictEqual(data.date, "2026-09-10");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-09-10-premarket-v1");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
-assert.strictEqual(data.newsItems.length, 7);
+assert.strictEqual(data.newsItems.length, 9);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
-assert(data.holdings.every((item) => item.lastTradeDate === "2026-09-08" && Number(item.lastClose) > 0), "holding quote baseline invalid");
-assert(data.watchlist.every((item) => item.lastTradeDate === (item.type === "open_fund" ? "2026-09-07" : "2026-09-08") && Number(item.lastClose) > 0), "watchlist baseline invalid");
+assert(data.holdings.every((item) => item.lastTradeDate === "2026-09-09" && Number(item.lastClose) > 0), "holding quote baseline invalid");
+assert(data.watchlist.every((item) => item.lastTradeDate === "2026-09-09" && Number(item.lastClose) > 0), "watchlist baseline invalid");
 
 for (const privatePhrase of ["总资产", "持仓金额", "持仓市值", "现金余额", "盈亏金额", "银证转账金额", "账号标识", "银行卡", "账户规模"]) {
   assert(!reportText.includes(privatePhrase), `privacy-sensitive wording found: ${privatePhrase}`);
 }
 
 const expected = {
-  "159740": [0.559, 0.554, 0.560, 0.552, -1.42],
-  "164701": [1.715, 1.703, 1.715, 1.701, 0.06],
-  "512710": [0.630, 0.645, 0.645, 0.629, 2.06],
-  "161226": [1.961, 1.946, 1.963, 1.937, 0.26],
-  "159608": [1.045, 1.048, 1.057, 1.042, 0.48],
-  "159241": [1.051, 1.075, 1.077, 1.051, 1.70],
-  "562350": [1.090, 1.097, 1.098, 1.088, 0.64],
-  "002090": [9.32, 9.33, 9.37, 9.25, 0.32],
-  "601208": [50.00, 47.41, 50.00, 47.26, -3.60],
-  "600050": [4.23, 4.24, 4.26, 4.22, 0.47],
-  "002466": [45.50, 45.59, 45.95, 45.28, 0.73],
-  "688981": [124.25, 121.52, 124.44, 121.50, -2.09],
-  "161725": [0.563, 0.561, 0.565, 0.558, -0.36],
-  "005827": [null, 1.5155, null, null, 1.20]
+  "159740": [0.554, 0.548, 0.554, 0.546, -1.08],
+  "164701": [1.692, 1.702, 1.708, 1.691, -0.06],
+  "512710": [0.643, 0.655, 0.661, 0.641, 1.55],
+  "161226": [1.936, 1.963, 1.964, 1.932, 0.87],
+  "159608": [1.049, 1.055, 1.060, 1.042, 0.67],
+  "159241": [1.073, 1.091, 1.103, 1.072, 1.49],
+  "562350": [1.100, 1.108, 1.108, 1.091, 1.00],
+  "002090": [9.32, 9.28, 9.35, 9.23, -0.54],
+  "601208": [47.90, 47.17, 48.31, 46.71, -0.51],
+  "600050": [4.24, 4.21, 4.26, 4.19, -0.71],
+  "002466": [45.34, 45.56, 45.79, 45.05, -0.07],
+  "688981": [122.12, 120.51, 122.96, 120.06, -0.83],
+  "161725": [0.559, 0.554, 0.560, 0.551, -1.25],
+  "005827": [null, 1.5053, null, null, -0.37]
 };
 for (const item of [...data.holdings, ...data.watchlist]) {
   const actual = [item.lastOpen, item.lastClose, item.lastHigh, item.lastLow, item.lastChangePercent];
