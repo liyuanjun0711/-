@@ -38,7 +38,7 @@
     details: "portfolio-dashboard:details:v4"
   };
   const sectionMap = Object.freeze({
-    action: { title: "今日操作", sections: ["trade-decision", "one-sentence", "execution-list", "trade-plan", "do-not-do"] },
+    action: { title: "今日操作", sections: ["trade-decision", "one-sentence", "transaction-costs", "execution-list", "trade-plan", "do-not-do"] },
     quote: { title: "持仓行情与走势", sections: ["quote-search", "holding-quotes", "prediction-overview", "risk-trigger", "quote-watchlist"] },
     news: { title: "市场新闻与机会", sections: ["holding-news", "market-risk", "hot-review", "sector-move", "watchlist"] },
     logic: { title: "今日交易逻辑", sections: ["reasoning", "invalid-conditions", "learning-framework", "cancel-plan", "next-watch"] }
@@ -315,6 +315,7 @@
         </div>
       </section>
       ${sectionBlock("one-sentence", "一句话", "第一屏只保留最重要的动作。", `<div class="brief-line">${escapeHtml(sourceData.oneLine || "")}</div>`)}
+      ${sectionBlock("transaction-costs", "小本金与手续费约束", "价格触发只进入复核；通过费用闸门后才允许下单。", renderTransactionCostPolicy())}
       ${sectionBlock("execution-list", "执行清单", "按顺序执行，未触发就不做。", renderDisciplineList(sourceData.executionOrder || []))}
       ${sectionBlock("trade-plan", "调仓计划", "每条计划区分依据、判断和失效条件。", renderPlanList(sourceData.tradePlan || []))}
       ${sectionBlock("do-not-do", "不要做", "防止把主观预期当成交易信号。", renderDisciplineList(sourceData.noTradeList || []))}
@@ -391,6 +392,31 @@
         </dl>
       </article>
     `;
+  }
+
+  function renderTransactionCostPolicy() {
+    const raw = sourceData.transactionCostPolicy;
+    const engine = window.TradeCostPolicy;
+    if (!raw || !engine) return renderEmpty("尚未配置费用规则", "先填写券商实际佣金和单笔最低收费，再生成交易动作。");
+    const policy = engine.normalizePolicy(raw);
+    const candidates = (raw.candidateOrders || []).map((order) => ({ order, result: engine.assessOrder(order, policy) }));
+    const assumptions = `当前仅按佣金率${formatPlainPercent(policy.commissionRate)}、每笔最低${formatCurrency(policy.minimumCommissionCny)}估算；券商实际费率优先。`;
+    const gate = `非硬性退出单笔至少${formatCurrency(policy.minimumEconomicOrderCny)}，单边费用不高于${formatPlainPercent(policy.maxOneWayCostRatio)}；新买入还需预期毛收益至少覆盖往返费用${policy.feeCoverageMultiple}倍，且扣费后预期收益率不低于${formatPlainPercent(policy.minimumNetEdgeRatio)}。`;
+    return `<div class="plan-list">
+      <article class="compact-item">
+        <div class="compact-item-head"><strong>费用假设（待券商交割单确认）</strong><span class="risk-tag medium">可配置</span></div>
+        <p>${escapeHtml(assumptions)}</p>
+        <p><strong>闸门：</strong>${escapeHtml(gate)}</p>
+        <p><strong>例外：</strong>基本面失效、溢价失控或明确硬性风控时，手续费不阻止退出；但同一标的尽量合并为一笔。</p>
+      </article>
+      ${candidates.map(({ order, result }) => `
+        <article class="compact-item">
+          <div class="compact-item-head"><strong>${escapeHtml(order.code || "待评估订单")} · ${escapeHtml(order.label || "费用复核")}</strong><span class="risk-tag ${result.status === "风险退出例外" ? "high" : "medium"}">${escapeHtml(result.status)}</span></div>
+          <p>估算成交额${formatCurrency(result.amount)}；${result.sideCount > 1 ? "往返" : "单边"}费用约${formatCurrency(result.totalCostCny)}，占成交额${formatPlainPercent(result.costRatio)}。</p>
+          <p><strong>结论：</strong>${escapeHtml(result.reason)}</p>
+        </article>
+      `).join("")}
+    </div>`;
   }
 
   function renderPlanList(items) {
@@ -2060,6 +2086,19 @@
     const number = Number(value);
     if (!Number.isFinite(number)) return "--";
     return `${number > 0 ? "+" : ""}${number.toFixed(2)}%`;
+  }
+
+  function formatPlainPercent(ratio) {
+    const number = Number(ratio);
+    if (!Number.isFinite(number)) return "--";
+    const percent = number * 100;
+    return `${percent.toFixed(Math.abs(percent) < 0.1 ? 3 : 2)}%`;
+  }
+
+  function formatCurrency(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return "--";
+    return `${number.toLocaleString("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}元`;
   }
 
   function formatDateTime(value) {

@@ -7,6 +7,7 @@
 - `index.html`：页面结构。
 - `styles.css`：移动端金融工作台样式。
 - `app.js`：前端渲染、交互、行情刷新、新闻刷新和图表逻辑。
+- `trade-cost-policy.js`：小本金交易的费用估算、最低经济金额和硬性退出例外。
 - `report-data.js`：持仓、观察池、策略和页面基础数据。
 - `vendor/lightweight-charts.standalone.production.js`：本地图表库。
 - `api/*.js`：Vercel Serverless API Routes。
@@ -77,6 +78,14 @@ Vercel Hobby 会把 `api/**/*.js` 都算作 Serverless Function，所以 provide
 ## 使用提醒
 
 页面中的预测评分和操作建议只用于个人复盘参考，不能替代券商 App 的真实成交价格、可用资金、可卖数量和交易确认。
+
+### 小本金与手续费规则
+
+`report-data.js` 的 `transactionCostPolicy` 是可配置假设，不代表券商实际收费。默认按佣金率 0.025%、每笔最低 5 元做保守估算；应优先用券商佣金表或交割单中的真实费率覆盖。
+
+- 非硬性退出：成交额不足 1000 元或单边费用超过成交额 0.5%时，不下碎片单。
+- 新买入：预期毛收益至少覆盖往返费用 3 倍，且扣费后预期收益率不少于 1%。
+- 硬性退出：基本面失效、LOF 溢价失控或明确风控时，手续费不阻止退出；同一标的尽量合并为一笔，避免重复支付最低佣金。
 
 ## 免费方案限制
 
