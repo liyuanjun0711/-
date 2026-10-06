@@ -252,6 +252,8 @@
     const available = assets.filter((asset) => hasQuote(asset));
     const failed = assets.filter((asset) => !hasQuote(asset));
     const isLoading = state.refreshingSnapshot || state.refreshingAll;
+    const latestRealUpdate = latestQuoteTime(available);
+    const isTrading = state.marketStatus.status === "trading";
 
     if (statusDot) statusDot.className = "status-dot";
     if (isLoading) {
@@ -259,13 +261,17 @@
       setText(dataStatus, available.length ? "正在后台校验最新行情" : "正在获取真实行情");
       setText(dataTimestamp, available.length ? `当前先显示${state.snapshotOrigin === "cache" ? "缓存" : "已验证"}数据` : "完成后自动更新页面");
     } else if (available.length && !failed.length && state.snapshotOrigin === "live") {
-      statusDot?.classList.add("live");
-      setText(dataStatus, "行情数据已校验");
-      setText(dataTimestamp, `最近成功更新：${formatDateTime(state.lastSuccessAt)}`);
+      statusDot?.classList.add(isTrading ? "live" : "cache");
+      setText(dataStatus, isTrading ? "实时行情已校验" : "最近真实收盘已校验");
+      setText(dataTimestamp, isTrading
+        ? `最近成功更新：${formatDateTime(state.lastSuccessAt)}`
+        : latestRealUpdate ? `最后真实更新时间：${formatDateTime(latestRealUpdate)}` : "暂无真实更新时间");
     } else if (available.length) {
       statusDot?.classList.add("cache");
       setText(dataStatus, failed.length ? `部分行情可用，${failed.length}只待更新` : "正在显示最近一次缓存");
-      setText(dataTimestamp, state.lastSuccessAt ? `缓存时间：${formatDateTime(state.lastSuccessAt)}` : "数据来源和时间已在每只标的下方标注");
+      setText(dataTimestamp, latestRealUpdate
+        ? `最后真实更新时间：${formatDateTime(latestRealUpdate)}`
+        : state.lastSuccessAt ? `缓存时间：${formatDateTime(state.lastSuccessAt)}` : "数据来源和时间已在每只标的下方标注");
     } else {
       statusDot?.classList.add(state.snapshotError ? "error" : "cache");
       setText(dataStatus, state.snapshotError ? "真实行情暂不可用" : "尚未取得可验证行情");
