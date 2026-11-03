@@ -5,6 +5,7 @@ const tradeCost = require("../trade-cost-policy.js");
 
 const app = fs.readFileSync("app.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
+const styles = fs.readFileSync("styles.css", "utf8");
 const reportText = fs.readFileSync("report-data.js", "utf8");
 const context = { window: {} };
 vm.createContext(context);
@@ -31,6 +32,8 @@ assert.strictEqual((html.match(/data-view=/g) || []).length, 4, "html must have 
 assert.strictEqual((app.match(/const sectionMap =/g) || []).length, 1, "sectionMap must be unique");
 for (const label of ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"]) assert(app.includes(label), `intraday axis label missing: ${label}`);
 assert(app.includes("timeVisible") && app.includes("tickMarkFormatter"), "chart time axis config missing");
+assert(app.includes("appendIntradayAxisGuide(host)") && app.includes('guide.className = "intraday-axis-guide"'), "fixed intraday axis guide missing");
+assert(styles.includes(".intraday-axis-guide"), "intraday axis guide style missing");
 assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("真实日K暂无；不绘制假K线。"), "chart failure labels missing");
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 assert(app.includes("最近真实收盘已校验") && app.includes("最后真实更新时间"), "non-trading quote status must show the real market timestamp");

@@ -1380,6 +1380,7 @@
         const lineRows = rows.map((row) => ({ time: intradayChartTime(row.time), value: Number(row.price), rawTime: row.time, volume: row.volume })).filter((row) => Number.isFinite(row.time) && Number.isFinite(row.value));
         series.setData(lineRows);
         bindChartTooltip(host, asset, series, lineRows, "intraday");
+        appendIntradayAxisGuide(host);
       }
       detailChart.timeScale().fitContent();
       detailResizeHandler = () => detailChart?.resize?.(host.clientWidth, window.innerWidth <= 640 ? 260 : 300);
@@ -1425,6 +1426,16 @@
       hour12: false
     }).format(new Date(timestamp));
     return ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"].includes(text) ? text : text;
+  }
+
+  function appendIntradayAxisGuide(host) {
+    const guide = document.createElement("div");
+    guide.className = "intraday-axis-guide";
+    guide.setAttribute("aria-label", "分时横轴：09:30、10:30、11:30、13:00、14:00、15:00");
+    guide.innerHTML = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"]
+      .map((label) => `<span>${label}</span>`)
+      .join("");
+    host.appendChild(guide);
   }
 
   function formatDailyTick(time) {

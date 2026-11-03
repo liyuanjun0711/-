@@ -427,6 +427,22 @@ button:disabled { opacity: .5; cursor: not-allowed; }
   pointer-events: none;
 }
 .chart-tooltip strong { color: var(--text); font-size: 10.5px; }
+.intraday-axis-guide {
+  position: absolute;
+  right: 58px;
+  bottom: 0;
+  left: 14px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+  background: rgba(255, 255, 255, .96);
+  color: #667085;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
 .chart-message { display: grid; place-items: center; min-height: 300px; color: var(--muted); }
 .detail-plan, .score-panel { padding: 15px; }
 .score-panel-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
