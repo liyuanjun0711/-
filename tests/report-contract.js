@@ -30,6 +30,7 @@ for (const forbidden of ["footerTabs", "mobileTabs", "bottomNav", "trend: {", "i
 
 assert.strictEqual((html.match(/data-view=/g) || []).length, 4, "html must have exactly four data-view buttons");
 assert.strictEqual((app.match(/const sectionMap =/g) || []).length, 1, "sectionMap must be unique");
+assert(html.includes("styles.css?v=20261103-axis1") && html.includes("app.js?v=20261103-axis1"), "axis-guide assets must be cache-busted");
 for (const label of ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"]) assert(app.includes(label), `intraday axis label missing: ${label}`);
 assert(app.includes("timeVisible") && app.includes("tickMarkFormatter"), "chart time axis config missing");
 assert(app.includes("appendIntradayAxisGuide(host)") && app.includes('guide.className = "intraday-axis-guide"'), "fixed intraday axis guide missing");
