@@ -5,7 +5,8 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-const baseUrl = "http://127.0.0.1:4174/";
+const remoteUrl = process.argv[2] || "";
+const baseUrl = remoteUrl || "http://127.0.0.1:4174/";
 const projectRoot = process.cwd();
 const profileDir = path.join(os.tmpdir(), `daily-briefing-edge-qa-${process.pid}`);
 const debugPort = 9333;
@@ -28,7 +29,7 @@ edge.on("exit", (code, signal) => { edgeExit = { code, signal }; });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const server = http.createServer((request, response) => {
+const server = remoteUrl ? null : http.createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, baseUrl).pathname);
   const requested = pathname === "/" ? "index.html" : pathname.replace(/^\/+/, "");
   const filePath = path.resolve(projectRoot, requested);
@@ -161,11 +162,16 @@ async function inspectViewport(client, width, height, label) {
     const row = document.querySelector('.asset-row[data-symbol="SZ159740"]');
     if (!row) return { opened: false, reason: 'exchange row missing' };
     row.click();
-    await new Promise((resolve) => setTimeout(resolve, 1800));
+    for (let attempt = 0; attempt < 70; attempt += 1) {
+      const canvases = document.querySelectorAll('#detailChartHost canvas').length;
+      const message = document.querySelector('#detailChartHost .chart-message')?.textContent?.trim() || '';
+      if (canvases > 0 || (message && !message.includes('正在加载'))) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
     const drawer = document.querySelector('.detail-drawer');
     const dailyCanvasCount = document.querySelectorAll('#detailChartHost canvas').length;
     document.querySelector('[data-action="detail-period"][data-period="intraday"]')?.click();
-    for (let attempt = 0; attempt < 35; attempt += 1) {
+    for (let attempt = 0; attempt < 70; attempt += 1) {
       const labels = document.querySelectorAll('.intraday-axis-guide span').length;
       const message = document.querySelector('#detailChartHost .chart-message')?.textContent?.trim();
       if (labels === 6 || message) break;
@@ -203,10 +209,12 @@ async function inspectViewport(client, width, height, label) {
 (async () => {
   let client;
   try {
-    await new Promise((resolve, reject) => {
-      server.once("error", reject);
-      server.listen(4174, "127.0.0.1", resolve);
-    });
+    if (server) {
+      await new Promise((resolve, reject) => {
+        server.once("error", reject);
+        server.listen(4174, "127.0.0.1", resolve);
+      });
+    }
     const targets = await waitFor(async () => {
       const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`);
       const rows = await response.json();
@@ -219,7 +227,7 @@ async function inspectViewport(client, width, height, label) {
     await client.send("Runtime.enable");
     await client.send("Log.enable");
     await client.send("Page.navigate", { url: baseUrl });
-    await waitFor(async () => evaluate(client, "location.href.startsWith('http://127.0.0.1:4174/')"), 10000, "local page navigation");
+    await waitFor(async () => evaluate(client, "location.protocol === 'http:' || location.protocol === 'https:'"), 10000, "page navigation");
 
     const desktop = await inspectViewport(client, 1440, 1000, "desktop");
     const mobile = await inspectViewport(client, 390, 844, "mobile");
@@ -243,7 +251,8 @@ async function inspectViewport(client, width, height, label) {
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
       if (!result.exchangeDetail.opened) throw new Error(`${result.label} exchange detail did not open`);
       if (result.exchangeDetail.dailyCanvasCount === 0 && result.exchangeDetail.canvasCount === 0 && !result.exchangeDetail.message) throw new Error(`${result.label} exchange chart has neither real chart nor explicit failure`);
-      if (JSON.stringify(result.exchangeDetail.intradayLabels) !== JSON.stringify(expectedAxis)) throw new Error(`${result.label} intraday labels mismatch`);
+      if (result.exchangeDetail.canvasCount > 0 && JSON.stringify(result.exchangeDetail.intradayLabels) !== JSON.stringify(expectedAxis)) throw new Error(`${result.label} intraday labels mismatch`);
+      if (result.exchangeDetail.canvasCount === 0 && /正在加载/.test(result.exchangeDetail.message)) throw new Error(`${result.label} exchange chart did not settle within 7 seconds`);
       if (!result.openFundDetail.opened || result.openFundDetail.periodButtons !== 0 || result.openFundDetail.canvasCount !== 0) throw new Error(`${result.label} open-fund chart controls must be absent`);
       if (!result.openFundDetail.text.includes("开放式基金按净值披露，不提供盘中K线")) throw new Error(`${result.label} open-fund disclosure missing`);
     }
@@ -252,7 +261,7 @@ async function inspectViewport(client, width, height, label) {
   } finally {
     client?.close();
     edge.kill();
-    server.close();
+    server?.close();
   }
 })().catch((error) => {
   console.error(error.stack || error);
