@@ -194,7 +194,11 @@ async function inspectViewport(client, width, height, label) {
     const row = document.querySelector('.asset-row[data-symbol="OF005827"], [data-action="open-detail"][data-symbol="OF005827"]');
     if (!row) return { opened: false, reason: 'open-fund row missing' };
     row.click();
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    for (let attempt = 0; attempt < 70; attempt += 1) {
+      const text = document.querySelector('.detail-drawer')?.innerText || '';
+      if (text.includes('开放式基金按净值披露，不提供盘中K线') || text.includes('行情获取失败')) break;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
     return {
       opened: Boolean(document.querySelector('.detail-drawer')),
       periodButtons: document.querySelectorAll('[data-action="detail-period"]').length,
