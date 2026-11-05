@@ -6,10 +6,11 @@ const { spawn } = require("child_process");
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
 const remoteUrl = process.argv[2] || "";
-const baseUrl = remoteUrl || "http://127.0.0.1:4174/";
+const localPort = 42000 + (process.pid % 1000);
+const baseUrl = remoteUrl || `http://127.0.0.1:${localPort}/`;
 const projectRoot = process.cwd();
 const profileDir = path.join(os.tmpdir(), `daily-briefing-edge-qa-${process.pid}`);
-const debugPort = 9333;
+const debugPort = 44000 + (process.pid % 1000);
 fs.mkdirSync(profileDir, { recursive: true });
 
 const edge = spawn(edgePath, [
@@ -153,7 +154,7 @@ async function inspectViewport(client, width, height, label) {
       bottomNavCount: document.querySelectorAll('.bottom-nav, .bottomNav, #bottomNav, #footerTabs, #mobileTabs').length,
       tabResults,
       feeCardCount,
-      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('买0手、卖0手') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('今日0手'),
+      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('仅供个人复盘参考') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('161226'),
       replacementChar: document.body.innerText.includes('\uFFFD')
     };
   })()`);
@@ -212,7 +213,7 @@ async function inspectViewport(client, width, height, label) {
     if (server) {
       await new Promise((resolve, reject) => {
         server.once("error", reject);
-        server.listen(4174, "127.0.0.1", resolve);
+        server.listen(localPort, "127.0.0.1", resolve);
       });
     }
     const targets = await waitFor(async () => {
@@ -245,7 +246,7 @@ async function inspectViewport(client, width, height, label) {
 
     const expectedAxis = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"];
     for (const result of [desktop, mobile]) {
-      if (result.version !== "portfolio-2026-11-04-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
+      if (result.version !== "portfolio-2026-11-05-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
       if (result.tabCount !== 4 || result.bottomNavCount !== 0 || result.overflowX) throw new Error(`${result.label} navigation or overflow regression`);
       if (!result.tabResults.every((item) => item.active)) throw new Error(`${result.label} tab click regression`);
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
