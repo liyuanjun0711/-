@@ -250,7 +250,7 @@ async function inspectViewport(client, width, height, label) {
 
     const expectedAxis = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"];
     for (const result of [desktop, mobile]) {
-      if (result.version !== "portfolio-2026-11-05-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
+      if (result.version !== "portfolio-2026-11-06-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
       if (result.tabCount !== 4 || result.bottomNavCount !== 0 || result.overflowX) throw new Error(`${result.label} navigation or overflow regression`);
       if (!result.tabResults.every((item) => item.active)) throw new Error(`${result.label} tab click regression`);
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
