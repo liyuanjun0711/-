@@ -29,6 +29,13 @@ edge.stderr.on("data", (chunk) => { edgeStderr += chunk.toString(); });
 edge.on("exit", (code, signal) => { edgeExit = { code, signal }; });
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+let qaStage = "startup";
+const watchdog = setTimeout(() => {
+  console.error(`browser QA watchdog timeout at stage: ${qaStage}`);
+  edge.kill();
+  server?.close();
+  process.exit(2);
+}, 150_000);
 
 const server = remoteUrl ? null : http.createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, baseUrl).pathname);
@@ -154,7 +161,7 @@ async function inspectViewport(client, width, height, label) {
       bottomNavCount: document.querySelectorAll('.bottom-nav, .bottomNav, #bottomNav, #footerTabs, #mobileTabs').length,
       tabResults,
       feeCardCount,
-      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('仅供个人复盘参考') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('161226'),
+      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('仅供个人复盘参考') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('0买0卖'),
       replacementChar: document.body.innerText.includes('\uFFFD')
     };
   })()`);
@@ -215,11 +222,13 @@ async function inspectViewport(client, width, height, label) {
   let client;
   try {
     if (server) {
+      qaStage = "local-server";
       await new Promise((resolve, reject) => {
         server.once("error", reject);
         server.listen(localPort, "127.0.0.1", resolve);
       });
     }
+    qaStage = "edge-target";
     const targets = await waitFor(async () => {
       const response = await fetch(`http://127.0.0.1:${debugPort}/json/list`);
       const rows = await response.json();
@@ -234,7 +243,10 @@ async function inspectViewport(client, width, height, label) {
     await client.send("Page.navigate", { url: baseUrl });
     await waitFor(async () => evaluate(client, "location.protocol === 'http:' || location.protocol === 'https:'"), 10000, "page navigation");
 
+    qaStage = "desktop";
     const desktop = await inspectViewport(client, 1440, 1000, "desktop");
+    console.error("browser QA desktop complete");
+    qaStage = "mobile";
     const mobile = await inspectViewport(client, 390, 844, "mobile");
     const runtimeErrors = client.events.filter((event) =>
       event.method === "Runtime.exceptionThrown" ||
@@ -250,7 +262,7 @@ async function inspectViewport(client, width, height, label) {
 
     const expectedAxis = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"];
     for (const result of [desktop, mobile]) {
-      if (result.version !== "portfolio-2026-11-06-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
+      if (result.version !== "portfolio-2026-11-09-midday-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
       if (result.tabCount !== 4 || result.bottomNavCount !== 0 || result.overflowX) throw new Error(`${result.label} navigation or overflow regression`);
       if (!result.tabResults.every((item) => item.active)) throw new Error(`${result.label} tab click regression`);
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
@@ -264,6 +276,7 @@ async function inspectViewport(client, width, height, label) {
     if (runtimeErrors.length) throw new Error(`page errors: ${JSON.stringify(runtimeErrors)}`);
 
   } finally {
+    clearTimeout(watchdog);
     client?.close();
     edge.kill();
     server?.close();

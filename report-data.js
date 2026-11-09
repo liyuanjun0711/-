@@ -1,11 +1,11 @@
 window.MARKET_BRIEFING_DATA = {
-  "date": "2026-11-06",
-  "portfolioVersion": "portfolio-2026-11-06-premarket-fee-aware-v1",
-  "time": "2026-11-06 08:36北京时点核验：13个场内持仓/观察标的均为11月5日真实收盘，逐只与日K末根日期和OHLC一致；两只基金均已披露11月5日净值。自有代理本次连接超时，页面运行时须显示行情获取失败，不把11月5日收盘写成实时行情。",
-  "lastUpdated": "2026-11-06 08:36 北京时间（场内为11月5日真实收盘；基金为11月5日公开净值；自有代理连接超时）",
+  "date": "2026-11-09",
+  "portfolioVersion": "portfolio-2026-11-09-midday-fee-aware-v1",
+  "time": "2026-11-09 13:42北京时点核验：13个场内持仓/观察标的均由自有代理返回11月9日真实盘中报价，状态为realtime；11月6日收盘OHLC另经新浪、腾讯、东方财富三源日K一致性核验。开放式基金运行时接口HTTP 501，保留明确失败态。",
+  "lastUpdated": "2026-11-09 13:42 北京时间（13个场内标的为真实盘中快照；基金为11月6日公开净值；开放式基金运行时接口HTTP 501）",
   "apiBase": "https://daily-briefing-blue.vercel.app",
   "refreshInterval": 10000,
-  "logicUpdatedAt": "2026-11-06盘前（最新券商持仓、可卖份额与实际费率仍待核对）",
+  "logicUpdatedAt": "2026-11-09午间补发（券商持仓、当日订单与成交接口因授权范围不足无法核验）",
   "transactionCostPolicy": {
     "profile": "low_principal",
     "assumptionStatus": "待用户用券商佣金表或交割单确认",
@@ -21,18 +21,18 @@ window.MARKET_BRIEFING_DATA = {
     "candidateOrders": [
       {
         "code": "161226",
-        "label": "溢价仍高于8%的合并退出复核",
+        "label": "旧2手溢价风险复核（同日证据不足）",
         "side": "sell",
         "lots": 2,
-        "referencePrice": 1.573,
-        "hardRiskExit": true
+        "referencePrice": 1.531,
+        "hardRiskExit": false
       },
       {
         "code": "159740",
         "label": "旧3手普通减仓复核",
         "side": "sell",
         "lots": 3,
-        "referencePrice": 0.509,
+        "referencePrice": 0.501,
         "hardRiskExit": false
       },
       {
@@ -40,107 +40,107 @@ window.MARKET_BRIEFING_DATA = {
         "label": "旧2手普通减仓复核",
         "side": "sell",
         "lots": 2,
-        "referencePrice": 1.58,
+        "referencePrice": 1.574,
         "hardRiskExit": false
       },
       {
         "code": "161725",
-        "label": "17手最低经济金额买入复核",
+        "label": "18手最低经济金额买入复核",
         "side": "buy",
-        "lots": 17,
-        "referencePrice": 0.589,
+        "lots": 18,
+        "referencePrice": 0.581,
         "hardRiskExit": false
       }
     ]
   },
-  "oneLine": "结论：11月6日先处理161226溢价硬风险，其他基金买0手、卖0手。11月5日场内收1.573、净值1.4204，同日静态溢价约10.74%，仍高于8%；若券商确认旧2手仍在且开盘溢价仍≥8%，合并卖2手，参考成交额314.60元、单边费约5元/1.59%，费用闸门为“风险退出例外”。隔夜美股AI急跌，科技基金不接飞刀。仅供个人复盘参考。",
+  "oneLine": "结论：11月9日午后买0手、卖0手。161226在11月6日同日溢价约6.80%，低于8%硬风险线；13:41盘中价相对上周五净值约8.28%只是跨日复核信号，且券商持仓接口未授权，不能据此生成卖单。其余普通碎片单继续被费用闸门拦截。仅供个人复盘参考。",
   "tradeDecision": [
     {
       "type": "第一屏结论",
-      "title": "161226硬退出仍有效；其余0手",
-      "conclusion": "已确认事实：11月5日161226场内收1.573、单位净值1.4204，同日静态溢价约10.74%，仍高于8%硬风险线。",
-      "action": "9:15先核对券商真实持仓。旧2手仍在且开盘溢价仍≥8%才合并卖2手，不拆单；参考额314.60元，单边费约5元/1.59%。扣费后收益空间不作为硬退出条件；成交资金留现金。",
-      "trigger": "实际仍持有且用最新可核验净值口径计算的开盘溢价≥8%；若≤8%或无持仓，卖0手。",
-      "reason": "费用闸门结论为风险退出例外；手续费不能阻止明确LOF溢价风险，但真实份额与券商费率仍须确认。仅供个人复盘参考。"
+      "title": "午后0买0卖，先补齐持仓证据",
+      "conclusion": "已确认事实：13个场内标的13:41前后均有真实盘中报价；券商持仓、订单和成交接口返回授权范围不足。161226上周五同日溢价约6.80%，未触发8%硬退出。",
+      "action": "今天不生成订单。若用户在券商端确认仍有161226，并能看到可靠同日IOPV/估值且溢价≥8%，才按全部实际剩余份额一次合并进入硬风险复核；否则卖0手。",
+      "trigger": "实际仍持有 + 同日可核验IOPV/估值 + 溢价≥8%三项同时成立；少一项都不下单。",
+      "reason": "当前只有跨日净值比较，不能把估算溢价冒充同日溢价。仅供个人复盘参考。"
+    },
+    {
+      "type": "盘中市场",
+      "title": "指数小涨，内部强弱仍分化",
+      "conclusion": "已确认事实：午盘沪指+0.46%、深成指+0.27%、创业板+0.56%、科创50+0.70%；半日成交约1.01万亿元，涨跌家数接近。",
+      "action": "不追早盘高点。军工、稀有金属和科技基金只看午后能否守住盘中低点；未确认资金来源前买0手。",
+      "trigger": "真实价格守住午盘低点并重新站上日内高点，同时有卖出成交资金和费用后收益证据，才复核。",
+      "reason": "指数修复但个股赚钱效应约五成，不能用指数红盘替代单只基金的执行证据。仅供个人复盘参考。"
     },
     {
       "type": "外部市场",
-      "title": "隔夜AI急跌，科技基金不接飞刀",
-      "conclusion": "已确认事实：11月5日美股S&P 500跌4.4%、道指跌3.4%、纳指跌5.5%；英伟达跌9.3%、AMD跌17.3%。布油反弹3.9%至98.29美元，10年期美债收益率降至4.84%。",
-      "action": "159740、512710及半导体相关观察均不追开盘；先看真实价格能否守住11月5日低点。",
-      "trigger": "只有基金真实价格止跌、重新站上11月5日高点，且资金与费用后收益证据齐备，才进入复核；否则买0手。",
-      "reason": "海外AI估值与融资成本风险重新定价，长端利率回落不足以抵消股价冲击。仅供个人复盘参考。"
-    },
-    {
-      "type": "市场总览",
-      "title": "A股普涨但冲高回落，等待承接",
-      "conclusion": "已确认事实：11月5日沪指+0.10%、深成指+1.19%、创业板+0.87%、科创50+1.68%；三市成交约2.14万亿元，近4900只上涨。",
-      "action": "A股广度改善只作正面背景；除161226硬风险退出外，基金买0手、卖0手。",
-      "trigger": "盘中回踩守住11月5日低点并重新站上高点，同时有真实卖出资金、毛收益覆盖往返费用3倍且扣费后收益≥1%，才复核。",
-      "reason": "指数盘中冲高回落，隔夜AI风险又显著放大，单日普涨不构成买入证据。仅供个人复盘参考。"
+      "title": "美股AI反弹但周线仍弱",
+      "conclusion": "已确认事实：上周五S&P 500涨0.3%、纳指涨1.1%、道指跌0.5%，英伟达反弹2.8%；S&P 500全周仍跌2.7%，10年期美债收益率升至4.86%。",
+      "action": "科技基金不追高；159740、512710只保留持有/观察。",
+      "trigger": "午后真实价格站稳日内高点且费用门通过才复核；否则新增0手。",
+      "reason": "单日反弹只部分修复前期急跌，融资成本风险仍在。仅供个人复盘参考。"
     },
     {
       "type": "费用闸门",
-      "title": "161226例外；普通碎片单继续暂停",
-      "conclusion": "161226旧2手约314.60元/单边费1.59%，因溢价>8%进入硬风险例外；159740旧3手约152.70元/3.27%，164701旧2手约316.00元/1.58%，均未达1000元且单边费率超0.5%。",
-      "action": "161226只按真实剩余份额一次合并；159740、164701普通小单不下。",
-      "trigger": "普通小单只有出现基本面失效、流动性异常或新的明确硬风控才越过金额门。",
+      "title": "三笔旧碎片单全部暂停",
+      "conclusion": "按13:41真实价：161226旧2手约306.20元/单边费1.63%，159740旧3手约150.30元/3.33%，164701旧2手约314.80元/1.59%；均低于1000元且费用占比高于0.5%。",
+      "action": "同日硬风险未被证实前，三笔都只复核、不下单、不拆单。",
+      "trigger": "只有基本面失效、流动性异常或经同日数据证实的LOF溢价失控，才越过普通费用门。",
       "reason": "费率暂按0.025%、每笔最低5元保守估算，待券商实际费率确认。仅供个人复盘参考。"
     },
     {
       "type": "新买入",
-      "title": "金额过门仍不买，新增买入0手",
-      "conclusion": "161725按17手约1001.30元，往返最低佣金约10元、费用占比约1.00%。",
-      "action": "不买。161226若成交，资金继续留现金；其余无已成交资金来源。",
-      "trigger": "未来需有真实资金，预期毛收益至少覆盖往返费3倍（约3.00%），且扣费后预期收益≥1%，再评估。",
-      "reason": "目前缺少可核验预期毛收益，费用闸门结论为缺少收益空间。仅供个人复盘参考。"
+      "title": "金额过门仍不买",
+      "conclusion": "161725按18手约1045.80元，往返最低佣金约10元、费用占比约0.96%。",
+      "action": "不买。没有已成交卖出资金，不把计划中的卖出当作资金来源。",
+      "trigger": "未来需有真实资金，预期毛收益至少覆盖往返费3倍（约2.87%），且扣费后预期收益≥1%，再评估。",
+      "reason": "目前缺少资金来源与可核验毛收益，费用闸门结论为缺少收益空间。仅供个人复盘参考。"
     }
   ],
   "executionOrder": [
-    "1. 9:15核对券商最新成交、161226实际持仓与可卖份额；不存在的旧2手不得生成订单。",
-    "2. 9:20用11月5日净值1.4204和券商真实开盘价重算溢价；最近同日静态溢价约10.74%。",
-    "3. 若旧2手仍在且溢价仍≥8%，合并卖2手；参考额314.60元、单边费约5元/1.59%，风险退出例外。",
-    "4. 若溢价≤8%、实际无持仓或券商数据无法核验，取消卖单，只做风险复核。",
-    "5. 159740旧3手、164701旧2手继续暂停；普通费用门不通过。",
-    "6. 隔夜AI急跌背景下，其他基金和观察池买0手；任何成交资金先留现金。",
-    "7. 自有代理仍失败时只看券商真实行情；网页不画假线、不显示假价。"
+    "1. 午后先在券商端核对最新持仓、可卖份额、当日成交和实际费率；网页无法读取这些账户数据。",
+    "2. 161226上周五同日溢价约6.80%；13:41跨日估算约8.28%，不得直接当作同日溢价。",
+    "3. 若无法取得可靠同日IOPV/估值，161226卖0手；若券商端确认实际仍持有且同日溢价≥8%，只进入一次合并退出复核。",
+    "4. 159740旧3手、164701旧2手继续暂停，普通费用门不通过。",
+    "5. 其余基金新增买入0手；任何卖出未真实成交前，不写入买入资金来源。",
+    "6. 股票观察池只作板块温度计，不生成股票订单。",
+    "7. 运行时行情若失败或时间戳过期，只显示失败态，不按缓存价执行。"
   ],
   "tradePlan": [
     {
-      "title": "161226硬风险仍成立",
-      "basis": "11月5日场内1.573、净值1.4204，同日溢价约10.74%。",
-      "inference": "溢价仍高于8%，回落风险高于最低佣金损耗。",
-      "conclusion": "实际仍有旧2手则一次合并退出。",
-      "invalidCondition": "无持仓或开盘溢价≤8%。"
+      "title": "161226硬退出暂不成立",
+      "basis": "11月6日场内收1.510、净值1.4139，同日溢价约6.80%。",
+      "inference": "低于8%硬风险线；盘中价与上周五净值是跨日口径。",
+      "conclusion": "无同日IOPV/估值与真实持仓前卖0手。",
+      "invalidCondition": "券商确认实际仍持有，且可靠同日溢价≥8%。"
     },
     {
-      "title": "隔夜AI急跌压过A股普涨",
-      "basis": "纳指跌5.5%、英伟达跌9.3%，A股前一日虽普涨但盘中冲高回落。",
-      "inference": "科技链开盘波动与下行风险上升。",
-      "conclusion": "科技相关基金不追、不接飞刀。",
-      "invalidCondition": "真实价格止跌并重新站上11月5日高点，且费用门通过。"
+      "title": "午盘普涨但强度一般",
+      "basis": "四个主要指数午盘上涨，个股涨跌接近一半一半。",
+      "inference": "市场修复但并非普遍强趋势。",
+      "conclusion": "不追高，等待午后确认。",
+      "invalidCondition": "基金真实价格放量站稳日内高点且费用门通过。"
     },
     {
       "title": "普通碎片单仍不经济",
-      "basis": "159740旧3手约152.70元，164701旧2手约316.00元。",
+      "basis": "159740旧3手约150.30元，164701旧2手约314.80元。",
       "inference": "单边费用占比显著高于0.5%。",
       "conclusion": "触价只复核，不机械卖。",
-      "invalidCondition": "出现基本面失效或明确硬风控。"
+      "invalidCondition": "出现明确硬风险。"
     },
     {
-      "title": "政策支持不能替代执行证据",
-      "basis": "金融工作报告与证监会措施继续强调稳市和增量工具。",
-      "inference": "政策改善中期预期，但不保证单只基金短线收益。",
+      "title": "政策托底只改善背景",
+      "basis": "国常会提出完善资本市场稳市机制，证监会继续部署稳市场工具。",
+      "inference": "政策有利于中期风险偏好，但不证明单只基金短线费用后收益。",
       "conclusion": "新增买入0手。",
       "invalidCondition": "资金、费率、毛收益与扣费后收益证据齐备。"
     }
   ],
   "noTradeList": [
-    "不把11月5日收盘写成11月6日实时行情；盘前只作最近真实基线。",
-    "不在未核对券商持仓时机械卖161226。",
-    "不把161226硬风险退出拆单。",
+    "不把13:41快照继续标成更新后的实时价；页面只按真实接口时间刷新。",
+    "不把161226盘中价/上周五净值的跨日比较写成同日溢价。",
+    "不在券商持仓接口未授权时机械卖旧2手。",
     "不执行159740旧3手或164701旧2手普通碎片卖单。",
-    "不在隔夜AI急跌后接飞刀；所有新增买入0手。",
+    "不把计划卖出当作已到账资金；新增买入0手。",
     "不买股票观察池；股票只作基金板块温度计。",
     "不自动下单；所有建议仅供个人复盘参考。"
   ],
@@ -152,22 +152,22 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "港股科技",
-      "support": "0.487 / 跌破后复核",
-      "resistance": "0.512 / 0.520",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 0.488,
-      "lastClose": 0.509,
+      "support": "0.499 / 跌破后复核",
+      "resistance": "0.512 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 0.507,
+      "lastClose": 0.501,
       "lastHigh": 0.512,
-      "lastLow": 0.487,
-      "lastChangePercent": 5.38,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "持有、不追涨；旧3手约152.70元、单边费约3.27%，普通减仓不下单",
-      "invalidCondition": "跌破0.487且隔夜科技风险继续扩散",
-      "predictionScore": 3,
-      "predictionLabel": "外盘AI急跌压制",
-      "expectedDirection": "震荡偏弱",
-      "reason": "11月5日涨5.38%，但隔夜纳指与AI龙头急跌，次日高开承接风险大。",
-      "riskLevel": "高"
+      "lastLow": 0.499,
+      "lastChangePercent": 0,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "持有、不追；旧3手约150.30元、单边费约3.33%，普通减仓暂停",
+      "invalidCondition": "跌破0.499且港股科技同步转弱",
+      "predictionScore": 5,
+      "predictionLabel": "冲高回落",
+      "expectedDirection": "震荡",
+      "reason": "13:41近昨收，早盘高点0.512未能保持。",
+      "riskLevel": "中高"
     },
     {
       "name": "黄金LOF",
@@ -176,21 +176,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "黄金",
-      "support": "1.570 / 跌破后复核",
-      "resistance": "1.620 / 1.650",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 1.586,
-      "lastClose": 1.58,
-      "lastHigh": 1.62,
+      "support": "1.570 / 日内低点",
+      "resistance": "1.583 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 1.572,
+      "lastClose": 1.574,
+      "lastHigh": 1.583,
       "lastLow": 1.57,
-      "lastChangePercent": 2.4,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "持有、不追涨；旧2手约316.00元、单边费约1.58%，普通减仓不下单",
+      "lastChangePercent": 1.35,
+      "lastSource": "自有代理sina真实盘中报价，2026-11-09 13:41:21；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "持有、不追；旧2手约314.80元、单边费约1.59%，普通减仓暂停",
       "invalidCondition": "跌破1.570且贵金属转弱",
       "predictionScore": 6,
-      "predictionLabel": "强势后震荡",
+      "predictionLabel": "相对强势",
       "expectedDirection": "震荡偏强",
-      "reason": "11月5日涨2.40%，贵金属板块强；但油价反弹提高宏观不确定性。",
+      "reason": "13:41约涨1.35%，仍守日内低点。",
       "riskLevel": "中"
     },
     {
@@ -200,21 +200,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "exchange_fund",
       "sector": "军工",
-      "support": "0.606 / 跌破后复核",
-      "resistance": "0.629 / 0.635",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 0.607,
-      "lastClose": 0.62,
-      "lastHigh": 0.629,
-      "lastLow": 0.606,
-      "lastChangePercent": 1.14,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "持有、不追涨；跌破0.606只进入复核，新买0手",
-      "invalidCondition": "跌破0.606且风险偏好转弱",
+      "support": "0.617 / 日内低点",
+      "resistance": "0.632 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 0.622,
+      "lastClose": 0.618,
+      "lastHigh": 0.632,
+      "lastLow": 0.617,
+      "lastChangePercent": 0.49,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:13；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "持有、不追；跌破0.617只进入复核，新买0手",
+      "invalidCondition": "跌破0.617且军工板块转弱",
       "predictionScore": 5,
-      "predictionLabel": "冲高后待承接",
+      "predictionLabel": "高开回落",
       "expectedDirection": "震荡",
-      "reason": "11月5日涨1.14%但未收日高，隔夜风险偏好急降。",
+      "reason": "开盘0.622后回落，13:41仍小幅红盘。",
       "riskLevel": "中高"
     },
     {
@@ -224,21 +224,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "白银",
-      "support": "1.514 / 硬风险复核",
-      "resistance": "1.590 / 溢价复核",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 1.535,
-      "lastClose": 1.573,
-      "lastHigh": 1.59,
-      "lastLow": 1.514,
-      "lastChangePercent": 4.38,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "同日溢价约10.74%，仍高于8%；实际旧2手仍在则一次合并退出，参考额314.60元/费约5元",
-      "invalidCondition": "实际无持仓或开盘溢价≤8%",
-      "predictionScore": 3,
-      "predictionLabel": "溢价仍失控",
-      "expectedDirection": "高波动偏弱",
-      "reason": "净值涨4.99%、场内涨4.38%，同日溢价仍约10.74%。",
+      "support": "1.527 / 日内低点",
+      "resistance": "1.548 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 1.527,
+      "lastClose": 1.531,
+      "lastHigh": 1.548,
+      "lastLow": 1.527,
+      "lastChangePercent": 1.39,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "卖0手；上周五同日溢价6.80%，跨日估算8.28%仅复核",
+      "invalidCondition": "可靠同日溢价≥8%且券商确认实际仍持有",
+      "predictionScore": 4,
+      "predictionLabel": "跨日溢价待核",
+      "expectedDirection": "高波动震荡",
+      "reason": "运行时场内价真实，但同日净值/IOPV不可得，硬退出证据不足。",
       "riskLevel": "高"
     },
     {
@@ -248,21 +248,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "稀有金属",
-      "support": "0.836 / 跌破后复核",
-      "resistance": "0.879 / 0.890",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 0.846,
-      "lastClose": 0.863,
-      "lastHigh": 0.879,
-      "lastLow": 0.836,
-      "lastChangePercent": 2.25,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "持有、不追涨；回踩0.836不破只进入复核，新买0手",
-      "invalidCondition": "跌破0.836或能源金属转弱",
-      "predictionScore": 5,
-      "predictionLabel": "强势后分化",
-      "expectedDirection": "震荡",
-      "reason": "11月5日涨2.25%，但隔夜风险资产急跌，先看承接。",
+      "support": "0.838 / 日内低点",
+      "resistance": "0.856 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 0.848,
+      "lastClose": 0.841,
+      "lastHigh": 0.856,
+      "lastLow": 0.838,
+      "lastChangePercent": 0.36,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "持有、不追；跌破0.838只进入复核，新买0手",
+      "invalidCondition": "跌破0.838且能源金属继续转弱",
+      "predictionScore": 4,
+      "predictionLabel": "高开回落",
+      "expectedDirection": "震荡偏弱",
+      "reason": "早盘冲至0.856后回落，锂板块偏弱。",
       "riskLevel": "中高"
     },
     {
@@ -272,21 +272,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "航空航天",
-      "support": "0.973 / 跌破后复核",
-      "resistance": "1.014 / 1.020",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 0.978,
-      "lastClose": 0.998,
-      "lastHigh": 1.014,
-      "lastLow": 0.973,
-      "lastChangePercent": 1.42,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "action": "持有、不追涨；站稳1.014只进入复核，新买0手",
-      "invalidCondition": "跌破0.973或军工链转弱",
+      "support": "0.990 / 日内低点",
+      "resistance": "1.017 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 0.996,
+      "lastClose": 0.993,
+      "lastHigh": 1.017,
+      "lastLow": 0.99,
+      "lastChangePercent": 0.3,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "action": "持有、不追；站稳1.017也只进入复核，新买0手",
+      "invalidCondition": "跌破0.990且航天链转弱",
       "predictionScore": 5,
-      "predictionLabel": "反弹待确认",
+      "predictionLabel": "冲高回落",
       "expectedDirection": "震荡",
-      "reason": "11月5日涨1.42%但盘中振幅较大。",
+      "reason": "商业航天活跃但基金未守住日内高点。",
       "riskLevel": "中"
     },
     {
@@ -296,21 +296,21 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "exchange_fund",
       "sector": "电力",
-      "support": "1.074 / 跌破后复核",
-      "resistance": "1.088 / 1.100",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 1.082,
-      "lastClose": 1.088,
-      "lastHigh": 1.088,
-      "lastLow": 1.074,
-      "lastChangePercent": 0.55,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
+      "support": "1.094 / 日内低点",
+      "resistance": "1.102 / 日内高点",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 1.096,
+      "lastClose": 1.097,
+      "lastHigh": 1.102,
+      "lastLow": 1.094,
+      "lastChangePercent": -0.18,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:06；mode=realtime；11月6日收盘另经三源日K一致性核验",
       "action": "持有、不加仓；普通碎片单不下",
-      "invalidCondition": "跌破1.074或政策预期转弱",
+      "invalidCondition": "跌破1.094且电力板块转弱",
       "predictionScore": 5,
-      "predictionLabel": "低波动修复",
+      "predictionLabel": "窄幅整理",
       "expectedDirection": "震荡",
-      "reason": "11月5日涨0.55%并收日高，仍需量能确认。",
+      "reason": "13:41约跌0.18%，波动较窄。",
       "riskLevel": "中"
     },
     {
@@ -320,22 +320,22 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "stock",
       "sector": "电网设备",
-      "support": "8.11 / 股票观察",
-      "resistance": "8.40 / 8.50",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 8.2,
-      "lastClose": 8.3,
-      "lastHigh": 8.4,
-      "lastLow": 8.11,
-      "lastChangePercent": 1.84,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
+      "support": "8.09 / 股票观察",
+      "resistance": "8.33 / 股票观察",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 8.24,
+      "lastClose": 8.13,
+      "lastHigh": 8.33,
+      "lastLow": 8.09,
+      "lastChangePercent": -0.73,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
       "action": "仅观察，不新增股票买卖指令；用于判断电网设备风险",
-      "invalidCondition": "跌破8.11",
-      "predictionScore": 6,
-      "predictionLabel": "板块强势验证",
-      "expectedDirection": "震荡偏强",
-      "reason": "11月5日涨1.84%，电力设备保持活跃。",
-      "riskLevel": "中"
+      "invalidCondition": "跌破8.09",
+      "predictionScore": 4,
+      "predictionLabel": "高开走弱",
+      "expectedDirection": "震荡偏弱",
+      "reason": "13:41约跌0.73%，接近日内低点。",
+      "riskLevel": "中高"
     }
   ],
   "watchlist": [
@@ -346,24 +346,24 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "新材料 / PCB材料",
-      "status": "高位续涨，股票不买",
-      "reason": "11月5日涨4.74%、振幅大，仅作材料与科技温度计。",
-      "buyTrigger": "股票不买；基金端需守住32.34并通过费用门",
-      "avoidReason": "高位波动且可执行建议限定基金",
-      "risk": "跌破32.34",
-      "support": "32.34",
-      "resistance": "36.08",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 32.5,
-      "lastClose": 34.89,
-      "lastHigh": 36.08,
-      "lastLow": 32.34,
-      "lastChangePercent": 4.74,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "invalidCondition": "跌破32.34",
-      "predictionScore": 5,
-      "predictionLabel": "高位分化",
-      "expectedDirection": "震荡",
+      "status": "强反弹但波动大，股票不买",
+      "reason": "13:41约涨2.59%，盘中振幅仍高。",
+      "buyTrigger": "股票不买；基金端需站稳34.97并通过费用门",
+      "avoidReason": "高波动且可执行建议限定基金",
+      "risk": "跌破32.75",
+      "support": "32.75",
+      "resistance": "34.97",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 33.68,
+      "lastClose": 34.01,
+      "lastHigh": 34.97,
+      "lastLow": 32.75,
+      "lastChangePercent": 2.59,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:11；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "invalidCondition": "跌破32.75",
+      "predictionScore": 6,
+      "predictionLabel": "强势高波动",
+      "expectedDirection": "震荡偏强",
       "riskLevel": "高"
     },
     {
@@ -373,24 +373,24 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "通信 / 算力",
-      "status": "继续弱于大盘，股票不买",
-      "reason": "11月5日跌1.12%，与市场普涨背离。",
-      "buyTrigger": "股票不买；基金端需站回4.46并通过费用门",
+      "status": "接近日内低点，股票不买",
+      "reason": "13:41约跌2.01%，弱于主要指数。",
+      "buyTrigger": "股票不买；基金端需站回4.45并通过费用门",
       "avoidReason": "相对强度弱且无基金端资金证据",
-      "risk": "跌破4.40",
-      "support": "4.40",
-      "resistance": "4.46",
-      "lastTradeDate": "2026-11-05",
+      "risk": "跌破4.38",
+      "support": "4.38",
+      "resistance": "4.45",
+      "lastTradeDate": "2026-11-09",
       "lastOpen": 4.45,
-      "lastClose": 4.42,
-      "lastHigh": 4.46,
-      "lastLow": 4.4,
-      "lastChangePercent": -1.12,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "invalidCondition": "放量站稳4.46",
+      "lastClose": 4.38,
+      "lastHigh": 4.45,
+      "lastLow": 4.38,
+      "lastChangePercent": -2.01,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:10；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "invalidCondition": "放量站稳4.45",
       "predictionScore": 3,
       "predictionLabel": "相对弱势",
-      "expectedDirection": "震荡偏弱",
+      "expectedDirection": "偏弱",
       "riskLevel": "中高"
     },
     {
@@ -400,24 +400,24 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "stock",
       "sector": "锂矿",
-      "status": "能源金属大涨，股票不买",
-      "reason": "11月5日涨5.03%，只作159608方向验证。",
-      "buyTrigger": "股票不买；基金端需守住36.20并通过费用门",
-      "avoidReason": "单日急涨且无费用后收益证据",
-      "risk": "跌破36.20",
-      "support": "36.20",
-      "resistance": "39.00",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 36.2,
-      "lastClose": 38.02,
-      "lastHigh": 39,
-      "lastLow": 36.2,
-      "lastChangePercent": 5.03,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "invalidCondition": "跌破36.20",
-      "predictionScore": 5,
-      "predictionLabel": "急涨后分化",
-      "expectedDirection": "震荡",
+      "status": "锂板块弱势，股票不买",
+      "reason": "13:41约跌2.88%，接近日内低点。",
+      "buyTrigger": "股票不买；基金端需重新站稳37.62并通过费用门",
+      "avoidReason": "板块回落且无费用后收益证据",
+      "risk": "跌破36.01",
+      "support": "36.01",
+      "resistance": "37.62",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 37.39,
+      "lastClose": 36.09,
+      "lastHigh": 37.62,
+      "lastLow": 36.01,
+      "lastChangePercent": -2.88,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "invalidCondition": "跌破36.01",
+      "predictionScore": 2,
+      "predictionLabel": "弱势下探",
+      "expectedDirection": "偏弱",
       "riskLevel": "高"
     },
     {
@@ -427,24 +427,24 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "半导体",
-      "status": "逆势回落且隔夜AI急跌，股票不买",
-      "reason": "11月5日跌0.55%，弱于科创50；隔夜英伟达跌9.3%。",
-      "buyTrigger": "股票不买；基金端先看107.60能否守住",
-      "avoidReason": "外盘AI重估且无资金与收益证据",
-      "risk": "跌破107.60",
-      "support": "107.60",
-      "resistance": "113.84",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 107.6,
-      "lastClose": 110.69,
-      "lastHigh": 113.84,
-      "lastLow": 107.6,
-      "lastChangePercent": -0.55,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "invalidCondition": "跌破107.60",
-      "predictionScore": 2,
-      "predictionLabel": "外盘冲击高",
-      "expectedDirection": "偏弱",
+      "status": "半导体高开回落，股票不买",
+      "reason": "13:41约跌0.93%，早盘反弹未保持。",
+      "buyTrigger": "股票不买；基金端先看109.40能否守住",
+      "avoidReason": "高开回落且无资金与收益证据",
+      "risk": "跌破109.40",
+      "support": "109.40",
+      "resistance": "111.71",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 111.2,
+      "lastClose": 109.87,
+      "lastHigh": 111.71,
+      "lastLow": 109.4,
+      "lastChangePercent": -0.93,
+      "lastSource": "自有代理eastmoney真实盘中报价，2026-11-09 13:41:12；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "invalidCondition": "跌破109.40",
+      "predictionScore": 4,
+      "predictionLabel": "高开回落",
+      "expectedDirection": "震荡偏弱",
       "riskLevel": "高"
     },
     {
@@ -454,24 +454,24 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "消费 / 白酒",
-      "status": "白酒小幅修复，不买",
-      "reason": "11月5日涨1.55%，金额过门仍缺收益证据。",
-      "buyTrigger": "守住0.576并站稳0.590，且先有成交资金与费用后收益证据",
-      "avoidReason": "17手约1001.30元、往返最低费约10元；无资金来源和预期毛收益",
-      "risk": "跌破0.576",
-      "support": "0.576",
-      "resistance": "0.590",
-      "lastTradeDate": "2026-11-05",
-      "lastOpen": 0.576,
-      "lastClose": 0.589,
-      "lastHigh": 0.59,
-      "lastLow": 0.576,
-      "lastChangePercent": 1.55,
-      "lastSource": "本次采集sina真实收盘与sina日K逐项核对，2026-11-05；mode=closed；自有代理连接超时",
-      "invalidCondition": "跌破0.576或资金来源缺失",
-      "predictionScore": 5,
-      "predictionLabel": "弱修复",
-      "expectedDirection": "震荡",
+      "status": "白酒窄幅偏弱，不买",
+      "reason": "13:41约跌0.68%，金额过门仍缺收益证据。",
+      "buyTrigger": "守住0.579并站稳0.587，且先有成交资金与费用后收益证据",
+      "avoidReason": "18手约1045.80元、往返最低费约10元；无资金来源和预期毛收益",
+      "risk": "跌破0.579",
+      "support": "0.579",
+      "resistance": "0.587",
+      "lastTradeDate": "2026-11-09",
+      "lastOpen": 0.579,
+      "lastClose": 0.581,
+      "lastHigh": 0.587,
+      "lastLow": 0.579,
+      "lastChangePercent": -0.68,
+      "lastSource": "自有代理sina真实盘中报价，2026-11-09 13:41:15；mode=realtime；11月6日收盘另经三源日K一致性核验",
+      "invalidCondition": "跌破0.579或资金来源缺失",
+      "predictionScore": 4,
+      "predictionLabel": "窄幅偏弱",
+      "expectedDirection": "震荡偏弱",
       "riskLevel": "中"
     },
     {
@@ -481,245 +481,240 @@ window.MARKET_BRIEFING_DATA = {
       "market": "OF",
       "type": "open_fund",
       "sector": "开放式基金",
-      "status": "11月5日净值已披露，运行时代理失败",
-      "reason": "11月5日净值1.4164、日涨1.11%；仅作dated NAV。",
+      "status": "11月6日净值已披露，运行时接口失败",
+      "reason": "11月6日净值1.4023、日跌1.00%；只作dated NAV。",
       "buyTrigger": "不买；开放式基金无盘中K线，且缺少资金与收益证据",
-      "avoidReason": "自有代理连接超时，不能伪装实时",
+      "avoidReason": "运行时基金接口HTTP 501，不能伪装实时",
       "risk": "净值披露滞后或接口失败",
       "support": "按净值披露",
       "resistance": "不设盘中价",
-      "lastTradeDate": "2026-11-05",
+      "lastTradeDate": "2026-11-06",
       "lastOpen": null,
-      "lastClose": 1.4164,
+      "lastClose": 1.4023,
       "lastHigh": null,
       "lastLow": null,
-      "lastChangePercent": 1.11,
-      "lastSource": "东方财富基金11月5日公开净值；自有运行时代理连接超时，mode=failed",
+      "lastChangePercent": -1,
+      "lastSource": "东方财富基金11月6日公开净值；运行时基金接口HTTP 501，mode=failed",
       "invalidCondition": "运行时真实基金接口接通并通过校验",
-      "predictionScore": 5,
-      "predictionLabel": "净值修复、接口失败",
+      "predictionScore": 4,
+      "predictionLabel": "净值回落、接口失败",
       "expectedDirection": "震荡",
       "riskLevel": "中"
     }
   ],
   "newsItems": [
     {
-      "title": "美股AI抛售加剧，纳指跌5.5%",
+      "title": "A股午盘小涨，涨跌家数接近",
+      "source": "新华财经 / 同花顺",
+      "publishTime": "2026-11-09 11:48:00+08:00",
+      "summary": "已确认事实：沪指+0.46%、深成指+0.27%、创业板+0.56%、科创50+0.70%，半日成交约1.01万亿元，约2650只上涨。基于事实的判断：修复强度一般，不据此追买基金。",
+      "relatedStocks": [
+        "159740",
+        "512710",
+        "159241"
+      ],
+      "sector": "过去24小时 / 全市场 / 午盘",
+      "relation": "market",
+      "url": "https://finance.sina.com.cn/jjxw/2026-11-09/doc-iniycfna6562919.shtml"
+    },
+    {
+      "title": "亚洲市场跟随美股AI反弹",
       "source": "AP",
-      "publishTime": "2026-11-06 07:00:00+08:00",
-      "summary": "已确认事实：S&P 500跌4.4%、道指跌3.4%、纳指跌5.5%；英伟达跌9.3%、AMD跌17.3%。基于事实的判断：科技基金开盘下行风险显著上升，不接飞刀。",
+      "publishTime": "2026-11-09 12:14:00+08:00",
+      "summary": "已确认事实：上周五S&P 500+0.3%、纳指+1.1%、道指-0.5%，英伟达+2.8%；周一亚洲主要市场多数反弹。基于事实的判断：风险偏好修复，但上周波动未消失。",
       "relatedStocks": [
         "159740",
         "512710",
         "688981"
       ],
-      "sector": "过去24小时 / 全市场重大风险 / 海外AI",
-      "relation": "risk",
-      "url": "https://apnews.com/article/stocks-markets-ai-midterm-oil-trump-7ee9c212805aa5e70cf34d25aab7a36e"
-    },
-    {
-      "title": "A股近4900只上涨，但指数冲高回落",
-      "source": "东方财富Choice / 澎湃新闻 / 三源行情",
-      "publishTime": "2026-11-05 15:27:00+08:00",
-      "summary": "已确认事实：沪指+0.10%、深成指+1.19%、创业板+0.87%、科创50+1.68%，三市成交约2.14万亿元；光伏、贵金属、能源金属领涨。基于事实的判断：广度改善但尾盘承接仍需验证。",
-      "relatedStocks": [
-        "164701",
-        "159608",
-        "512710"
-      ],
-      "sector": "过去24小时 / 全市场重大利好与分化 / A股",
+      "sector": "过去24小时 / 全市场重大利好与风险 / 海外AI",
       "relation": "market",
-      "url": "https://fund.eastmoney.com/a/202611053923465485.html"
+      "url": "https://apnews.com/article/stocks-markets-ai-trump-oil-d938f8e6ff42b3706e1d36e6245ec56b"
     },
     {
-      "title": "金融工作报告强调巩固稳市机制",
-      "source": "全国人大信息 / 东方财富Choice",
-      "publishTime": "2026-11-05 15:00:00+08:00",
-      "summary": "已确认事实：11月5日发布的金融工作情况报告提出支持中央汇金发挥类平准基金作用、巩固完善资本市场稳市机制。基于事实的判断：政策托底改善中期预期，但不替代当日价格和费用证据。",
+      "title": "13个场内标的盘中真实报价全部通过校验",
+      "source": "自有代理 / 新浪 / 腾讯 / 东方财富",
+      "publishTime": "2026-11-09 13:42:00+08:00",
+      "summary": "已确认事实：13/13报价日期均为11月9日、mode=realtime、非零OHLC；11月6日收盘另经三源日K一致性核验。基于事实的判断：页面可显示真实盘中状态，但只以接口时间戳为准。",
       "relatedStocks": [
+        "159740",
+        "164701",
         "512710",
+        "161226",
+        "159608",
         "159241",
         "562350"
       ],
-      "sector": "过去24小时 / 全市场重大利好 / 稳市政策",
-      "relation": "market",
-      "url": "https://fund.eastmoney.com/a/202611053923465485.html"
+      "sector": "过去24小时 / 数据校验 / 真实行情",
+      "relation": "holding",
+      "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SH512710"
     },
     {
-      "title": "161226同日溢价仍约10.74%",
-      "source": "东方财富基金 / 三源行情",
-      "publishTime": "2026-11-06 08:36:00+08:00",
-      "summary": "已确认事实：11月5日净值1.4204、场内收1.573，同日静态溢价约10.74%，仍高于8%。基于事实的判断：实际旧2手仍在且开盘溢价未回落才一次合并退出。",
+      "title": "161226跨日估算约8.28%，不等于同日溢价",
+      "source": "自有代理 / 东方财富基金",
+      "publishTime": "2026-11-09 13:42:00+08:00",
+      "summary": "已确认事实：11月6日场内收1.510、净值1.4139，同日溢价约6.80%；13:41盘中价1.531。基于事实的判断：缺少11月9日同日净值/IOPV与真实持仓，卖0手。",
       "relatedStocks": [
         "161226"
       ],
-      "sector": "持仓 / 白银LOF / 溢价风险",
+      "sector": "过去24小时 / 持仓 / 白银LOF",
       "relation": "risk",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=161226&pageIndex=1&pageSize=10"
     },
     {
-      "title": "005827净值涨1.11%，运行时代理连接超时",
+      "title": "贵金属相对强，锂板块偏弱",
+      "source": "自有代理",
+      "publishTime": "2026-11-09 13:42:00+08:00",
+      "summary": "已确认事实：164701约涨1.35%，159608约涨0.36%；002466约跌2.88%。基于事实的判断：资源方向内部明显分化，不追强、不补弱。",
+      "relatedStocks": [
+        "164701",
+        "159608",
+        "002466"
+      ],
+      "sector": "持仓关联 / 板块分化",
+      "relation": "holding",
+      "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SZ164701"
+    },
+    {
+      "title": "商业航天活跃，但基金冲高回落",
+      "source": "新华财经 / 自有代理",
+      "publishTime": "2026-11-09 13:42:00+08:00",
+      "summary": "已确认事实：商业航天板块早盘活跃；159241盘中高见1.017，13:41回到0.993。基于事实的判断：题材热度没有转化为可执行追价信号。",
+      "relatedStocks": [
+        "159241"
+      ],
+      "sector": "持仓关联 / 航空航天",
+      "relation": "holding",
+      "url": "https://finance.sina.com.cn/jjxw/2026-11-09/doc-iniycfna6562919.shtml"
+    },
+    {
+      "title": "国常会提出完善资本市场稳市机制",
+      "source": "新华社 / 教育部政府门户",
+      "publishTime": "2026-11-07 09:00:00+08:00",
+      "summary": "已确认事实：11月6日国常会提出完善资本市场稳市机制、增强股市内在稳定性。基于事实的判断：政策托底改善中期背景，但不替代费用和触发条件。",
+      "relatedStocks": [
+        "512710",
+        "562350"
+      ],
+      "sector": "全市场重大利好 / 稳市政策",
+      "relation": "market",
+      "url": "https://www.moe.gov.cn/jyb_xwfb/s6052/moe_838/202611/t20261107_1457467.html"
+    },
+    {
+      "title": "11月6日A股缩量下跌，科技压力较大",
+      "source": "新华财经",
+      "publishTime": "2026-11-06 15:30:00+08:00",
+      "summary": "已确认事实：沪指-1.10%、深成指-2.57%、创业板-3.96%，两市成交约1.66万亿元；算力硬件走弱。基于事实的判断：周一小幅修复尚未完全扭转上周五风险。",
+      "relatedStocks": [
+        "159740",
+        "512710",
+        "688981"
+      ],
+      "sector": "市场风险 / 上一交易日",
+      "relation": "risk",
+      "url": "https://www.cnfin.com/gs-lb/detail/20261106/4492047_1.html"
+    },
+    {
+      "title": "005827净值跌1.00%，运行时基金接口失败",
       "source": "东方财富基金 / 自有代理",
-      "publishTime": "2026-11-06 08:36:00+08:00",
-      "summary": "已确认事实：11月5日净值1.4164、日涨1.11%；本次自有代理连接超时。基于事实的判断：只保留dated NAV，不提供盘中K线。",
+      "publishTime": "2026-11-09 13:42:00+08:00",
+      "summary": "已确认事实：11月6日净值1.4023、日跌1.00%；运行时基金接口HTTP 501。基于事实的判断：只保留dated NAV，不提供盘中K线。",
       "relatedStocks": [
         "005827"
       ],
       "sector": "持仓 / 开放式基金 / 接口失败",
       "relation": "holding",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=005827&pageIndex=1&pageSize=10"
-    },
-    {
-      "title": "能源金属和贵金属延续强势，科技内部背离",
-      "source": "三源行情 / 独立日K",
-      "publishTime": "2026-11-05 16:15:00+08:00",
-      "summary": "已确认事实：159740涨5.38%、164701涨2.40%、159608涨2.25%，但688981跌0.55%、600050跌1.12%。基于事实的判断：A股内部已分化，隔夜AI急跌后不追强势基金。",
-      "relatedStocks": [
-        "159740",
-        "164701",
-        "159608",
-        "688981"
-      ],
-      "sector": "过去24小时 / 持仓关联 / 板块分化",
-      "relation": "holding",
-      "url": "https://finance.sina.com.cn/jjxw/2026-11-05/doc-inixsmiu5599974.shtml"
-    },
-    {
-      "title": "中芯国际弱于科创50，通信继续背离",
-      "source": "三源行情 / 独立日K",
-      "publishTime": "2026-11-05 16:15:00+08:00",
-      "summary": "已确认事实：科创50涨1.68%，但688981跌0.55%、600050跌1.12%；601208涨4.74%。基于事实的判断：科技内部强弱分化明显，股票只作基金温度计，不生成股票订单。",
-      "relatedStocks": [
-        "688981",
-        "600050",
-        "601208",
-        "512710"
-      ],
-      "sector": "过去24小时 / 观察池 / 科技分化",
-      "relation": "market",
-      "url": "https://fund.eastmoney.com/a/202611053923465485.html"
-    },
-    {
-      "title": "布油反弹、长端利率下行，宏观信号相互冲突",
-      "source": "AP",
-      "publishTime": "2026-11-06 07:00:00+08:00",
-      "summary": "已确认事实：布油涨3.9%至98.29美元，10年期美债收益率降至4.84%。基于事实的判断：能源与避险交易并存，不能据此追买贵金属或资源基金。",
-      "relatedStocks": [
-        "164701",
-        "161226",
-        "159608"
-      ],
-      "sector": "过去24小时 / 全市场重大风险 / 油价与利率",
-      "relation": "risk",
-      "url": "https://apnews.com/article/stocks-markets-ai-midterm-oil-trump-7ee9c212805aa5e70cf34d25aab7a36e"
-    },
-    {
-      "title": "13个场内标的真实收盘全部通过日K核对",
-      "source": "新浪 / 腾讯 / 东方财富",
-      "publishTime": "2026-11-06 08:36:00+08:00",
-      "summary": "已确认事实：13/13报价日期均为11月5日，三源非零OHLC与各自日K末根一致；自有代理连接超时。基于事实的判断：11月5日值只作最近真实收盘基线，不能冒充11月6日实时行情。",
-      "relatedStocks": [
-        "159740",
-        "164701",
-        "512710",
-        "161226",
-        "159608",
-        "159241",
-        "562350"
-      ],
-      "sector": "数据校验 / 持仓 / 真实行情",
-      "relation": "holding",
-      "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SH512710"
     }
   ],
   "reasoning": [
     {
-      "title": "161226硬退出仍成立",
-      "basis": "同日场内1.573、净值1.4204，溢价约10.74%。",
-      "inference": "超过8%后，溢价回落风险高于最低佣金损耗。",
-      "conclusion": "实际旧2手仍在则一次合并退出。",
-      "invalidCondition": "无持仓或开盘溢价≤8%。"
+      "title": "161226先解决口径问题",
+      "basis": "上周五同日溢价6.80%，盘中跨日估算8.28%。",
+      "inference": "跨日估算会混入银价和净值变化，不能直接触发卖出。",
+      "conclusion": "无同日IOPV/估值和真实持仓前卖0手。",
+      "invalidCondition": "可靠同日溢价≥8%且实际仍持有。"
     },
     {
-      "title": "隔夜AI急跌改变短线风险",
-      "basis": "纳指跌5.5%，英伟达跌9.3%，AMD跌17.3%。",
-      "inference": "A股科技基金面临外盘估值与风险偏好双重冲击。",
-      "conclusion": "不接飞刀，新增0手。",
-      "invalidCondition": "真实价格止跌回升且费用门通过。"
+      "title": "指数反弹不等于可追",
+      "basis": "午盘指数普涨但涨跌家数接近。",
+      "inference": "市场修复广度一般，热点轮动快。",
+      "conclusion": "基金不追高，新增0手。",
+      "invalidCondition": "真实价格站稳日内高点且费用门通过。"
     },
     {
       "title": "普通碎片单仍不经济",
-      "basis": "159740旧3手、164701旧2手均不足1000元且单边费用占比超0.5%。",
+      "basis": "161226旧2手、159740旧3手、164701旧2手均不足1000元且单边费用占比超0.5%。",
       "inference": "普通波动不值得重复支付最低佣金。",
       "conclusion": "触价只复核。",
       "invalidCondition": "出现明确硬风险。"
     },
     {
-      "title": "政策托底不是买单",
-      "basis": "稳市机制与增量工具方向已确认。",
-      "inference": "政策只能改善背景，不能证明单只基金的费用后收益。",
-      "conclusion": "所有新增买入0手。",
-      "invalidCondition": "资金、费率、毛收益与扣费后收益证据齐备。"
+      "title": "账户证据是执行前置条件",
+      "basis": "券商持仓、订单和成交接口未获授权。",
+      "inference": "无法确认旧份额是否仍在，也无法确认卖出资金。",
+      "conclusion": "买卖均为0手。",
+      "invalidCondition": "用户在券商端完成核对。"
     }
   ],
   "invalidConditions": [
-    "161226实际无持仓，或开盘价对应溢价≤8%：取消卖出。",
+    "161226缺少同日IOPV/估值，或无法确认实际持仓：卖0手。",
     "最新券商持仓与旧计划不一致：旧手数示例立即失效，按真实可卖份额一次合并重算。",
-    "159740/164701订单仍<1000元或单边费率>0.5%：普通调仓只复核。",
+    "161226/159740/164701普通订单仍<1000元或单边费率>0.5%：只复核。",
     "任何买入缺少已成交资金、实际费率、可核验毛收益或扣费后≥1%收益空间：保持0手。",
-    "网页出现0价、11月5日旧时间戳却标实时、来源失败或代理超时：取消基于网页价格的执行。"
+    "网页出现0价、时间戳过期、来源失败或mode非realtime：取消基于网页价格的执行。"
   ],
   "cancelPlan": [
-    "9:15先查最新成交与持仓；不存在的161226份额不得生成卖单。",
-    "9:20用最新可核验净值和券商真实价重算161226溢价；≤8%则取消硬退出。",
-    "开盘一分钟瞬时跳空不直接成交，先确认真实价格。",
+    "先查券商最新持仓与成交；不存在的旧份额不得生成订单。",
+    "161226只用可靠同日IOPV/估值重算溢价；跨日估算不得触发卖出。",
+    "午后瞬时跳价不直接成交，先确认真实价格与时间戳。",
     "卖出未真实成交前不写入买入资金；成交后也先留现金。",
     "自有代理失败时不画假线、不显示假价、不把缓存写成实时。"
   ],
   "learningFramework": [
     {
-      "title": "报价与日K必须同日核对",
-      "basis": "13个场内标的11月5日OHLC全部与日K末根一致。",
-      "inference": "只有日期和OHLC校验通过的数据才能进入报告。",
-      "conclusion": "以11月5日收盘作11月6日盘前基线。",
-      "invalidCondition": "11月6日真实行情到达。"
+      "title": "盘中价必须带真实时间戳",
+      "basis": "13个场内标的均返回11月9日13:41前后非零OHLC和mode=realtime。",
+      "inference": "只有通过校验的数据才能显示为实时。",
+      "conclusion": "页面按接口时间刷新。",
+      "invalidCondition": "接口失败或时间戳过期。"
     },
     {
-      "title": "LOF硬风险按同日溢价重算",
-      "basis": "161226同日场内1.573和净值1.4204，溢价约10.74%。",
-      "inference": "仍超过8%，硬风险例外继续。",
-      "conclusion": "按真实剩余份额一次退出。",
-      "invalidCondition": "开盘溢价≤8%或无持仓。"
+      "title": "LOF溢价必须同日比较",
+      "basis": "11月6日同日溢价6.80%，盘中跨日估算8.28%。",
+      "inference": "跨日口径不能确认真实溢价。",
+      "conclusion": "同日证据不足时卖0手。",
+      "invalidCondition": "取得可靠同日IOPV/估值。"
     },
     {
-      "title": "费用门不阻止硬风险",
-      "basis": "旧2手参考额314.60元、单边费占比约1.59%。",
-      "inference": "普通调仓不经济，但明确溢价风险可越过金额门。",
-      "conclusion": "一次合并，不拆单。",
-      "invalidCondition": "硬风险失效。"
+      "title": "费用门先于普通调仓",
+      "basis": "三笔旧碎片单参考额306.20元、150.30元、314.80元。",
+      "inference": "均未达到经济金额，最低佣金侵蚀过大。",
+      "conclusion": "普通调仓暂停。",
+      "invalidCondition": "明确硬风险出现。"
     },
     {
-      "title": "海外冲击先于追涨",
-      "basis": "A股普涨后隔夜美股AI板块急跌。",
-      "inference": "次日先验证承接，不根据昨日涨幅追买。",
+      "title": "资金来源必须已成交",
+      "basis": "账户成交接口未授权，无法证明有卖出回款。",
+      "inference": "计划卖出不是资金。",
       "conclusion": "新增买入0手。",
-      "invalidCondition": "止跌、资金与费用后收益同时成立。"
+      "invalidCondition": "券商端确认成交和可用资金。"
     },
     {
       "title": "股票只作板块温度计",
-      "basis": "601208与002466上涨，但600050、688981相对偏弱。",
+      "basis": "601208上涨，600050、002466、688981走弱。",
       "inference": "个股信号用于验证基金方向，不生成股票订单。",
       "conclusion": "观察池股票不买。",
       "invalidCondition": "无。"
     }
   ],
   "nextWatch": [
-    "9:15：核对最新成交、161226实际持仓和可卖份额。",
-    "9:20：用11月5日净值1.4204和券商真实价重算溢价；≥8%且仍有旧2手才一次卖2手。",
-    "9:30后：若161226开盘溢价≤8%，取消卖出。",
-    "10:00：看159740的0.487、512710的0.606、688981的107.60能否守住；跌破只复核。",
-    "全天：关注美股AI抛售传导、布油反弹和美债收益率；其余基金不追。",
-    "15:00后：记录11月6日真实收盘与基金净值，重算溢价和费用闸门。"
+    "14:00：核对券商真实持仓、可卖份额和实际费率。",
+    "14:10：若能取得可靠同日IOPV/估值，再重算161226溢价；否则卖0手。",
+    "14:30：观察159740的0.499、512710的0.617、159241的0.990能否守住；跌破只复核。",
+    "14:50：不追尾盘拉升；没有已成交资金仍买0手。",
+    "15:00后：记录真实收盘，等待11月9日基金净值披露后再做同日溢价复盘。",
+    "全天：运行时接口失败时只显示失败态，不绘制假线或假K线。"
   ],
   "quoteWatchlist": [
     {
@@ -729,8 +724,8 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "新材料 / PCB材料",
-      "support": "32.34",
-      "resistance": "36.08"
+      "support": "32.75",
+      "resistance": "34.97"
     },
     {
       "name": "中国联通",
@@ -739,8 +734,8 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "通信 / 算力",
-      "support": "4.40",
-      "resistance": "4.46"
+      "support": "4.38",
+      "resistance": "4.45"
     },
     {
       "name": "天齐锂业",
@@ -749,8 +744,8 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "stock",
       "sector": "锂矿",
-      "support": "36.20",
-      "resistance": "39.00"
+      "support": "36.01",
+      "resistance": "37.62"
     },
     {
       "name": "中芯国际",
@@ -759,8 +754,8 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SH",
       "type": "stock",
       "sector": "半导体",
-      "support": "107.60",
-      "resistance": "113.84"
+      "support": "109.40",
+      "resistance": "111.71"
     },
     {
       "name": "白酒基金LOF",
@@ -769,8 +764,8 @@ window.MARKET_BRIEFING_DATA = {
       "market": "SZ",
       "type": "exchange_fund",
       "sector": "消费 / 白酒",
-      "support": "0.576",
-      "resistance": "0.590"
+      "support": "0.579",
+      "resistance": "0.587"
     },
     {
       "name": "易方达蓝筹精选混合",
@@ -785,44 +780,44 @@ window.MARKET_BRIEFING_DATA = {
   ],
   "sources": [
     {
-      "name": "本次运行：13个场内标的三源收盘与日K核验",
+      "name": "本次运行：13个场内标的真实盘中报价",
       "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SH512710",
-      "note": "2026-11-06 08:36：因自有代理连接超时，改用新浪、腾讯、东方财富直接交叉核对；13/13为非零11月5日真实收盘，报价与日K日期/OHLC一致。"
+      "note": "2026-11-09 13:42：13/13为非零11月9日真实盘中报价，mode=realtime；页面只按各接口时间戳显示。"
     },
     {
-      "name": "自有代理连接超时失败态",
-      "url": "https://daily-briefing-blue.vercel.app/api/fund?symbol=OF005827",
-      "note": "2026-11-06运行时SZ161226与OF005827均连接超时，mode=failed；页面不得伪装实时，开放式基金不提供盘中K线。"
+      "name": "本次基线：11月6日三源日K一致性核验",
+      "url": "https://daily-briefing-blue.vercel.app/api/kline?symbol=SH512710&period=day",
+      "note": "新浪、腾讯、东方财富对13个标的11月6日OHLC形成至少两源一致，全部13/13通过。"
     },
     {
       "name": "东方财富基金：161226历史净值",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=161226&pageIndex=1&pageSize=10",
-      "note": "11月5日单位净值1.4204、日涨4.99%、暂停申购；相对同日场内收盘1.573的静态溢价约10.74%。"
+      "note": "11月6日单位净值1.4139、日跌0.46%；相对同日场内收盘1.510的静态溢价约6.80%。"
     },
     {
       "name": "东方财富基金：005827历史净值",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=005827&pageIndex=1&pageSize=10",
-      "note": "11月5日单位净值1.4164、日涨1.11%；仅作dated NAV。"
+      "note": "11月6日单位净值1.4023、日跌1.00%；仅作dated NAV。"
     },
     {
-      "name": "三源交叉核验：11月5日A股指数",
-      "url": "https://fund.eastmoney.com/a/202611053923465485.html",
-      "note": "至少两源核对：沪指+0.10%、深成指+1.19%、创业板+0.87%、科创50+1.68%。"
+      "name": "运行时基金接口HTTP 501失败态",
+      "url": "https://daily-briefing-blue.vercel.app/api/fund?symbol=OF005827",
+      "note": "SZ161226与OF005827运行时基金接口均返回ok:false/mode:failed；开放式基金不提供盘中K线。"
     },
     {
-      "name": "东方财富Choice：11月5日A股收盘",
-      "url": "https://fund.eastmoney.com/a/202611053923465485.html",
-      "note": "三市成交约2.14万亿元，近4900只上涨，光伏、贵金属、能源金属领涨；金融工作报告强调巩固稳市机制。"
+      "name": "新华财经：11月9日A股午盘",
+      "url": "https://finance.sina.com.cn/jjxw/2026-11-09/doc-iniycfna6562919.shtml",
+      "note": "沪指+0.46%、深成指+0.27%、创业板+0.56%，主要股指小涨，热点轮动。"
     },
     {
-      "name": "AP：11月5日美股AI抛售",
-      "url": "https://apnews.com/article/stocks-markets-ai-midterm-oil-trump-7ee9c212805aa5e70cf34d25aab7a36e",
-      "note": "S&P 500-4.4%、道指-3.4%、纳指-5.5%；英伟达-9.3%、AMD-17.3%；布油+3.9%至98.29美元，10年期美债收益率降至4.84%。"
+      "name": "AP：美股AI反弹与亚洲市场",
+      "url": "https://apnews.com/article/stocks-markets-ai-trump-oil-d938f8e6ff42b3706e1d36e6245ec56b",
+      "note": "上周五S&P 500+0.3%、纳指+1.1%、道指-0.5%，周一亚洲市场多数反弹；10年期美债收益率4.86%。"
     },
     {
-      "name": "证监会：稳市场稳预期与ETF工具",
-      "url": "https://www.csrc.gov.cn/csrc/c100028/c7668092/content.shtml",
-      "note": "证监会披露回购增持、主动ETF和进一步丰富指数基金工具；仅作政策背景，不直接生成买单。"
+      "name": "新华社：国常会完善稳市机制",
+      "url": "https://www.moe.gov.cn/jyb_xwfb/s6052/moe_838/202611/t20261107_1457467.html",
+      "note": "11月6日国常会提出完善资本市场稳市机制、增强股市内在稳定性；仅作政策背景。"
     }
   ]
 };

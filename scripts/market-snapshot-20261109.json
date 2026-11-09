@@ -1,0 +1,985 @@
+{
+  "collectedAt": "2026-11-09T05:41:01.345Z",
+  "collectionMode": "three-provider-daily-k-consensus",
+  "expectedDate": "2026-11-06",
+  "quotes": [
+    {
+      "symbol": "SZ159740",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 0.496,
+        "high": 0.51,
+        "low": 0.494,
+        "close": 0.501,
+        "volume": 1916256516,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.496,
+            "high": 0.51,
+            "low": 0.494,
+            "close": 0.501,
+            "volume": 1916256516,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.496,
+            "close": 0.501,
+            "high": 0.51,
+            "low": 0.494,
+            "volume": 1916256500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.496,
+            "close": 0.501,
+            "high": 0.51,
+            "low": 0.494,
+            "volume": 1916256500,
+            "amount": 962655376.196,
+            "changePercent": -1.57
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ164701",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 1.56,
+        "high": 1.563,
+        "low": 1.55,
+        "close": 1.553,
+        "volume": 6749006,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.56,
+            "high": 1.563,
+            "low": 1.55,
+            "close": 1.553,
+            "volume": 6749006,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.56,
+            "close": 1.553,
+            "high": 1.563,
+            "low": 1.55,
+            "volume": 6749000,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.56,
+            "close": 1.553,
+            "high": 1.563,
+            "low": 1.55,
+            "volume": 6749000,
+            "amount": 10495868.735,
+            "changePercent": -1.71
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH512710",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 0.608,
+        "high": 0.625,
+        "low": 0.606,
+        "close": 0.615,
+        "volume": 492120282,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.608,
+            "high": 0.625,
+            "low": 0.606,
+            "close": 0.615,
+            "volume": 492120282,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.608,
+            "close": 0.615,
+            "high": 0.625,
+            "low": 0.606,
+            "volume": 492120300,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.608,
+            "close": 0.615,
+            "high": 0.625,
+            "low": 0.606,
+            "volume": 492120300,
+            "amount": 303515158,
+            "changePercent": -0.81
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ161226",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 1.51,
+        "high": 1.533,
+        "low": 1.49,
+        "close": 1.51,
+        "volume": 94864774,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.51,
+            "high": 1.533,
+            "low": 1.49,
+            "close": 1.51,
+            "volume": 94864774,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.51,
+            "close": 1.51,
+            "high": 1.533,
+            "low": 1.49,
+            "volume": 94864800,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.51,
+            "close": 1.51,
+            "high": 1.533,
+            "low": 1.49,
+            "volume": 94864800,
+            "amount": 143236423.157,
+            "changePercent": -4.01
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ159608",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 0.855,
+        "high": 0.855,
+        "low": 0.829,
+        "close": 0.838,
+        "volume": 84439600,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.855,
+            "high": 0.855,
+            "low": 0.829,
+            "close": 0.838,
+            "volume": 84439600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.855,
+            "close": 0.838,
+            "high": 0.855,
+            "low": 0.829,
+            "volume": 84439600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.855,
+            "close": 0.838,
+            "high": 0.855,
+            "low": 0.829,
+            "volume": 84439600,
+            "amount": 71458292.1,
+            "changePercent": -2.9
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ159241",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 0.971,
+        "high": 1.001,
+        "low": 0.97,
+        "close": 0.99,
+        "volume": 97135800,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.971,
+            "high": 1.001,
+            "low": 0.97,
+            "close": 0.99,
+            "volume": 97135800,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.971,
+            "close": 0.99,
+            "high": 1.001,
+            "low": 0.97,
+            "volume": 97135800,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.971,
+            "close": 0.99,
+            "high": 1.001,
+            "low": 0.97,
+            "volume": 97135800,
+            "amount": 95972172,
+            "changePercent": -0.8
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH562350",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 1.085,
+        "high": 1.1,
+        "low": 1.075,
+        "close": 1.099,
+        "volume": 8037600,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.085,
+            "high": 1.1,
+            "low": 1.075,
+            "close": 1.099,
+            "volume": 8037600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.085,
+            "close": 1.099,
+            "high": 1.1,
+            "low": 1.075,
+            "volume": 8037600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 1.085,
+            "close": 1.099,
+            "high": 1.1,
+            "low": 1.075,
+            "volume": 8037600,
+            "amount": 8799837,
+            "changePercent": 1.01
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ002090",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 8.06,
+        "high": 8.34,
+        "low": 8.06,
+        "close": 8.19,
+        "volume": 2496700,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 8.06,
+            "high": 8.34,
+            "low": 8.06,
+            "close": 8.19,
+            "volume": 2496700,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 8.06,
+            "close": 8.19,
+            "high": 8.34,
+            "low": 8.06,
+            "volume": 2496700,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 8.06,
+            "close": 8.19,
+            "high": 8.34,
+            "low": 8.06,
+            "volume": 2496700,
+            "amount": 20565949,
+            "changePercent": -1.33
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH601208",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 32.49,
+        "high": 34.11,
+        "low": 31.62,
+        "close": 33.15,
+        "volume": 58745698,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 32.49,
+            "high": 34.11,
+            "low": 31.62,
+            "close": 33.15,
+            "volume": 58745698,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 32.49,
+            "close": 33.15,
+            "high": 34.11,
+            "low": 31.62,
+            "volume": 58745700,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 32.49,
+            "close": 33.15,
+            "high": 34.11,
+            "low": 31.62,
+            "volume": 58745700,
+            "amount": 1927119793,
+            "changePercent": -4.99
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH600050",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 4.42,
+        "high": 4.47,
+        "low": 4.38,
+        "close": 4.47,
+        "volume": 154174167,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 4.42,
+            "high": 4.47,
+            "low": 4.38,
+            "close": 4.47,
+            "volume": 154174167,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 4.42,
+            "close": 4.47,
+            "high": 4.47,
+            "low": 4.38,
+            "volume": 154174200,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 4.42,
+            "close": 4.47,
+            "high": 4.47,
+            "low": 4.38,
+            "volume": 154174200,
+            "amount": 685150015,
+            "changePercent": 1.13
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ002466",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 37,
+        "high": 38.38,
+        "low": 36.75,
+        "close": 37.16,
+        "volume": 40709760,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 37,
+            "high": 38.38,
+            "low": 36.75,
+            "close": 37.16,
+            "volume": 40709760,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 37,
+            "close": 37.16,
+            "high": 38.38,
+            "low": 36.75,
+            "volume": 40709800,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 37,
+            "close": 37.16,
+            "high": 38.38,
+            "low": 36.75,
+            "volume": 40709800,
+            "amount": 1531669038.49,
+            "changePercent": -2.26
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH688981",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 106,
+        "high": 113.49,
+        "low": 105,
+        "close": 110.9,
+        "volume": 44934854,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 106,
+            "high": 113.49,
+            "low": 105,
+            "close": 110.9,
+            "volume": 44934854,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 106,
+            "close": 110.9,
+            "high": 113.49,
+            "low": 105,
+            "volume": 4493485400,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 106,
+            "close": 110.9,
+            "high": 113.49,
+            "low": 105,
+            "volume": 44934900,
+            "amount": 4932073612,
+            "changePercent": 0.19
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ161725",
+      "expectedDate": "2026-11-06",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-06",
+        "open": 0.591,
+        "high": 0.592,
+        "low": 0.576,
+        "close": 0.585,
+        "volume": 94796415,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.591,
+            "high": 0.592,
+            "low": 0.576,
+            "close": 0.585,
+            "volume": 94796415,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.591,
+            "close": 0.585,
+            "high": 0.592,
+            "low": 0.576,
+            "volume": 94796400,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-06",
+            "open": 0.591,
+            "close": 0.585,
+            "high": 0.592,
+            "low": 0.576,
+            "volume": 94796400,
+            "amount": 55298284.425,
+            "changePercent": -0.68
+          }
+        }
+      ]
+    }
+  ],
+  "funds": [
+    {
+      "code": "161226",
+      "status": 200,
+      "body": {
+        "Data": {
+          "LSJZList": [
+            {
+              "FSRQ": "2026-11-06",
+              "DWJZ": "1.4139",
+              "LJJZ": "1.4139",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.46",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-05",
+              "DWJZ": "1.4204",
+              "LJJZ": "1.4204",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "4.99",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-04",
+              "DWJZ": "1.3529",
+              "LJJZ": "1.3529",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.13",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-03",
+              "DWJZ": "1.3546",
+              "LJJZ": "1.3546",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "2.11",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-02",
+              "DWJZ": "1.3266",
+              "LJJZ": "1.3266",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-4.86",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            }
+          ],
+          "FundType": "002",
+          "SYType": null,
+          "isNewType": false,
+          "Feature": "020,411"
+        },
+        "ErrCode": 0,
+        "ErrMsg": null,
+        "TotalCount": 2737,
+        "Expansion": null,
+        "PageSize": 5,
+        "PageIndex": 1
+      }
+    },
+    {
+      "code": "005827",
+      "status": 200,
+      "body": {
+        "Data": {
+          "LSJZList": [
+            {
+              "FSRQ": "2026-11-06",
+              "DWJZ": "1.4023",
+              "LJJZ": "1.4023",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-1.00",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-05",
+              "DWJZ": "1.4164",
+              "LJJZ": "1.4164",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "1.11",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-04",
+              "DWJZ": "1.4009",
+              "LJJZ": "1.4009",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "1.43",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-03",
+              "DWJZ": "1.3811",
+              "LJJZ": "1.3811",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.04",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-02",
+              "DWJZ": "1.3817",
+              "LJJZ": "1.3817",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "0.67",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            }
+          ],
+          "FundType": "002",
+          "SYType": null,
+          "isNewType": false,
+          "Feature": "211,701"
+        },
+        "ErrCode": 0,
+        "ErrMsg": null,
+        "TotalCount": 1958,
+        "Expansion": null,
+        "PageSize": 5,
+        "PageIndex": 1
+      }
+    }
+  ],
+  "runtimeFunds": [
+    {
+      "symbol": "SZ161226",
+      "status": 501,
+      "body": {
+        "ok": false,
+        "mode": "failed",
+        "symbol": "SZ161226",
+        "message": "open fund NAV provider is not connected"
+      }
+    },
+    {
+      "symbol": "OF005827",
+      "status": 501,
+      "body": {
+        "ok": false,
+        "mode": "failed",
+        "symbol": "OF005827",
+        "message": "open fund NAV provider is not connected"
+      }
+    }
+  ]
+}
