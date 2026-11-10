@@ -5,7 +5,9 @@ const path = require("path");
 const { spawn } = require("child_process");
 
 const edgePath = "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe";
-const remoteUrl = process.argv[2] || "";
+const layoutOnly = process.argv.includes("--layout-only");
+const desktopOnly = process.argv.includes("--desktop-only");
+const remoteUrl = process.argv.slice(2).find((value) => !value.startsWith("--")) || "";
 const localPort = 42000 + (process.pid % 1000);
 const baseUrl = remoteUrl || `http://127.0.0.1:${localPort}/`;
 const projectRoot = process.cwd();
@@ -166,6 +168,8 @@ async function inspectViewport(client, width, height, label) {
     };
   })()`);
 
+  if (layoutOnly) return { ...summary, exchangeDetail: null, openFundDetail: null };
+
   const exchangeDetail = await evaluate(client, `(async () => {
     const row = document.querySelector('.asset-row[data-symbol="SZ159740"]');
     if (!row) return { opened: false, reason: 'exchange row missing' };
@@ -246,8 +250,11 @@ async function inspectViewport(client, width, height, label) {
     qaStage = "desktop";
     const desktop = await inspectViewport(client, 1440, 1000, "desktop");
     console.error("browser QA desktop complete");
-    qaStage = "mobile";
-    const mobile = await inspectViewport(client, 390, 844, "mobile");
+    let mobile = null;
+    if (!desktopOnly) {
+      qaStage = "mobile";
+      mobile = await inspectViewport(client, 390, 844, "mobile");
+    }
     const runtimeErrors = client.events.filter((event) =>
       event.method === "Runtime.exceptionThrown" ||
       (event.method === "Runtime.consoleAPICalled" && event.params?.type === "error")
@@ -261,17 +268,19 @@ async function inspectViewport(client, width, height, label) {
     }, null, 2));
 
     const expectedAxis = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"];
-    for (const result of [desktop, mobile]) {
-      if (result.version !== "portfolio-2026-11-09-midday-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
+    for (const result of [desktop, mobile].filter(Boolean)) {
+      if (result.version !== "portfolio-2026-11-10-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
       if (result.tabCount !== 4 || result.bottomNavCount !== 0 || result.overflowX) throw new Error(`${result.label} navigation or overflow regression`);
       if (!result.tabResults.every((item) => item.active)) throw new Error(`${result.label} tab click regression`);
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
-      if (!result.exchangeDetail.opened) throw new Error(`${result.label} exchange detail did not open`);
-      if (result.exchangeDetail.dailyCanvasCount === 0 && result.exchangeDetail.canvasCount === 0 && !result.exchangeDetail.message) throw new Error(`${result.label} exchange chart has neither real chart nor explicit failure`);
-      if (result.exchangeDetail.canvasCount > 0 && JSON.stringify(result.exchangeDetail.intradayLabels) !== JSON.stringify(expectedAxis)) throw new Error(`${result.label} intraday labels mismatch`);
-      if (result.exchangeDetail.canvasCount === 0 && /正在加载/.test(result.exchangeDetail.message)) throw new Error(`${result.label} exchange chart did not settle within 7 seconds`);
-      if (!result.openFundDetail.opened || result.openFundDetail.periodButtons !== 0 || result.openFundDetail.canvasCount !== 0) throw new Error(`${result.label} open-fund chart controls must be absent`);
-      if (!result.openFundDetail.text.includes("开放式基金按净值披露，不提供盘中K线")) throw new Error(`${result.label} open-fund disclosure missing`);
+      if (!layoutOnly) {
+        if (!result.exchangeDetail.opened) throw new Error(`${result.label} exchange detail did not open`);
+        if (result.exchangeDetail.dailyCanvasCount === 0 && result.exchangeDetail.canvasCount === 0 && !result.exchangeDetail.message) throw new Error(`${result.label} exchange chart has neither real chart nor explicit failure`);
+        if (result.exchangeDetail.canvasCount > 0 && JSON.stringify(result.exchangeDetail.intradayLabels) !== JSON.stringify(expectedAxis)) throw new Error(`${result.label} intraday labels mismatch`);
+        if (result.exchangeDetail.canvasCount === 0 && /正在加载/.test(result.exchangeDetail.message)) throw new Error(`${result.label} exchange chart did not settle within 7 seconds`);
+        if (!result.openFundDetail.opened || result.openFundDetail.periodButtons !== 0 || result.openFundDetail.canvasCount !== 0) throw new Error(`${result.label} open-fund chart controls must be absent`);
+        if (!result.openFundDetail.text.includes("开放式基金按净值披露，不提供盘中K线")) throw new Error(`${result.label} open-fund disclosure missing`);
+      }
     }
     if (runtimeErrors.length) throw new Error(`page errors: ${JSON.stringify(runtimeErrors)}`);
 
