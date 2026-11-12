@@ -1,0 +1,1609 @@
+{
+  "collectedAt": "2026-11-12T08:00:23.023Z",
+  "collectionMode": "own-proxy-close-plus-three-provider-daily-k-consensus",
+  "expectedDate": "2026-11-12",
+  "quotes": [
+    {
+      "symbol": "SZ159740",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 0.491,
+        "high": 0.492,
+        "low": 0.483,
+        "close": 0.483,
+        "volume": 1544620083,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.491,
+            "high": 0.492,
+            "low": 0.483,
+            "close": 0.483,
+            "volume": 1544620083,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.491,
+            "close": 0.483,
+            "high": 0.492,
+            "low": 0.483,
+            "volume": 1544620100,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.491,
+            "close": 0.483,
+            "high": 0.492,
+            "low": 0.483,
+            "volume": 1544620100,
+            "amount": 752585854.723,
+            "changePercent": -2.82
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ159740",
+          "name": "恒生科技ETF大成",
+          "code": "159740",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:42",
+          "time": "2026-11-12 15:34:42",
+          "quote": {
+            "price": 0.483,
+            "preClose": 0.497,
+            "open": 0.491,
+            "high": 0.492,
+            "low": 0.483,
+            "close": 0.483,
+            "change": -0.014,
+            "changePercent": -2.82,
+            "volume": 1544620100,
+            "amount": 752585854.723
+          },
+          "price": 0.483,
+          "preClose": 0.497,
+          "open": 0.491,
+          "high": 0.492,
+          "low": 0.483,
+          "close": 0.483,
+          "change": -0.014,
+          "changePercent": -2.82,
+          "volume": 1544620100,
+          "amount": 752585854.723,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_40da28bf6235d496",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ164701",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 1.54,
+        "high": 1.546,
+        "low": 1.52,
+        "close": 1.521,
+        "volume": 8610779,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.54,
+            "high": 1.546,
+            "low": 1.52,
+            "close": 1.521,
+            "volume": 8610779,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.54,
+            "close": 1.521,
+            "high": 1.546,
+            "low": 1.52,
+            "volume": 8610800,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.54,
+            "close": 1.521,
+            "high": 1.546,
+            "low": 1.52,
+            "volume": 8610800,
+            "amount": 13176588.355,
+            "changePercent": -2.25
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "sina",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ164701",
+          "name": "黄金LOF",
+          "code": "164701",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:00:00",
+          "time": "2026-11-12 15:00:00",
+          "quote": {
+            "price": 1.521,
+            "preClose": 1.556,
+            "open": 1.54,
+            "high": 1.546,
+            "low": 1.52,
+            "close": 1.521,
+            "change": -0.03500000000000014,
+            "changePercent": -2.249357326478158,
+            "volume": 8610779,
+            "amount": 13176588.355
+          },
+          "price": 1.521,
+          "preClose": 1.556,
+          "open": 1.54,
+          "high": 1.546,
+          "low": 1.52,
+          "close": 1.521,
+          "change": -0.03500000000000014,
+          "changePercent": -2.249357326478158,
+          "volume": 8610779,
+          "amount": 13176588.355,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_e4a50428efd6917d",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SH512710",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 2,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 0.611,
+        "high": 0.621,
+        "low": 0.607,
+        "close": 0.611,
+        "volume": 509214500,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.611,
+            "high": 0.621,
+            "low": 0.607,
+            "close": 0.611,
+            "volume": 509214500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.61,
+            "close": 0.61,
+            "high": 0.62,
+            "low": 0.61,
+            "volume": 509214500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.611,
+            "close": 0.611,
+            "high": 0.621,
+            "low": 0.607,
+            "volume": 509214500,
+            "amount": 312070580,
+            "changePercent": 0
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SH512710",
+          "name": "军工龙头ETF富国",
+          "code": "512710",
+          "type": "exchange_fund",
+          "market": "SH",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:59:41",
+          "time": "2026-11-12 15:59:41",
+          "quote": {
+            "price": 0.611,
+            "preClose": 0.611,
+            "open": 0.611,
+            "high": 0.621,
+            "low": 0.607,
+            "close": 0.611,
+            "change": 0,
+            "changePercent": 0,
+            "volume": 509214500,
+            "amount": 312070580
+          },
+          "price": 0.611,
+          "preClose": 0.611,
+          "open": 0.611,
+          "high": 0.621,
+          "low": 0.607,
+          "close": 0.611,
+          "change": 0,
+          "changePercent": 0,
+          "volume": 509214500,
+          "amount": 312070580,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_f4e64a35bf859e5e",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ161226",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 1.496,
+        "high": 1.5,
+        "low": 1.486,
+        "close": 1.486,
+        "volume": 76619307,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.496,
+            "high": 1.5,
+            "low": 1.486,
+            "close": 1.486,
+            "volume": 76619307,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.496,
+            "close": 1.486,
+            "high": 1.5,
+            "low": 1.486,
+            "volume": 76619300,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.496,
+            "close": 1.486,
+            "high": 1.5,
+            "low": 1.486,
+            "volume": 76619300,
+            "amount": 114357972.767,
+            "changePercent": -2.56
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ161226",
+          "name": "国投白银LOF",
+          "code": "161226",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:00",
+          "time": "2026-11-12 15:34:00",
+          "quote": {
+            "price": 1.486,
+            "preClose": 1.525,
+            "open": 1.496,
+            "high": 1.5,
+            "low": 1.486,
+            "close": 1.486,
+            "change": -0.039,
+            "changePercent": -2.56,
+            "volume": 76619300,
+            "amount": 114357972.767
+          },
+          "price": 1.486,
+          "preClose": 1.525,
+          "open": 1.496,
+          "high": 1.5,
+          "low": 1.486,
+          "close": 1.486,
+          "change": -0.039,
+          "changePercent": -2.56,
+          "volume": 76619300,
+          "amount": 114357972.767,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_8406d704ec392179",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ159608",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 0.85,
+        "high": 0.859,
+        "low": 0.833,
+        "close": 0.835,
+        "volume": 99622100,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.85,
+            "high": 0.859,
+            "low": 0.833,
+            "close": 0.835,
+            "volume": 99622100,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.85,
+            "close": 0.835,
+            "high": 0.859,
+            "low": 0.833,
+            "volume": 99622100,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.85,
+            "close": 0.835,
+            "high": 0.859,
+            "low": 0.833,
+            "volume": 99622100,
+            "amount": 84367963.8,
+            "changePercent": -2.45
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ159608",
+          "name": "稀有金属ETF广发",
+          "code": "159608",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:00",
+          "time": "2026-11-12 15:34:00",
+          "quote": {
+            "price": 0.835,
+            "preClose": 0.856,
+            "open": 0.85,
+            "high": 0.859,
+            "low": 0.833,
+            "close": 0.835,
+            "change": -0.021,
+            "changePercent": -2.45,
+            "volume": 99622100,
+            "amount": 84367963.8
+          },
+          "price": 0.835,
+          "preClose": 0.856,
+          "open": 0.85,
+          "high": 0.859,
+          "low": 0.833,
+          "close": 0.835,
+          "change": -0.021,
+          "changePercent": -2.45,
+          "volume": 99622100,
+          "amount": 84367963.8,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_c439c948b38b3b90",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ159241",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 0.988,
+        "high": 1.003,
+        "low": 0.983,
+        "close": 0.986,
+        "volume": 104961498,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.988,
+            "high": 1.003,
+            "low": 0.983,
+            "close": 0.986,
+            "volume": 104961498,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.988,
+            "close": 0.986,
+            "high": 1.003,
+            "low": 0.983,
+            "volume": 104961500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.988,
+            "close": 0.986,
+            "high": 1.003,
+            "low": 0.983,
+            "volume": 104961500,
+            "amount": 104049293.326,
+            "changePercent": -0.1
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ159241",
+          "name": "航空航天ETF天弘",
+          "code": "159241",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:12",
+          "time": "2026-11-12 15:34:12",
+          "quote": {
+            "price": 0.986,
+            "preClose": 0.987,
+            "open": 0.988,
+            "high": 1.003,
+            "low": 0.983,
+            "close": 0.986,
+            "change": -0.001,
+            "changePercent": -0.1,
+            "volume": 104961500,
+            "amount": 104049293.326
+          },
+          "price": 0.986,
+          "preClose": 0.987,
+          "open": 0.988,
+          "high": 1.003,
+          "low": 0.983,
+          "close": 0.986,
+          "change": -0.001,
+          "changePercent": -0.1,
+          "volume": 104961500,
+          "amount": 104049293.326,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_baad966a8a969823",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SH562350",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 1.084,
+        "high": 1.085,
+        "low": 1.076,
+        "close": 1.082,
+        "volume": 5456700,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.084,
+            "high": 1.085,
+            "low": 1.076,
+            "close": 1.082,
+            "volume": 5456700,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.084,
+            "close": 1.082,
+            "high": 1.085,
+            "low": 1.076,
+            "volume": 5456700,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 1.084,
+            "close": 1.082,
+            "high": 1.085,
+            "low": 1.076,
+            "volume": 5456700,
+            "amount": 5897929,
+            "changePercent": -0.18
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SH562350",
+          "name": "电力ETF银华",
+          "code": "562350",
+          "type": "exchange_fund",
+          "market": "SH",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:59:30",
+          "time": "2026-11-12 15:59:30",
+          "quote": {
+            "price": 1.082,
+            "preClose": 1.084,
+            "open": 1.084,
+            "high": 1.085,
+            "low": 1.076,
+            "close": 1.082,
+            "change": -0.002,
+            "changePercent": -0.18,
+            "volume": 5456700,
+            "amount": 5897929
+          },
+          "price": 1.082,
+          "preClose": 1.084,
+          "open": 1.084,
+          "high": 1.085,
+          "low": 1.076,
+          "close": 1.082,
+          "change": -0.002,
+          "changePercent": -0.18,
+          "volume": 5456700,
+          "amount": 5897929,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_8fe41495ae20cafd",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ002090",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 8.39,
+        "high": 8.58,
+        "low": 8.36,
+        "close": 8.5,
+        "volume": 6403394,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 8.39,
+            "high": 8.58,
+            "low": 8.36,
+            "close": 8.5,
+            "volume": 6403394,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 8.39,
+            "close": 8.5,
+            "high": 8.58,
+            "low": 8.36,
+            "volume": 6403400,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 8.39,
+            "close": 8.5,
+            "high": 8.58,
+            "low": 8.36,
+            "volume": 6403400,
+            "amount": 54319104.24,
+            "changePercent": 1.19
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ002090",
+          "name": "金智科技",
+          "code": "002090",
+          "type": "stock",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:48",
+          "time": "2026-11-12 15:34:48",
+          "quote": {
+            "price": 8.5,
+            "preClose": 8.4,
+            "open": 8.39,
+            "high": 8.58,
+            "low": 8.36,
+            "close": 8.5,
+            "change": 0.1,
+            "changePercent": 1.19,
+            "volume": 6403400,
+            "amount": 54319104.24
+          },
+          "price": 8.5,
+          "preClose": 8.4,
+          "open": 8.39,
+          "high": 8.58,
+          "low": 8.36,
+          "close": 8.5,
+          "change": 0.1,
+          "changePercent": 1.19,
+          "volume": 6403400,
+          "amount": 54319104.24,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_05650b13394b2901",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SH601208",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 35.2,
+        "high": 36.7,
+        "low": 34.31,
+        "close": 34.39,
+        "volume": 60433511,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.2,
+            "high": 36.7,
+            "low": 34.31,
+            "close": 34.39,
+            "volume": 60433511,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.2,
+            "close": 34.39,
+            "high": 36.7,
+            "low": 34.31,
+            "volume": 60433500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.2,
+            "close": 34.39,
+            "high": 36.7,
+            "low": 34.31,
+            "volume": 60433500,
+            "amount": 2146194993,
+            "changePercent": -2.33
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SH601208",
+          "name": "东材科技",
+          "code": "601208",
+          "type": "stock",
+          "market": "SH",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:59:42",
+          "time": "2026-11-12 15:59:42",
+          "quote": {
+            "price": 34.39,
+            "preClose": 35.21,
+            "open": 35.2,
+            "high": 36.7,
+            "low": 34.31,
+            "close": 34.39,
+            "change": -0.82,
+            "changePercent": -2.33,
+            "volume": 60433500,
+            "amount": 2146194993
+          },
+          "price": 34.39,
+          "preClose": 35.21,
+          "open": 35.2,
+          "high": 36.7,
+          "low": 34.31,
+          "close": 34.39,
+          "change": -0.82,
+          "changePercent": -2.33,
+          "volume": 60433500,
+          "amount": 2146194993,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_21c48c1a903a6f6e",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SH600050",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 4.29,
+        "high": 4.3,
+        "low": 4.21,
+        "close": 4.23,
+        "volume": 140310861,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 4.29,
+            "high": 4.3,
+            "low": 4.21,
+            "close": 4.23,
+            "volume": 140310861,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 4.29,
+            "close": 4.23,
+            "high": 4.3,
+            "low": 4.21,
+            "volume": 140310900,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 4.29,
+            "close": 4.23,
+            "high": 4.3,
+            "low": 4.21,
+            "volume": 140310900,
+            "amount": 595209859,
+            "changePercent": -1.4
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SH600050",
+          "name": "中国联通",
+          "code": "600050",
+          "type": "stock",
+          "market": "SH",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:59:43",
+          "time": "2026-11-12 15:59:43",
+          "quote": {
+            "price": 4.23,
+            "preClose": 4.29,
+            "open": 4.29,
+            "high": 4.3,
+            "low": 4.21,
+            "close": 4.23,
+            "change": -0.06,
+            "changePercent": -1.4,
+            "volume": 140310900,
+            "amount": 595209859
+          },
+          "price": 4.23,
+          "preClose": 4.29,
+          "open": 4.29,
+          "high": 4.3,
+          "low": 4.21,
+          "close": 4.23,
+          "change": -0.06,
+          "changePercent": -1.4,
+          "volume": 140310900,
+          "amount": 595209859,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_809b705876fb5bec",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ002466",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 35.68,
+        "high": 36.08,
+        "low": 34.95,
+        "close": 35.16,
+        "volume": 28986599,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.68,
+            "high": 36.08,
+            "low": 34.95,
+            "close": 35.16,
+            "volume": 28986599,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.68,
+            "close": 35.16,
+            "high": 36.08,
+            "low": 34.95,
+            "volume": 28986600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 35.68,
+            "close": 35.16,
+            "high": 36.08,
+            "low": 34.95,
+            "volume": 28986600,
+            "amount": 1028227867.05,
+            "changePercent": -2.12
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ002466",
+          "name": "天齐锂业",
+          "code": "002466",
+          "type": "stock",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:09",
+          "time": "2026-11-12 15:34:09",
+          "quote": {
+            "price": 35.16,
+            "preClose": 35.92,
+            "open": 35.68,
+            "high": 36.08,
+            "low": 34.95,
+            "close": 35.16,
+            "change": -0.76,
+            "changePercent": -2.12,
+            "volume": 28986600,
+            "amount": 1028227867.05
+          },
+          "price": 35.16,
+          "preClose": 35.92,
+          "open": 35.68,
+          "high": 36.08,
+          "low": 34.95,
+          "close": 35.16,
+          "change": -0.76,
+          "changePercent": -2.12,
+          "volume": 28986600,
+          "amount": 1028227867.05,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_2195550cf251f87c",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SH688981",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 3,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 108.49,
+        "high": 114.9,
+        "low": 108.44,
+        "close": 111.72,
+        "volume": 49349812,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 108.49,
+            "high": 114.9,
+            "low": 108.44,
+            "close": 111.72,
+            "volume": 49349812,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 108.49,
+            "close": 111.72,
+            "high": 114.9,
+            "low": 108.44,
+            "volume": 4934981200,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 108.49,
+            "close": 111.72,
+            "high": 114.9,
+            "low": 108.44,
+            "volume": 49349800,
+            "amount": 5506971989,
+            "changePercent": 2.2
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SH688981",
+          "name": "中芯国际",
+          "code": "688981",
+          "type": "stock",
+          "market": "SH",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:59:33",
+          "time": "2026-11-12 15:59:33",
+          "quote": {
+            "price": 111.72,
+            "preClose": 109.31,
+            "open": 108.49,
+            "high": 114.9,
+            "low": 108.44,
+            "close": 111.72,
+            "change": 2.41,
+            "changePercent": 2.2,
+            "volume": 49349800,
+            "amount": 5506971989
+          },
+          "price": 111.72,
+          "preClose": 109.31,
+          "open": 108.49,
+          "high": 114.9,
+          "low": 108.44,
+          "close": 111.72,
+          "change": 2.41,
+          "changePercent": 2.2,
+          "volume": 49349800,
+          "amount": 5506971989,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_4b4eef8ddccd8d2c",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    },
+    {
+      "symbol": "SZ161725",
+      "expectedDate": "2026-11-12",
+      "tieOut": true,
+      "consensusCount": 2,
+      "source": "sina",
+      "bar": {
+        "time": "2026-11-12",
+        "open": 0.561,
+        "high": 0.57,
+        "low": 0.559,
+        "close": 0.566,
+        "volume": 59864017,
+        "amount": null
+      },
+      "providerAttempts": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.561,
+            "high": 0.57,
+            "low": 0.559,
+            "close": 0.566,
+            "volume": 59864017,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.56,
+            "close": 0.57,
+            "high": 0.57,
+            "low": 0.56,
+            "volume": 59864000,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "bar": {
+            "time": "2026-11-12",
+            "open": 0.561,
+            "close": 0.566,
+            "high": 0.57,
+            "low": 0.559,
+            "volume": 59864000,
+            "amount": 33771912.871,
+            "changePercent": 0.35
+          }
+        }
+      ],
+      "proxy": {
+        "status": 200,
+        "body": {
+          "ok": true,
+          "source": "eastmoney",
+          "mode": "closed",
+          "marketStatus": "closed",
+          "symbol": "SZ161725",
+          "name": "白酒基金LOF",
+          "code": "161725",
+          "type": "exchange_fund",
+          "market": "SZ",
+          "sourceType": "real",
+          "cached": false,
+          "dataDate": "2026-11-12",
+          "lastUpdated": "2026-11-12 15:34:54",
+          "time": "2026-11-12 15:34:54",
+          "quote": {
+            "price": 0.566,
+            "preClose": 0.564,
+            "open": 0.561,
+            "high": 0.57,
+            "low": 0.559,
+            "close": 0.566,
+            "change": 0.002,
+            "changePercent": 0.35,
+            "volume": 59864000,
+            "amount": 33771912.871
+          },
+          "price": 0.566,
+          "preClose": 0.564,
+          "open": 0.561,
+          "high": 0.57,
+          "low": 0.559,
+          "close": 0.566,
+          "change": 0.002,
+          "changePercent": 0.35,
+          "volume": 59864000,
+          "amount": 33771912.871,
+          "schemaVersion": 4,
+          "scoreVersion": "market-observation-v4.0.0",
+          "snapshotId": "s4_2b9ebe4f10e8d597",
+          "generatedAt": "2026-11-12T07:55:00.000Z",
+          "validUntil": "2026-11-12T08:00:00.000Z"
+        },
+        "valid": true,
+        "matchesConsensus": true
+      }
+    }
+  ],
+  "funds": [
+    {
+      "code": "161226",
+      "status": 200,
+      "body": {
+        "Data": {
+          "LSJZList": [
+            {
+              "FSRQ": "2026-11-11",
+              "DWJZ": "1.4045",
+              "LJJZ": "1.4045",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-1.98",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-10",
+              "DWJZ": "1.4329",
+              "LJJZ": "1.4329",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "1.01",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-09",
+              "DWJZ": "1.4186",
+              "LJJZ": "1.4186",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "0.33",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-06",
+              "DWJZ": "1.4139",
+              "LJJZ": "1.4139",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.46",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-05",
+              "DWJZ": "1.4204",
+              "LJJZ": "1.4204",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "4.99",
+              "SGZT": "暂停申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            }
+          ],
+          "FundType": "002",
+          "SYType": null,
+          "isNewType": false,
+          "Feature": "020,411"
+        },
+        "ErrCode": 0,
+        "ErrMsg": null,
+        "TotalCount": 2740,
+        "Expansion": null,
+        "PageSize": 5,
+        "PageIndex": 1
+      }
+    },
+    {
+      "code": "005827",
+      "status": 200,
+      "body": {
+        "Data": {
+          "LSJZList": [
+            {
+              "FSRQ": "2026-11-11",
+              "DWJZ": "1.3947",
+              "LJJZ": "1.3947",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.26",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-10",
+              "DWJZ": "1.3983",
+              "LJJZ": "1.3983",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.07",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-09",
+              "DWJZ": "1.3993",
+              "LJJZ": "1.3993",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-0.21",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-06",
+              "DWJZ": "1.4023",
+              "LJJZ": "1.4023",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "-1.00",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            },
+            {
+              "FSRQ": "2026-11-05",
+              "DWJZ": "1.4164",
+              "LJJZ": "1.4164",
+              "SDATE": null,
+              "ACTUALSYI": "",
+              "NAVTYPE": "1",
+              "JZZZL": "1.11",
+              "SGZT": "限制大额申购",
+              "SHZT": "开放赎回",
+              "FHFCZ": "",
+              "FHFCZ10": "",
+              "FHFCBZ": "",
+              "DTYPE": null,
+              "FHSP": ""
+            }
+          ],
+          "FundType": "002",
+          "SYType": null,
+          "isNewType": false,
+          "Feature": "211,701"
+        },
+        "ErrCode": 0,
+        "ErrMsg": null,
+        "TotalCount": 1961,
+        "Expansion": null,
+        "PageSize": 5,
+        "PageIndex": 1
+      }
+    }
+  ],
+  "runtimeFunds": [
+    {
+      "symbol": "SZ161226",
+      "status": 501,
+      "body": {
+        "ok": false,
+        "mode": "failed",
+        "symbol": "SZ161226",
+        "message": "open fund NAV provider is not connected"
+      }
+    },
+    {
+      "symbol": "OF005827",
+      "status": 501,
+      "body": {
+        "ok": false,
+        "mode": "failed",
+        "symbol": "OF005827",
+        "message": "open fund NAV provider is not connected"
+      }
+    }
+  ]
+}

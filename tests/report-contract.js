@@ -39,15 +39,15 @@ assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 assert(app.includes("最近真实收盘已校验") && app.includes("最后真实更新时间"), "non-trading quote status must show the real market timestamp");
 
-assert.strictEqual(data.date, "2026-11-10");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-10-premarket-fee-aware-v1");
+assert.strictEqual(data.date, "2026-11-13");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-13-premarket-fee-aware-v1");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
 assert.strictEqual(data.newsItems.length, 8);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
-assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-09" && Number(item.lastClose) > 0), "holding quote baseline invalid");
-assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-09" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
-assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-09", "open-fund NAV date mismatch");
+assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-12" && Number(item.lastClose) > 0), "holding quote baseline invalid");
+assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-12" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
+assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-11", "open-fund NAV date mismatch");
 
 assert(html.includes("./trade-cost-policy.js"), "trade cost policy script missing");
 assert(data.transactionCostPolicy, "transaction cost policy missing");
@@ -65,18 +65,18 @@ for (const order of data.transactionCostPolicy.candidateOrders.slice(1, 3)) {
   assert(result.excessiveCostRatio, `${order.code} should exceed the one-way cost ratio cap`);
 }
 const silverOrdinaryReview = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[0], data.transactionCostPolicy);
-assert.strictEqual(silverOrdinaryReview.status, "暂缓小单", "161226 must stay blocked when same-date premium does not prove a hard-risk exit");
-assert(Math.abs(silverOrdinaryReview.amount - 304.2) < 1e-9, "161226 ordinary-review amount mismatch");
+assert.strictEqual(silverOrdinaryReview.status, "暂缓小单", "161226 must stay blocked when the latest date lacks a same-date NAV and account confirmation");
+assert(Math.abs(silverOrdinaryReview.amount - 297.2) < 1e-9, "161226 ordinary-review amount mismatch");
 const watchBuy = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[3], data.transactionCostPolicy);
 assert.strictEqual(watchBuy.status, "缺少收益空间", "minimum-sized watchlist buy must remain blocked without sourced expected edge");
-assert(Math.abs(watchBuy.amount - 1049.4) < 1e-9, "watchlist buy amount mismatch");
+assert(Math.abs(watchBuy.amount - 1018.8) < 1e-9, "watchlist buy amount mismatch");
 assert(Math.abs(watchBuy.totalCostCny - 10) < 1e-9, "watchlist round-trip minimum commission mismatch");
-assert(watchBuy.requiredGrossEdgeRatio > 0.0285 && watchBuy.requiredGrossEdgeRatio < 0.0286, "watchlist required gross edge mismatch");
-const smallSell = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.499 }, data.transactionCostPolicy);
-assert(Math.abs(smallSell.amount - 149.7) < 1e-9, "small sell amount mismatch");
+assert(watchBuy.requiredGrossEdgeRatio > 0.0294 && watchBuy.requiredGrossEdgeRatio < 0.0295, "watchlist required gross edge mismatch");
+const smallSell = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.483 }, data.transactionCostPolicy);
+assert(Math.abs(smallSell.amount - 144.9) < 1e-9, "small sell amount mismatch");
 assert(Math.abs(smallSell.totalCostCny - 5) < 1e-9, "minimum commission mismatch");
-assert(Math.abs(smallSell.costRatio - (5 / 149.7)) < 1e-9, "small sell cost ratio mismatch");
-const hardExit = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.499, hardRiskExit: true }, data.transactionCostPolicy);
+assert(Math.abs(smallSell.costRatio - (5 / 144.9)) < 1e-9, "small sell cost ratio mismatch");
+const hardExit = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.483, hardRiskExit: true }, data.transactionCostPolicy);
 assert.strictEqual(hardExit.status, "风险退出例外", "hard risk exits must bypass the economic amount gate");
 const buyReview = tradeCost.assessOrder({ side: "buy", estimatedAmountCny: 1000 }, data.transactionCostPolicy);
 assert.strictEqual(buyReview.sideCount, 2, "buy review must include round-trip commission");
@@ -93,20 +93,20 @@ for (const privatePhrase of ["总资产", "持仓金额", "持仓市值", "现�
 }
 
 const expected = {
-  "159740": [0.507, 0.499, 0.512, 0.499, -0.4],
-  "164701": [1.572, 1.574, 1.583, 1.57, 1.35],
-  "512710": [0.622, 0.62, 0.632, 0.617, 0.81],
-  "161226": [1.527, 1.521, 1.548, 1.52, 0.73],
-  "159608": [0.848, 0.84, 0.856, 0.838, 0.24],
-  "159241": [0.996, 0.993, 1.017, 0.99, 0.3],
-  "562350": [1.096, 1.096, 1.102, 1.094, -0.27],
-  "002090": [8.24, 8.08, 8.33, 8.08, -1.34],
-  "601208": [33.68, 33.7, 34.97, 32.75, 1.66],
-  "600050": [4.45, 4.39, 4.45, 4.37, -1.79],
-  "002466": [37.39, 35.96, 37.62, 35.9, -3.23],
-  "688981": [111.2, 109.02, 111.71, 109.02, -1.7],
-  "161725": [0.579, 0.583, 0.587, 0.579, -0.34],
-  "005827": [null, 1.3993, null, null, -0.21]
+  "159740": [0.491, 0.483, 0.492, 0.483, -2.82],
+  "164701": [1.54, 1.521, 1.546, 1.52, -2.25],
+  "512710": [0.611, 0.611, 0.621, 0.607, 0],
+  "161226": [1.496, 1.486, 1.5, 1.486, -2.56],
+  "159608": [0.85, 0.835, 0.859, 0.833, -2.45],
+  "159241": [0.988, 0.986, 1.003, 0.983, -0.1],
+  "562350": [1.084, 1.082, 1.085, 1.076, -0.18],
+  "002090": [8.39, 8.5, 8.58, 8.36, 1.19],
+  "601208": [35.2, 34.39, 36.7, 34.31, -2.33],
+  "600050": [4.29, 4.23, 4.3, 4.21, -1.4],
+  "002466": [35.68, 35.16, 36.08, 34.95, -2.12],
+  "688981": [108.49, 111.72, 114.9, 108.44, 2.2],
+  "161725": [0.561, 0.566, 0.57, 0.559, 0.35],
+  "005827": [null, 1.3947, null, null, -0.26]
 };
 for (const item of [...data.holdings, ...data.watchlist]) {
   const actual = [item.lastOpen, item.lastClose, item.lastHigh, item.lastLow, item.lastChangePercent];
