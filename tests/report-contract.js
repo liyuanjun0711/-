@@ -39,15 +39,15 @@ assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 assert(app.includes("最近真实收盘已校验") && app.includes("最后真实更新时间"), "non-trading quote status must show the real market timestamp");
 
-assert.strictEqual(data.date, "2026-11-13");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-13-premarket-fee-aware-v1");
+assert.strictEqual(data.date, "2026-11-16");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-16-premarket-fee-aware-v1");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
 assert.strictEqual(data.newsItems.length, 8);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
-assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-12" && Number(item.lastClose) > 0), "holding quote baseline invalid");
-assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-12" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
-assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-11", "open-fund NAV date mismatch");
+assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-13" && Number(item.lastClose) > 0), "holding quote baseline invalid");
+assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-13" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
+assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-13", "open-fund NAV date mismatch");
 
 assert(html.includes("./trade-cost-policy.js"), "trade cost policy script missing");
 assert(data.transactionCostPolicy, "transaction cost policy missing");
@@ -66,17 +66,17 @@ for (const order of data.transactionCostPolicy.candidateOrders.slice(1, 3)) {
 }
 const silverOrdinaryReview = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[0], data.transactionCostPolicy);
 assert.strictEqual(silverOrdinaryReview.status, "暂缓小单", "161226 must stay blocked when the latest date lacks a same-date NAV and account confirmation");
-assert(Math.abs(silverOrdinaryReview.amount - 297.2) < 1e-9, "161226 ordinary-review amount mismatch");
+assert(Math.abs(silverOrdinaryReview.amount - 290.8) < 1e-9, "161226 ordinary-review amount mismatch");
 const watchBuy = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[3], data.transactionCostPolicy);
 assert.strictEqual(watchBuy.status, "缺少收益空间", "minimum-sized watchlist buy must remain blocked without sourced expected edge");
-assert(Math.abs(watchBuy.amount - 1018.8) < 1e-9, "watchlist buy amount mismatch");
+assert(Math.abs(watchBuy.amount - 1036.8) < 1e-9, "watchlist buy amount mismatch");
 assert(Math.abs(watchBuy.totalCostCny - 10) < 1e-9, "watchlist round-trip minimum commission mismatch");
-assert(watchBuy.requiredGrossEdgeRatio > 0.0294 && watchBuy.requiredGrossEdgeRatio < 0.0295, "watchlist required gross edge mismatch");
-const smallSell = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.483 }, data.transactionCostPolicy);
-assert(Math.abs(smallSell.amount - 144.9) < 1e-9, "small sell amount mismatch");
+assert(watchBuy.requiredGrossEdgeRatio > 0.0289 && watchBuy.requiredGrossEdgeRatio < 0.0290, "watchlist required gross edge mismatch");
+const smallSell = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.47 }, data.transactionCostPolicy);
+assert(Math.abs(smallSell.amount - 141) < 1e-9, "small sell amount mismatch");
 assert(Math.abs(smallSell.totalCostCny - 5) < 1e-9, "minimum commission mismatch");
-assert(Math.abs(smallSell.costRatio - (5 / 144.9)) < 1e-9, "small sell cost ratio mismatch");
-const hardExit = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.483, hardRiskExit: true }, data.transactionCostPolicy);
+assert(Math.abs(smallSell.costRatio - (5 / 141)) < 1e-9, "small sell cost ratio mismatch");
+const hardExit = tradeCost.assessOrder({ side: "sell", lots: 3, referencePrice: 0.47, hardRiskExit: true }, data.transactionCostPolicy);
 assert.strictEqual(hardExit.status, "风险退出例外", "hard risk exits must bypass the economic amount gate");
 const buyReview = tradeCost.assessOrder({ side: "buy", estimatedAmountCny: 1000 }, data.transactionCostPolicy);
 assert.strictEqual(buyReview.sideCount, 2, "buy review must include round-trip commission");
@@ -93,20 +93,20 @@ for (const privatePhrase of ["总资产", "持仓金额", "持仓市值", "现�
 }
 
 const expected = {
-  "159740": [0.491, 0.483, 0.492, 0.483, -2.82],
-  "164701": [1.54, 1.521, 1.546, 1.52, -2.25],
-  "512710": [0.611, 0.611, 0.621, 0.607, 0],
-  "161226": [1.496, 1.486, 1.5, 1.486, -2.56],
-  "159608": [0.85, 0.835, 0.859, 0.833, -2.45],
-  "159241": [0.988, 0.986, 1.003, 0.983, -0.1],
-  "562350": [1.084, 1.082, 1.085, 1.076, -0.18],
-  "002090": [8.39, 8.5, 8.58, 8.36, 1.19],
-  "601208": [35.2, 34.39, 36.7, 34.31, -2.33],
-  "600050": [4.29, 4.23, 4.3, 4.21, -1.4],
-  "002466": [35.68, 35.16, 36.08, 34.95, -2.12],
-  "688981": [108.49, 111.72, 114.9, 108.44, 2.2],
-  "161725": [0.561, 0.566, 0.57, 0.559, 0.35],
-  "005827": [null, 1.3947, null, null, -0.26]
+  "159740": [0.481, 0.47, 0.484, 0.468, -2.69],
+  "164701": [1.508, 1.503, 1.515, 1.501, -1.18],
+  "512710": [0.61, 0.6, 0.621, 0.598, -1.8],
+  "161226": [1.47, 1.454, 1.475, 1.451, -2.15],
+  "159608": [0.835, 0.811, 0.842, 0.81, -2.87],
+  "159241": [0.989, 0.962, 1.003, 0.959, -2.43],
+  "562350": [1.076, 1.083, 1.093, 1.076, 0.09],
+  "002090": [8.55, 8.59, 8.77, 8.47, 1.06],
+  "601208": [34.9, 31.92, 35.05, 31.7, -7.18],
+  "600050": [4.21, 4.27, 4.3, 4.2, 0.95],
+  "002466": [35.41, 34.6, 36.16, 34.51, -1.59],
+  "688981": [111.72, 110.5, 116.28, 108.7, -1.09],
+  "161725": [0.563, 0.576, 0.578, 0.559, 1.77],
+  "005827": [null, 1.3732, null, null, -0.79]
 };
 for (const item of [...data.holdings, ...data.watchlist]) {
   const actual = [item.lastOpen, item.lastClose, item.lastHigh, item.lastLow, item.lastChangePercent];
