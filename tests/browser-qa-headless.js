@@ -163,7 +163,7 @@ async function inspectViewport(client, width, height, label) {
       bottomNavCount: document.querySelectorAll('.bottom-nav, .bottomNav, #bottomNav, #footerTabs, #mobileTabs').length,
       tabResults,
       feeCardCount,
-      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('仅供个人复盘参考') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('0买0卖'),
+      firstScreen: window.MARKET_BRIEFING_DATA.oneLine.includes('仅供个人复盘参考') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('不买') && window.MARKET_BRIEFING_DATA.tradeDecision[0].title.includes('硬退出'),
       replacementChar: document.body.innerText.includes('\uFFFD')
     };
   })()`);
@@ -269,7 +269,7 @@ async function inspectViewport(client, width, height, label) {
 
     const expectedAxis = ["09:30", "10:30", "11:30", "13:00", "14:00", "15:00"];
     for (const result of [desktop, mobile].filter(Boolean)) {
-      if (result.version !== "portfolio-2026-11-16-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
+      if (result.version !== "portfolio-2026-11-18-premarket-fee-aware-v1") throw new Error(`${result.label} version mismatch`);
       if (result.tabCount !== 4 || result.bottomNavCount !== 0 || result.overflowX) throw new Error(`${result.label} navigation or overflow regression`);
       if (!result.tabResults.every((item) => item.active)) throw new Error(`${result.label} tab click regression`);
       if (!result.firstScreen || result.replacementChar) throw new Error(`${result.label} first-screen or encoding regression`);
