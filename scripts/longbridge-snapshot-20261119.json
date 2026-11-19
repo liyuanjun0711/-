@@ -1,0 +1,24 @@
+{
+  "collectedAt": "2026-11-19T04:15:38.131092276Z",
+  "session": "2026-11-19-lunch-break",
+  "source": "Longbridge quote connector",
+  "accountRead": {
+    "positions": "OAuth 403308: scope not authorized",
+    "todayOrders": "OAuth 403308: scope not authorized"
+  },
+  "quotes": [
+    { "symbol": "SZ159740", "last": 0.45, "prevClose": 0.457, "open": 0.453, "high": 0.454, "low": 0.447, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SZ164701", "last": 1.429, "prevClose": 1.455, "open": 1.444, "high": 1.448, "low": 1.425, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SH512710", "last": 0.553, "prevClose": 0.558, "open": 0.557, "high": 0.557, "low": 0.548, "timestamp": "2026-11-19T11:29:57+08:00" },
+    { "symbol": "SZ161226", "last": 1.31, "prevClose": 1.353, "open": 1.338, "high": 1.338, "low": 1.299, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SZ159608", "last": 0.753, "prevClose": 0.759, "open": 0.751, "high": 0.755, "low": 0.744, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SZ159241", "last": 0.862, "prevClose": 0.869, "open": 0.873, "high": 0.873, "low": 0.853, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SH562350", "last": 1.098, "prevClose": 1.101, "open": 1.106, "high": 1.108, "low": 1.094, "timestamp": "2026-11-19T11:28:20+08:00" },
+    { "symbol": "SZ002090", "last": 8.04, "prevClose": 8.21, "open": 8.21, "high": 8.22, "low": 7.98, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SH601208", "last": 28.99, "prevClose": 29.48, "open": 29.0, "high": 29.29, "low": 28.48, "timestamp": "2026-11-19T11:29:59+08:00" },
+    { "symbol": "SH600050", "last": 4.48, "prevClose": 4.53, "open": 4.54, "high": 4.55, "low": 4.46, "timestamp": "2026-11-19T11:29:56+08:00" },
+    { "symbol": "SZ002466", "last": 33.07, "prevClose": 33.53, "open": 33.33, "high": 33.53, "low": 32.77, "timestamp": "2026-11-19T11:30:00+08:00" },
+    { "symbol": "SH688981", "last": 121.4, "prevClose": 115.1, "open": 117.2, "high": 121.72, "low": 116.01, "timestamp": "2026-11-19T11:29:59+08:00" },
+    { "symbol": "SZ161725", "last": 0.576, "prevClose": 0.575, "open": 0.576, "high": 0.578, "low": 0.57, "timestamp": "2026-11-19T11:30:00+08:00" }
+  ]
+}
