@@ -1,0 +1,24 @@
+{
+  "collectedAt": "2026-11-20T22:53:00+08:00",
+  "source": "Longbridge connector quote",
+  "accountState": {
+    "positions": "OAuth 403308",
+    "orders": "OAuth 403308",
+    "executions": "OAuth 403308"
+  },
+  "quotes": [
+    {"symbol":"SZ159740","last":0.429,"prevClose":0.448,"open":0.438,"high":0.438,"low":0.429,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ164701","last":1.368,"prevClose":1.434,"open":1.389,"high":1.395,"low":1.353,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SH512710","last":0.529,"prevClose":0.552,"open":0.543,"high":0.545,"low":0.527,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ161226","last":1.258,"prevClose":1.317,"open":1.25,"high":1.266,"low":1.233,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ159608","last":0.721,"prevClose":0.752,"open":0.742,"high":0.742,"low":0.719,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ159241","last":0.816,"prevClose":0.86,"open":0.844,"high":0.844,"low":0.815,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SH562350","last":1.096,"prevClose":1.096,"open":1.09,"high":1.098,"low":1.085,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ002090","last":7.98,"prevClose":8.04,"open":7.92,"high":8.14,"low":7.75,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SH601208","last":26.63,"prevClose":28.84,"open":27.5,"high":28.36,"low":26.59,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SH600050","last":4.53,"prevClose":4.49,"open":4.45,"high":4.54,"low":4.44,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ002466","last":31.87,"prevClose":32.96,"open":32.5,"high":32.69,"low":31.64,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SH688981","last":125.46,"prevClose":122.25,"open":119.7,"high":125.68,"low":119.33,"timestamp":"2026-11-20T15:00:00+08:00"},
+    {"symbol":"SZ161725","last":0.566,"prevClose":0.576,"open":0.572,"high":0.573,"low":0.558,"timestamp":"2026-11-20T15:00:00+08:00"}
+  ]
+}
