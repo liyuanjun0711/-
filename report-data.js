@@ -1,11 +1,11 @@
 window.MARKET_BRIEFING_DATA = {
   "date": "2026-11-23",
-  "portfolioVersion": "portfolio-2026-11-23-premarket-from-20261120-close-fee-aware-v1",
-  "time": "2026-11-20 22:53周末版：面向11月23日开盘。13个场内持仓/观察标的均为11月20日15:00真实收盘，Longbridge收盘与新浪、腾讯、东方财富至少两源日K逐项一致；161226与005827为11月20日公开净值。",
-  "lastUpdated": "2026-11-20 22:53 北京时间（场内标的为11月20日真实收盘；基金为11月20日公开净值；周末不刷新为实时行情）",
+  "portfolioVersion": "portfolio-2026-11-23-premarket-verified-fee-aware-v2",
+  "time": "2026-11-23 08:32盘前版：13个场内持仓/观察标的最新可得数据仍为11月20日15:00真实收盘，Longbridge报价与日K再次逐项一致；自有代理返回closed，未把盘前状态写成实时行情。161226与005827仍为11月20日公开净值。",
+  "lastUpdated": "2026-11-23 08:32 北京时间（盘前核验；场内标的为11月20日真实收盘，基金为11月20日公开净值）",
   "apiBase": "https://daily-briefing-blue.vercel.app",
   "refreshInterval": 10000,
-  "logicUpdatedAt": "2026-11-20收盘后 / 11月23日盘前计划（券商持仓、订单、成交接口仍为OAuth 403308）",
+  "logicUpdatedAt": "2026-11-23 08:32盘前（券商持仓、订单、成交接口再次返回OAuth 403308）",
   "transactionCostPolicy": {
     "profile": "low_principal",
     "assumptionStatus": "待用户用券商佣金表或交割单确认",
@@ -53,12 +53,12 @@ window.MARKET_BRIEFING_DATA = {
       }
     ]
   },
-  "oneLine": "11月23日盘前买0手、卖0手。161226在11月20日收1.258、净值1.1631，同日静态溢价约8.16%，重新高于8%硬风险线；但实际持仓无法核验，周一须先确认份额并用最新同日数据重算。仅供个人复盘参考。",
+  "oneLine": "11月23日盘前买0手、卖0手。周末三项稳市场政策是情绪边际利好，但161226在11月20日同日静态溢价仍约8.16%，且实际持仓无法核验；开盘后先确认份额并用最新同日数据重算。仅供个人复盘参考。",
   "tradeDecision": [
     {
       "type": "第一屏结论",
       "title": "周一先核仓；买0手、卖0手",
-      "conclusion": "已确认事实：11月20日A股放量普跌，161226同日静态溢价约8.16%；账户持仓、挂单和成交仍无法读取。",
+      "conclusion": "已确认事实：11月20日A股放量普跌，161226同日静态溢价约8.16%；11月23日盘前账户持仓、挂单和成交仍无法读取。",
       "action": "周一不开盘即下单。先核对真实持仓与可卖份额，再用最新可验证IOPV/净值重算161226溢价；未核验则卖0手。",
       "trigger": "实际持仓存在 + 最新可靠同日溢价≥8% + 真实报价有效；三项齐备后才把全部实际可卖份额合并为一笔硬风险退出复核。",
       "reason": "费用可为硬风险让路，但账户证据和同日口径不能省。仅供个人复盘参考。"
@@ -66,8 +66,8 @@ window.MARKET_BRIEFING_DATA = {
     {
       "type": "市场风险",
       "title": "放量普跌；普通调仓不抢反弹",
-      "conclusion": "已确认事实：上证-1.22%、深成指-3.09%、创业板-3.54%、科创50-3.12%；全市场超过5200只股票下跌。",
-      "action": "周一不补仓、不追反弹；持仓跌破11月20日低点只进入风险复核。",
+      "conclusion": "已确认事实：11月20日上证-1.22%、深成指-3.09%、创业板-3.54%、科创50-3.12%；11月22日交易所公布稳市场政策，但融资保证金新规11月30日才生效。",
+      "action": "政策只作情绪观察，不抢开盘反弹；持仓跌破11月20日低点只进入风险复核。",
       "trigger": "至少先看到主要指数止跌、基金自身收复11月20日高点，且资金与费用后收益证据齐备。",
       "reason": "11月20日是放量下跌而非缩量震荡，风险优先级高于抄底。仅供个人复盘参考。"
     },
@@ -103,7 +103,7 @@ window.MARKET_BRIEFING_DATA = {
     "4. 159740历史3手与164701历史2手继续暂停：普通费用门不通过。",
     "5. 其余基金新增买入0手；未成交卖出不得写成资金来源，真实卖出后也先留现金。",
     "6. 股票条目只作板块温度计，不生成股票订单。",
-    "7. 周末页面只显示最后真实收盘时间；运行时接口失败时不画假线或假K线。"
+    "7. 盘前页面只显示最后真实收盘时间；运行时接口失败时不画假线或假K线。"
   ],
   "tradePlan": [
     {
@@ -136,7 +136,7 @@ window.MARKET_BRIEFING_DATA = {
     }
   ],
   "noTradeList": [
-    "不把11月20日收盘数据写成周末实时行情。",
+    "不把11月20日收盘数据写成11月23日盘前实时行情。",
     "不在券商持仓接口未授权时机械卖历史2手。",
     "不把11月20日溢价直接当作11月23日可执行溢价。",
     "不执行159740历史3手或164701历史2手普通碎片卖单。",
@@ -504,6 +504,50 @@ window.MARKET_BRIEFING_DATA = {
   ],
   "newsItems": [
     {
+      "title": "沪深北交易所将融资保证金比例下限降至80%",
+      "source": "上海证券交易所 / 深圳证券交易所",
+      "publishTime": "2026-11-22 18:00:00+08:00",
+      "summary": "已确认事实：融资买入证券的保证金比例下限将由100%降至80%，11月30日起施行，并要求券商加强异常交易风控。基于事实的判断：这是流动性与预期的边际利好，但今天尚未生效，且本工作台不使用融资资金，不构成买入触发。",
+      "relatedStocks": [
+        "159740",
+        "512710",
+        "159241",
+        "562350"
+      ],
+      "sector": "过去24小时 / 全市场重大利好 / 稳市场政策",
+      "relation": "market",
+      "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/trade/specific/margin/c/c_20261122_10838633.shtml"
+    },
+    {
+      "title": "创业板拟引入做市商制度",
+      "source": "深圳证券交易所",
+      "publishTime": "2026-11-22 18:00:00+08:00",
+      "summary": "已确认事实：深交所就创业板股票做市交易业务细则公开征求意见，反馈截止12月6日，目标包括提高定价效率、减少波动、增强市场韧性。基于事实的判断：中期利于成长板块交易质量，但目前仍是征求意见稿，不把它当作当日基金买点。",
+      "relatedStocks": [
+        "159241",
+        "512710",
+        "688981"
+      ],
+      "sector": "过去24小时 / 全市场重大利好 / 创业板改革",
+      "relation": "positive",
+      "url": "https://www.szse.cn/disclosure/notice/t20261122_623987.html"
+    },
+    {
+      "title": "沪深交易所推出新一批降费措施",
+      "source": "上海证券交易所 / 深圳证券交易所",
+      "publishTime": "2026-11-22 18:00:00+08:00",
+      "summary": "已确认事实：交易所减免交易单元、上市、通信和数据中心等相关费用，部分措施延长至2028年。基于事实的判断：有助市场主体降本，但不等于用户券商佣金已调整；本页仍按0.025%、每笔最低5元保守估算，等待真实交割单确认。",
+      "relatedStocks": [
+        "159740",
+        "164701",
+        "161226",
+        "512710"
+      ],
+      "sector": "过去24小时 / 全市场重大利好 / 交易所降费",
+      "relation": "market",
+      "url": "https://www.szse.cn/disclosure/notice/t20261122_623989.html"
+    },
+    {
       "title": "A股放量普跌，成长指数跌幅超过3%",
       "source": "上交所 / Longbridge / 新浪 / 腾讯 / 东方财富",
       "publishTime": "2026-11-20 16:15:00+08:00",
@@ -515,7 +559,7 @@ window.MARKET_BRIEFING_DATA = {
         "159241",
         "688981"
       ],
-      "sector": "过去24小时 / 全市场重大风险 / A股收盘",
+      "sector": "前一交易日 / 全市场重大风险 / A股收盘",
       "relation": "risk",
       "url": "https://finance.sina.com.cn/jjxw/2026-11-20/doc-inizkizc5583458.shtml"
     },
@@ -528,7 +572,7 @@ window.MARKET_BRIEFING_DATA = {
         "600050",
         "562350"
       ],
-      "sector": "过去24小时 / 全市场重大利好 / 权重防御",
+      "sector": "前一交易日 / 全市场重大利好 / 权重防御",
       "relation": "market",
       "url": "https://finance.sina.com.cn/jjxw/2026-11-20/doc-inizkizc5583458.shtml"
     },
@@ -540,7 +584,7 @@ window.MARKET_BRIEFING_DATA = {
       "relatedStocks": [
         "161226"
       ],
-      "sector": "过去24小时 / 持仓重大风险 / 白银LOF",
+      "sector": "前一交易日 / 持仓重大风险 / 白银LOF",
       "relation": "risk",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=161226&pageIndex=1&pageSize=10"
     },
@@ -552,7 +596,7 @@ window.MARKET_BRIEFING_DATA = {
       "relatedStocks": [
         "159740"
       ],
-      "sector": "过去24小时 / 全市场重大风险 / 港股科技",
+      "sector": "前一交易日 / 全市场重大风险 / 港股科技",
       "relation": "risk",
       "url": "https://finance.eastmoney.com/a/202611203936166744.html"
     },
@@ -566,7 +610,7 @@ window.MARKET_BRIEFING_DATA = {
         "161226",
         "159608"
       ],
-      "sector": "过去24小时 / 全市场重大风险 / 贵金属",
+      "sector": "前一交易日 / 全市场重大风险 / 贵金属",
       "relation": "risk",
       "url": "https://invest.10jqka.com.cn/20261120/c682050267.shtml"
     },
@@ -580,7 +624,7 @@ window.MARKET_BRIEFING_DATA = {
         "512710",
         "688981"
       ],
-      "sector": "过去24小时 / 全市场重大风险 / 海外市场",
+      "sector": "前一交易日 / 全市场重大风险 / 海外市场",
       "relation": "risk",
       "url": "https://apnews.com/article/2f178054aea79d282e5ccf8d62f26a28"
     },
@@ -593,15 +637,15 @@ window.MARKET_BRIEFING_DATA = {
         "688981",
         "512710"
       ],
-      "sector": "过去24小时 / 观察池 / 半导体",
+      "sector": "前一交易日 / 观察池 / 半导体",
       "relation": "market",
       "url": "https://finance.sina.com.cn/jjxw/2026-11-20/doc-inizkizc5583458.shtml"
     },
     {
       "title": "13个场内标的收盘价与日K全部通过核验",
-      "source": "Longbridge / 新浪 / 腾讯 / 东方财富",
-      "publishTime": "2026-11-20 22:53:00+08:00",
-      "summary": "已确认事实：13/13均有11月20日15:00非零OHLC，且收盘与至少两家独立日K逐项一致；自有代理11个closed、2个failed。基于事实的判断：失败标的不由前端补造行情。",
+      "source": "Longbridge / 自有代理 / 前次多源日K证据",
+      "publishTime": "2026-11-23 08:32:00+08:00",
+      "summary": "已确认事实：盘前复核13/13个标的，Longbridge最新报价仍为11月20日15:00非零收盘且与最新日K一致；自有代理抽查返回closed，开放式基金仍failed。基于事实的判断：盘前不伪装实时，失败标的不由前端补造行情。",
       "relatedStocks": [
         "159740",
         "164701",
@@ -611,7 +655,7 @@ window.MARKET_BRIEFING_DATA = {
         "159241",
         "562350"
       ],
-      "sector": "过去24小时 / 数据校验 / 真实行情",
+      "sector": "盘前核验 / 数据校验 / 真实行情",
       "relation": "holding",
       "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SZ161226"
     },
@@ -623,12 +667,19 @@ window.MARKET_BRIEFING_DATA = {
       "relatedStocks": [
         "005827"
       ],
-      "sector": "过去24小时 / 持仓 / 开放式基金 / 接口失败",
+      "sector": "前一交易日 / 持仓 / 开放式基金 / 接口失败",
       "relation": "holding",
       "url": "https://api.fund.eastmoney.com/f10/lsjz?fundCode=005827&pageIndex=1&pageSize=10"
     }
   ],
   "reasoning": [
+    {
+      "title": "稳市场政策不替代价格确认",
+      "basis": "11月22日融资保证金、创业板做市与交易所降费三项政策已发布；融资保证金新规11月30日才生效。",
+      "inference": "政策改善流动性预期，但不能抹去11月20日放量普跌，也不能证明目标基金已止跌。",
+      "conclusion": "观察开盘反馈，不抢开盘；买入仍须通过资金、费用和收益三道门。",
+      "invalidCondition": "目标基金真实价格形成止跌结构且三道门同时通过。"
+    },
     {
       "title": "161226先核仓再处理溢价",
       "basis": "11月20日同日溢价约8.16%，但账户接口仍为OAuth 403308。",
@@ -674,9 +725,9 @@ window.MARKET_BRIEFING_DATA = {
   ],
   "learningFramework": [
     {
-      "title": "周末页面只认最后真实收盘",
+      "title": "盘前页面只认最后真实收盘",
       "basis": "13个场内标的均有11月20日15:00非零OHLC。",
-      "inference": "周末没有A股实时行情。",
+      "inference": "11月23日08:32尚未开盘，没有当日A股成交行情。",
       "conclusion": "页面标明最近真实收盘和更新时间。",
       "invalidCondition": "11月23日取得更新且通过校验的真实报价。"
     },
@@ -781,9 +832,9 @@ window.MARKET_BRIEFING_DATA = {
   ],
   "sources": [
     {
-      "name": "Longbridge：13个标的11月20日真实收盘",
+      "name": "Longbridge：11月23日盘前复核13个标的",
       "url": "https://daily-briefing-blue.vercel.app/api/quote?symbol=SZ161226",
-      "note": "13/13返回11月20日15:00非零OHLC；收盘与三源日K逐项一致。"
+      "note": "11月23日08:28再次返回13/13个标的的11月20日15:00非零OHLC，且逐项匹配最新日K；盘前未产生新成交。"
     },
     {
       "name": "11月20日三源日K一致性核验",
@@ -803,7 +854,22 @@ window.MARKET_BRIEFING_DATA = {
     {
       "name": "运行时基金接口HTTP 501失败态",
       "url": "https://daily-briefing-blue.vercel.app/api/fund?symbol=OF005827",
-      "note": "SZ161226与OF005827运行时基金接口均返回ok:false/mode:failed；开放式基金不提供盘中K线。"
+      "note": "11月23日盘前OF005827仍返回ok:false/mode:failed；开放式基金不提供盘中K线。"
+    },
+    {
+      "name": "上交所：融资保证金比例下限调整为80%",
+      "url": "https://www.sse.com.cn/lawandrules/sselawsrules2025/trade/specific/margin/c/c_20261122_10838633.shtml",
+      "note": "11月22日发布，11月30日起施行；今天尚未生效，且不改变本工作台不使用融资资金的约束。"
+    },
+    {
+      "name": "深交所：创业板做市业务细则征求意见",
+      "url": "https://www.szse.cn/disclosure/notice/t20261122_623987.html",
+      "note": "11月22日发布，反馈截止12月6日；目前仍为征求意见稿。"
+    },
+    {
+      "name": "深交所：进一步减免相关费用",
+      "url": "https://www.szse.cn/disclosure/notice/t20261122_623989.html",
+      "note": "交易所层面减免交易单元、上市、通信等费用，不等于用户券商佣金表已经调整。"
     },
     {
       "name": "上交所：11月16日至20日沪市市场运行情况",

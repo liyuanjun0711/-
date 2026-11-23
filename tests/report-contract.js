@@ -40,10 +40,10 @@ assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "op
 assert(app.includes("最近真实收盘已校验") && app.includes("最后真实更新时间"), "non-trading quote status must show the real market timestamp");
 
 assert.strictEqual(data.date, "2026-11-23");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-23-premarket-from-20261120-close-fee-aware-v1");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-23-premarket-verified-fee-aware-v2");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
-assert.strictEqual(data.newsItems.length, 9);
+assert.strictEqual(data.newsItems.length, 12);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
 assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-20" && Number(item.lastClose) > 0), "holding quote baseline invalid");
 assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-20" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
