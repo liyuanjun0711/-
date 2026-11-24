@@ -39,15 +39,15 @@ assert(app.includes("真实分时暂无；不绘制假线。") && app.includes("
 assert(app.includes("开放式基金按净值披露，不提供盘中K线"), "open-fund disclosure missing");
 assert(app.includes("最近真实收盘已校验") && app.includes("最后真实更新时间"), "non-trading quote status must show the real market timestamp");
 
-assert.strictEqual(data.date, "2026-11-23");
-assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-23-premarket-verified-fee-aware-v2");
+assert.strictEqual(data.date, "2026-11-24");
+assert.strictEqual(data.portfolioVersion, "portfolio-2026-11-24-midday-realtime-fee-aware-v1");
 assert.strictEqual(data.holdings.length, 8);
 assert.strictEqual(data.watchlist.length, 6);
 assert.strictEqual(data.newsItems.length, 12);
 assert(data.newsItems.filter((item) => String(item.sector).includes("过去24小时")).length >= 3, "past-24h coverage missing");
-assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-20" && Number(item.lastClose) > 0), "holding quote baseline invalid");
-assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-20" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
-assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-20", "open-fund NAV date mismatch");
+assert(data.holdings.every((item) => item.lastTradeDate === "2026-11-24" && Number(item.lastClose) > 0), "holding quote baseline invalid");
+assert(data.watchlist.filter((item) => item.code !== "005827").every((item) => item.lastTradeDate === "2026-11-24" && Number(item.lastClose) > 0), "watchlist quote baseline invalid");
+assert(data.watchlist.find((item) => item.code === "005827")?.lastTradeDate === "2026-11-23", "open-fund NAV date mismatch");
 
 assert(html.includes("./trade-cost-policy.js"), "trade cost policy script missing");
 assert(data.transactionCostPolicy, "transaction cost policy missing");
@@ -66,7 +66,7 @@ for (const order of data.transactionCostPolicy.candidateOrders.slice(1, 3)) {
 }
 const silverHardExitReview = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[0], data.transactionCostPolicy);
 assert.strictEqual(silverHardExitReview.status, "暂缓小单", "161226 unverified historical shares must not use the hard-risk exception");
-assert(Math.abs(silverHardExitReview.amount - 251.6) < 1e-9, "161226 review amount mismatch");
+assert(Math.abs(silverHardExitReview.amount - 254.8) < 1e-9, "161226 review amount mismatch");
 const watchBuy = tradeCost.assessOrder(data.transactionCostPolicy.candidateOrders[3], data.transactionCostPolicy);
 assert.strictEqual(watchBuy.status, "缺少收益空间", "minimum-sized watchlist buy must remain blocked without sourced expected edge");
 assert(Math.abs(watchBuy.amount - 1018.8) < 1e-9, "watchlist buy amount mismatch");
@@ -93,20 +93,20 @@ for (const privatePhrase of ["总资产", "持仓金额", "持仓市值", "现�
 }
 
 const expected = {
-  "159740": [0.438, 0.429, 0.438, 0.429, -4.24],
-  "164701": [1.389, 1.368, 1.395, 1.353, -4.6],
-  "512710": [0.543, 0.529, 0.545, 0.527, -4.17],
-  "161226": [1.25, 1.258, 1.266, 1.233, -4.48],
-  "159608": [0.742, 0.721, 0.742, 0.719, -4.12],
-  "159241": [0.844, 0.816, 0.844, 0.815, -5.12],
-  "562350": [1.09, 1.096, 1.098, 1.085, 0],
-  "002090": [7.92, 7.98, 8.14, 7.75, -0.75],
-  "601208": [27.5, 26.63, 28.36, 26.59, -7.66],
-  "600050": [4.45, 4.53, 4.54, 4.44, 0.89],
-  "002466": [32.5, 31.87, 32.69, 31.64, -3.31],
-  "688981": [119.7, 125.46, 125.68, 119.33, 2.63],
-  "161725": [0.572, 0.566, 0.573, 0.558, -1.74],
-  "005827": [null, 1.3391, null, null, -0.92]
+  "159740": [0.442, 0.427, 0.444, 0.426, -1.16],
+  "164701": [1.403, 1.389, 1.41, 1.387, 0.07],
+  "512710": [0.544, 0.544, 0.553, 0.544, 1.3],
+  "161226": [1.294, 1.274, 1.308, 1.27, -0.31],
+  "159608": [0.761, 0.742, 0.768, 0.742, -0.13],
+  "159241": [0.844, 0.848, 0.863, 0.844, 1.8],
+  "562350": [1.073, 1.084, 1.09, 1.073, 0.18],
+  "002090": [8.19, 7.89, 8.19, 7.86, -1.99],
+  "601208": [29.71, 28.12, 30.12, 27.98, 2.03],
+  "600050": [4.48, 4.47, 4.5, 4.43, -0.67],
+  "002466": [33.07, 32.47, 33.33, 32.45, 0.03],
+  "688981": [121.1, 125.76, 127.85, 121.1, 3.42],
+  "161725": [0.56, 0.566, 0.568, 0.56, -0.18],
+  "005827": [null, 1.3365, null, null, -0.19]
 };
 for (const item of [...data.holdings, ...data.watchlist]) {
   const actual = [item.lastOpen, item.lastClose, item.lastHigh, item.lastLow, item.lastChangePercent];

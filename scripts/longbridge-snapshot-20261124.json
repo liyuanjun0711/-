@@ -1,0 +1,25 @@
+{
+  "collectedAt": "2026-11-24T05:48:00Z",
+  "quoteMode": "delayed",
+  "quoteDelayNote": "Longbridge timestamps were about 14 minutes behind collection time; own-proxy provider quotes were used for the fresher 13:46 snapshot.",
+  "quotes": [
+    {"symbol":"SZ159740","last":0.427,"prevClose":0.432,"open":0.442,"high":0.444,"low":0.426,"timestamp":"2026-11-24T13:32:48+08:00"},
+    {"symbol":"SZ164701","last":1.390,"prevClose":1.388,"open":1.403,"high":1.410,"low":1.387,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SH512710","last":0.544,"prevClose":0.537,"open":0.544,"high":0.553,"low":0.544,"timestamp":"2026-11-24T13:31:30+08:00"},
+    {"symbol":"SZ161226","last":1.276,"prevClose":1.278,"open":1.294,"high":1.308,"low":1.270,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SZ159608","last":0.743,"prevClose":0.743,"open":0.761,"high":0.768,"low":0.742,"timestamp":"2026-11-24T13:32:42+08:00"},
+    {"symbol":"SZ159241","last":0.846,"prevClose":0.833,"open":0.844,"high":0.863,"low":0.844,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SH562350","last":1.086,"prevClose":1.082,"open":1.073,"high":1.090,"low":1.073,"timestamp":"2026-11-24T13:31:17+08:00"},
+    {"symbol":"SZ002090","last":7.91,"prevClose":8.05,"open":8.19,"high":8.19,"low":7.88,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SH601208","last":28.02,"prevClose":27.56,"open":29.71,"high":30.12,"low":27.98,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SH600050","last":4.48,"prevClose":4.50,"open":4.48,"high":4.50,"low":4.43,"timestamp":"2026-11-24T13:32:50+08:00"},
+    {"symbol":"SZ002466","last":32.51,"prevClose":32.46,"open":33.07,"high":33.33,"low":32.49,"timestamp":"2026-11-24T13:32:54+08:00"},
+    {"symbol":"SH688981","last":124.85,"prevClose":121.60,"open":121.10,"high":127.85,"low":121.10,"timestamp":"2026-11-24T13:32:55+08:00"},
+    {"symbol":"SZ161725","last":0.567,"prevClose":0.567,"open":0.560,"high":0.568,"low":0.560,"timestamp":"2026-11-24T13:32:54+08:00"}
+  ],
+  "account": {
+    "positions": {"ok":false,"error_code":403308,"message":"Target API's scope is not in authorized scopes"},
+    "todayOrders": {"ok":false,"error_code":403308,"message":"Target API's scope is not in authorized scopes"},
+    "todayExecutions": {"ok":false,"error_code":403308,"message":"Target API's scope is not in authorized scopes"}
+  }
+}
