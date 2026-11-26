@@ -1,0 +1,28 @@
+{
+  "collectedAt": "2026-11-26T18:22:39+08:00",
+  "marketStatus": {
+    "market": "CN",
+    "trade_status": "Closed",
+    "timestamp": "2026-11-26T18:22:39+08:00"
+  },
+  "quotes": [
+    { "symbol": "SZ159740", "price": 0.424, "prevClose": 0.417, "open": 0.425, "high": 0.432, "low": 0.421, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ164701", "price": 1.360, "prevClose": 1.342, "open": 1.361, "high": 1.375, "low": 1.355, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SH512710", "price": 0.516, "prevClose": 0.526, "open": 0.532, "high": 0.537, "low": 0.512, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ161226", "price": 1.225, "prevClose": 1.209, "open": 1.226, "high": 1.236, "low": 1.212, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ159608", "price": 0.710, "prevClose": 0.708, "open": 0.715, "high": 0.727, "low": 0.701, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ159241", "price": 0.800, "prevClose": 0.813, "open": 0.824, "high": 0.836, "low": 0.792, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SH562350", "price": 1.069, "prevClose": 1.068, "open": 1.069, "high": 1.073, "low": 1.066, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ002090", "price": 7.590, "prevClose": 7.560, "open": 7.580, "high": 7.720, "low": 7.470, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SH601208", "price": 25.750, "prevClose": 25.470, "open": 25.890, "high": 26.650, "low": 25.110, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SH600050", "price": 4.470, "prevClose": 4.490, "open": 4.490, "high": 4.520, "low": 4.440, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ002466", "price": 30.680, "prevClose": 30.520, "open": 31.010, "high": 31.470, "low": 30.280, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SH688981", "price": 116.500, "prevClose": 122.000, "open": 123.000, "high": 123.020, "low": 115.760, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true },
+    { "symbol": "SZ161725", "price": 0.563, "prevClose": 0.569, "open": 0.568, "high": 0.570, "low": 0.562, "timestamp": "2026-11-26T15:00:00+08:00", "dailyBarMatched": true }
+  ],
+  "account": {
+    "positions": { "ok": false, "error_code": 403308, "message": "Target API's scope is not in authorized scopes" },
+    "todayOrders": { "ok": false, "error_code": 403308, "message": "Target API's scope is not in authorized scopes" },
+    "todayExecutions": { "ok": false, "error_code": 403308, "message": "Target API's scope is not in authorized scopes" }
+  }
+}

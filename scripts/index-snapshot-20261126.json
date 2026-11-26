@@ -1,0 +1,353 @@
+{
+  "collectedAt": "2026-11-26T10:24:23.896Z",
+  "rows": [
+    {
+      "symbol": "SH000001",
+      "name": "上证指数",
+      "providers": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "quote": {
+            "source": "sina",
+            "name": "��ָ֤��",
+            "code": "000001",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000001",
+            "time": "2026-11-26 15:35:57",
+            "price": 3476.8816,
+            "preClose": 3476.4697,
+            "open": 3490.1446,
+            "high": 3497.8092,
+            "low": 3455.036,
+            "change": 0.41190000000005966,
+            "changePercent": 0.011848226377467339,
+            "volume": 454062959,
+            "amount": 613332810453
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 3490.145,
+            "high": 3497.809,
+            "low": 3455.036,
+            "close": 3476.882,
+            "volume": 45406295900,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "quote": {
+            "source": "tencent",
+            "name": "��ָ֤��",
+            "code": "000001",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000001",
+            "time": "2026-11-26 16:14:27",
+            "price": 3476.88,
+            "preClose": 3476.47,
+            "open": 3490.14,
+            "high": 3497.81,
+            "low": 3455.04,
+            "change": 0.41,
+            "changePercent": 0.01,
+            "volume": 45406295900,
+            "amount": 613332810000
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 3490.14,
+            "close": 3476.88,
+            "high": 3497.81,
+            "low": 3455.04,
+            "volume": 45406295900,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "quote": {
+            "source": "eastmoney",
+            "name": "上证指数",
+            "code": "000001",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000001",
+            "time": "2026-11-26 16:11:57",
+            "price": 3476.88,
+            "preClose": 3476.47,
+            "open": 3490.14,
+            "high": 3497.81,
+            "low": 3455.04,
+            "change": 0.41,
+            "changePercent": 0.01,
+            "volume": 45406295900,
+            "amount": 613332810452.5
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 3490.14,
+            "close": 3476.88,
+            "high": 3497.81,
+            "low": 3455.04,
+            "volume": 45406295900,
+            "amount": 613332810452.5,
+            "changePercent": 0.01
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ399001",
+      "name": "深证成指",
+      "providers": [
+        {
+          "provider": "sina",
+          "ok": false,
+          "error": "sina quote does not support open fund realtime"
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "quote": {
+            "source": "tencent",
+            "name": "��֤��ָ",
+            "code": "399001",
+            "type": "open_fund",
+            "market": "SZ",
+            "symbol": "SZ399001",
+            "time": "2026-11-26 16:14:15",
+            "price": 10084.04,
+            "preClose": 10086.36,
+            "open": 10184.94,
+            "high": 10235.5,
+            "low": 9979.06,
+            "change": -2.32,
+            "changePercent": -0.02,
+            "volume": 54473368600,
+            "amount": 704044360000
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 10184.94,
+            "close": 10084.04,
+            "high": 10235.5,
+            "low": 9979.06,
+            "volume": 54473368600,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "quote": {
+            "source": "eastmoney",
+            "name": "深证成指",
+            "code": "399001",
+            "type": "open_fund",
+            "market": "SZ",
+            "symbol": "SZ399001",
+            "time": "2026-11-26 16:11:54",
+            "price": 10084.04,
+            "preClose": 10086.36,
+            "open": 10184.94,
+            "high": 10235.5,
+            "low": 9979.06,
+            "change": -2.32,
+            "changePercent": -0.02,
+            "volume": 54473368600,
+            "amount": 704044360242.141
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 10184.94,
+            "close": 10084.04,
+            "high": 10235.5,
+            "low": 9979.06,
+            "volume": 54473368600,
+            "amount": 704044360242.14,
+            "changePercent": -0.02
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SZ399006",
+      "name": "创业板指",
+      "providers": [
+        {
+          "provider": "sina",
+          "ok": false,
+          "error": "sina quote does not support open fund realtime"
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "quote": {
+            "source": "tencent",
+            "name": "��ҵ��ָ",
+            "code": "399006",
+            "type": "open_fund",
+            "market": "SZ",
+            "symbol": "SZ399006",
+            "time": "2026-11-26 16:14:30",
+            "price": 2189.82,
+            "preClose": 2183.58,
+            "open": 2213.12,
+            "high": 2227.41,
+            "low": 2155.01,
+            "change": 6.24,
+            "changePercent": 0.29,
+            "volume": 15711848900,
+            "amount": 333541050000
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 2213.12,
+            "close": 2189.82,
+            "high": 2227.41,
+            "low": 2155.01,
+            "volume": 15711848900,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "quote": {
+            "source": "eastmoney",
+            "name": "创业板指",
+            "code": "399006",
+            "type": "open_fund",
+            "market": "SZ",
+            "symbol": "SZ399006",
+            "time": "2026-11-26 16:11:21",
+            "price": 2189.82,
+            "preClose": 2183.58,
+            "open": 2213.12,
+            "high": 2227.41,
+            "low": 2155.01,
+            "change": 6.24,
+            "changePercent": 0.29,
+            "volume": 16588148800,
+            "amount": 337854178098.93
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 2213.12,
+            "close": 2189.82,
+            "high": 2227.41,
+            "low": 2155.01,
+            "volume": 16588148800,
+            "amount": 337854178098.93,
+            "changePercent": 0.29
+          }
+        }
+      ]
+    },
+    {
+      "symbol": "SH000688",
+      "name": "科创50",
+      "providers": [
+        {
+          "provider": "sina",
+          "ok": true,
+          "quote": {
+            "source": "sina",
+            "name": "�ƴ�50",
+            "code": "000688",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000688",
+            "time": "2026-11-26 15:35:39",
+            "price": 1169.9913,
+            "preClose": 1186.1418,
+            "open": 1201.0588,
+            "high": 1202.3076,
+            "low": 1156.5652,
+            "change": -16.150500000000193,
+            "changePercent": -1.3615994310292574,
+            "volume": 8791835,
+            "amount": 73376738380
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 1201.059,
+            "high": 1202.308,
+            "low": 1156.565,
+            "close": 1169.991,
+            "volume": 879183500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "tencent",
+          "ok": true,
+          "quote": {
+            "source": "tencent",
+            "name": "�ƴ�50",
+            "code": "000688",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000688",
+            "time": "2026-11-26 16:14:09",
+            "price": 1169.99,
+            "preClose": 1186.14,
+            "open": 1201.06,
+            "high": 1202.31,
+            "low": 1156.57,
+            "change": -16.15,
+            "changePercent": -1.36,
+            "volume": 879183500,
+            "amount": 73376740000
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 1201.06,
+            "close": 1169.99,
+            "high": 1202.31,
+            "low": 1156.57,
+            "volume": 879183500,
+            "amount": null
+          }
+        },
+        {
+          "provider": "eastmoney",
+          "ok": true,
+          "quote": {
+            "source": "eastmoney",
+            "name": "科创50",
+            "code": "000688",
+            "type": "stock",
+            "market": "SH",
+            "symbol": "SH000688",
+            "time": "2026-11-26 16:11:39",
+            "price": 1169.99,
+            "preClose": 1186.14,
+            "open": 1201.06,
+            "high": 1202.31,
+            "low": 1156.57,
+            "change": -16.15,
+            "changePercent": -1.36,
+            "volume": 879183500,
+            "amount": 73376738379.6
+          },
+          "lastBar": {
+            "time": "2026-11-26",
+            "open": 1201.06,
+            "close": 1169.99,
+            "high": 1202.31,
+            "low": 1156.57,
+            "volume": 879183500,
+            "amount": 73376738379.6,
+            "changePercent": -1.36
+          }
+        }
+      ]
+    }
+  ]
+}
